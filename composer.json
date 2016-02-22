@@ -1,0 +1,21 @@
+{
+    "name": "autowp/image",
+    "description": "Image services for autowp.ru",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmitry Pereslegin",
+            "email": "dmitry@pereslegin.ru",
+            "homepage": "http://pereslegin.ru"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {
+        "ext-imagick": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Autowp\\Image\\": "src/"
+        }
+    }
+}
