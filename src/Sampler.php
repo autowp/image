@@ -5,6 +5,7 @@ namespace Autowp\Image;
 use Imagick;
 use ImagickDraw;
 use ImagickPixel;
+use ImagickPixelIterator;
 
 use Autowp\Image\Sampler\Format;
 use Autowp\Image\Sampler\Exception;
