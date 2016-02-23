@@ -5,4 +5,8 @@ php:
   - '7.0'
   - hhvm
   - nightly
+  
+install:
+  - printf "\n" | pecl install imagick
+  
 before_script: composer install --dev
