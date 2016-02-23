@@ -37,67 +37,67 @@ class Storage
      *
      * @var Zend_Db_Adapter_Abstract
      */
-    protected $_db = null;
+    private $_db = null;
 
     /**
      * @var ImageTable
      */
-    protected $_imageTable = null;
+    private $_imageTable = null;
 
     /**
      * @var string
      */
-    protected $_imageTableName = 'image';
+    private $_imageTableName = 'image';
 
     /**
      * @var FormatedImageTable
      */
-    protected $_formatedImageTable = null;
+    private $_formatedImageTable = null;
 
     /**
      * @var string
      */
-    protected $_formatedImageTableName = 'formated_image';
+    private $_formatedImageTableName = 'formated_image';
 
     /**
      * @var DirTable
      */
-    protected $_dirTable = null;
+    private $_dirTable = null;
 
     /**
      * @var string
      */
-    protected $_dirTableName = 'image_dir';
+    private $_dirTableName = 'image_dir';
 
     /**
      * @var array
      */
-    protected $_dirs = array();
+    private $_dirs = array();
 
     /**
      * @var array
      */
-    protected $_formats = array();
+    private $_formats = array();
 
     /**
      * @var int
      */
-    protected $_fileMode = 0600;
+    private $_fileMode = 0600;
 
     /**
      * @var int
      */
-    protected $_dirMode = 0700;
+    private $_dirMode = 0700;
 
     /**
      * @var string
      */
-    protected $_formatedImageDirName = null;
+    private $_formatedImageDirName = null;
 
     /**
      * @var Sampler
      */
-    protected $_imageSampler = null;
+    private $_imageSampler = null;
 
     /**
      * @var boll
@@ -342,7 +342,7 @@ class Storage
      * @param string $message
      * @throws Exception
      */
-    protected function _raise($message)
+    private function _raise($message)
     {
         throw new Exception($message);
     }
@@ -350,7 +350,7 @@ class Storage
     /**
      * @return ImageTable
      */
-    protected function _getImageTable()
+    private function _getImageTable()
     {
         if (null === $this->_imageTable) {
             $this->_imageTable = new ImageTable(array(
@@ -365,7 +365,7 @@ class Storage
     /**
      * @return FormatedImageTable
      */
-    protected function _getFormatedImageTable()
+    private function _getFormatedImageTable()
     {
         if (null === $this->_formatedImageTable) {
             $this->_formatedImageTable = new FormatedImageTable(array(
@@ -380,7 +380,7 @@ class Storage
     /**
      * @return DirTable
      */
-    protected function _getDirTable()
+    private function _getDirTable()
     {
         if (null === $this->_dirTable) {
             $this->_dirTable = new DirTable(array(
@@ -397,7 +397,7 @@ class Storage
      * @return Image
      * @throws Exception
      */
-    protected function _buildImageResult(Zend_Db_Table_Row $imageRow)
+    private function _buildImageResult(Zend_Db_Table_Row $imageRow)
     {
         $dir = $this->getDir($imageRow->dir);
         if (!$dir) {
@@ -431,7 +431,7 @@ class Storage
      * @return string
      * @throws Exception
      */
-    protected function _buildImageBlobResult(Zend_Db_Table_Row $imageRow)
+    private function _buildImageBlobResult(Zend_Db_Table_Row $imageRow)
     {
         $dir = $this->getDir($imageRow->dir);
         if (!$dir) {
@@ -452,7 +452,7 @@ class Storage
      * @return Zend_Db_Table_Row
      * @throws Exception
      */
-    protected function _getImageRow($imageId)
+    private function _getImageRow($imageId)
     {
         $id = (int)$imageId;
         if (strlen($id) != strlen($imageId)) {
@@ -471,7 +471,7 @@ class Storage
      * @return Zend_Db_Table_Row
      * @throws Exception
      */
-    protected function _getImageRows(array $imageIds)
+    private function _getImageRows(array $imageIds)
     {
         $result = array();
         if (count($imageIds)) {
@@ -522,7 +522,7 @@ class Storage
         return $imageRow ? $this->_buildImageBlobResult($imageRow) : null;
     }
 
-    protected function _getFormatedImageRows(array $requests, $formatName)
+    private function _getFormatedImageRows(array $requests, $formatName)
     {
         $imageTable = $this->_getImageTable();
 
@@ -663,7 +663,7 @@ class Storage
      * @param string $formatName
      * @return Zend_Db_Table_Row
      */
-    protected function _getFormatedImageRow(Request $request, $formatName)
+    private function _getFormatedImageRow(Request $request, $formatName)
     {
         $result = $this->_getFormatedImageRows(array($request), $formatName);
 
@@ -783,7 +783,7 @@ class Storage
      * @return string
      * @throws Exception
      */
-    protected function _createImagePath($dirName, array $options = array())
+    private function _createImagePath($dirName, array $options = array())
     {
         $dir = $this->getDir($dirName);
         if (!$dir) {
@@ -826,7 +826,7 @@ class Storage
      * @param string $path
      * @throws Exception
      */
-    protected function _chmodFile($path)
+    private function _chmodFile($path)
     {
         if (!chmod($path, $this->_fileMode)) {
             $this->_raise("Cannot chmod file '$path'");
@@ -855,7 +855,7 @@ class Storage
      * @param Closure $callback
      * @return string
      */
-    protected function _lockFile($dirName, array $options, Closure $callback)
+    private function _lockFile($dirName, array $options, Closure $callback)
     {
         $dir = $this->getDir($dirName);
         if (!$dir) {
@@ -916,7 +916,7 @@ class Storage
      * @param Closure $callback
      * @return int
      */
-    protected function _generateLockWrite($dirName, array $options, $width, $height, Closure $callback)
+    private function _generateLockWrite($dirName, array $options, $width, $height, Closure $callback)
     {
         $dir = $this->getDir($dirName);
         if (!$dir) {
