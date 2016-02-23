@@ -11,7 +11,9 @@
     ],
     "minimum-stability": "beta",
     "require": {
-        "ext-imagick": "*"
+        "ext-imagick": "*",
+        "zendframework/zendframework1": "1.*",
+        "autowp/filters"
     },
     "autoload": {
         "psr-4": {
