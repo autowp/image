@@ -6,25 +6,22 @@ use Autowp\Filter\Filename\Safe;
 use Autowp\Image\Storage\NamingStrategy\AbstractStrategy;
 use Autowp\Image\Storage\Exception;
 
-class Pattern
-    extends AbstractStrategy
+class Pattern extends AbstractStrategy
 {
-    private $_notAllowedParts = array('.', '..');
+    private static $_notAllowedParts = ['.', '..'];
 
     /**
      * @param string $pattern
      * @return string
      */
-    private function _normalizePattern($pattern)
+    private static function _normalizePattern($pattern)
     {
-        $pattern = preg_replace('|[' . preg_quote(DIRECTORY_SEPARATOR) . ']+|isu', DIRECTORY_SEPARATOR, $pattern);
-
         $filter = new Safe();
 
-        $result = array();
-        $patternComponents = explode(DIRECTORY_SEPARATOR, $pattern);
+        $result = [];
+        $patternComponents = preg_split('|[\\/]+|isu', $pattern);
         foreach ($patternComponents as $component) {
-            if (!in_array($component, $this->_notAllowedParts)) {
+            if (!in_array($component, self::$_notAllowedParts)) {
                 if ($component) {
                     $filtered = $filter->filter($component);
                     $result[] = $filtered;
@@ -32,7 +29,7 @@ class Pattern
             }
         }
 
-        return implode(DIRECTORY_SEPARATOR, $result);
+        return implode('/', $result);
     }
 
     /**
@@ -49,7 +46,7 @@ class Pattern
         $options = array_merge($defaults, $options);
 
         $ext = (string)$options['extension'];
-        $pattern = $this->_normalizePattern($options['pattern']);
+        $pattern = self::_normalizePattern($options['pattern']);
 
         $dir = $this->getDir();
         if (!$dir) {
@@ -58,7 +55,7 @@ class Pattern
 
         $idx = 0;
         do {
-            $nameComponents = array();
+            $nameComponents = [];
             if ($pattern) {
                 $nameComponents[] = $pattern;
             }
