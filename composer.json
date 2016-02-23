@@ -14,7 +14,7 @@
     	"php": "^5.5.0",
         "ext-imagick": "*",
         "zendframework/zendframework1": "1.*",
-        "autowp/filters"
+        "autowp/filters": "1.*"
     },
     "autoload": {
         "psr-4": {
