@@ -37,72 +37,72 @@ class Storage
      *
      * @var Zend_Db_Adapter_Abstract
      */
-    private $_db = null;
+    private $db = null;
 
     /**
      * @var ImageTable
      */
-    private $_imageTable = null;
+    private $imageTable = null;
 
     /**
      * @var string
      */
-    private $_imageTableName = 'image';
+    private $imageTableName = 'image';
 
     /**
      * @var FormatedImageTable
      */
-    private $_formatedImageTable = null;
+    private $formatedImageTable = null;
 
     /**
      * @var string
      */
-    private $_formatedImageTableName = 'formated_image';
+    private $formatedImageTableName = 'formated_image';
 
     /**
      * @var DirTable
      */
-    private $_dirTable = null;
+    private $dirTable = null;
 
     /**
      * @var string
      */
-    private $_dirTableName = 'image_dir';
+    private $dirTableName = 'image_dir';
 
     /**
      * @var array
      */
-    private $_dirs = array();
+    private $dirs = array();
 
     /**
      * @var array
      */
-    private $_formats = array();
+    private $formats = array();
 
     /**
      * @var int
      */
-    private $_fileMode = 0600;
+    private $fileMode = 0600;
 
     /**
      * @var int
      */
-    private $_dirMode = 0700;
+    private $dirMode = 0700;
 
     /**
      * @var string
      */
-    private $_formatedImageDirName = null;
+    private $formatedImageDirName = null;
 
     /**
      * @var Sampler
      */
-    private $_imageSampler = null;
+    private $imageSampler = null;
 
     /**
      * @var boll
      */
-    private $_forceHttps = false;
+    private $forceHttps = false;
 
     /**
      * @param array $options
@@ -126,7 +126,7 @@ class Storage
             if (method_exists($this, $method)) {
                 $this->$method($value);
             } else {
-                $this->_raise("Unexpected option '$key'");
+                $this->raise("Unexpected option '$key'");
             }
         }
 
@@ -139,7 +139,7 @@ class Storage
      */
     public function setForceHttps($value)
     {
-        $this->_forceHttps = (bool)$value;
+        $this->forceHttps = (bool)$value;
 
         return $this;
     }
@@ -150,7 +150,7 @@ class Storage
      */
     public function setImageTableName($tableName)
     {
-        $this->_imageTableName = $tableName;
+        $this->imageTableName = $tableName;
 
         return $this;
     }
@@ -167,10 +167,10 @@ class Storage
             $imageSampler = new Sampler($options);
         } else {
             $message = "Unexpected imageSampler options. Array or object excepcted";
-            return $this->_raise($message);
+            return $this->raise($message);
         }
 
-        $this->_imageSampler = $imageSampler;
+        $this->imageSampler = $imageSampler;
 
         return $this;
     }
@@ -180,10 +180,10 @@ class Storage
      */
     public function getImageSampler()
     {
-        if (null === $this->_imageSampler) {
+        if (null === $this->imageSampler) {
             $this->setImageSampler(array());
         }
-        return $this->_imageSampler;
+        return $this->imageSampler;
     }
 
     /**
@@ -192,7 +192,7 @@ class Storage
      */
     public function setFormatedImageTableName($tableName)
     {
-        $this->_formatedImageTableName = $tableName;
+        $this->formatedImageTableName = $tableName;
 
         return $this;
     }
@@ -203,7 +203,7 @@ class Storage
      */
     public function setDirTableName($tableName)
     {
-        $this->_dirTableName = $tableName;
+        $this->dirTableName = $tableName;
 
         return $this;
     }
@@ -214,7 +214,7 @@ class Storage
      */
     public function setDbAdapter(Zend_Db_Adapter_Abstract $dbAdapter)
     {
-        $this->_db = $dbAdapter;
+        $this->db = $dbAdapter;
 
         return $this;
     }
@@ -225,7 +225,7 @@ class Storage
      */
     public function setFileMode($mode)
     {
-        $this->_fileMode = is_string($mode) ? octdec($mode) : (int)$mode;
+        $this->fileMode = is_string($mode) ? octdec($mode) : (int)$mode;
 
         return $this;
     }
@@ -236,7 +236,7 @@ class Storage
      */
     public function setDirMode($mode)
     {
-        $this->_dirMode = is_string($mode) ? octdec($mode) : (int)$mode;
+        $this->dirMode = is_string($mode) ? octdec($mode) : (int)$mode;
 
         return $this;
     }
@@ -247,7 +247,7 @@ class Storage
      */
     public function setDirs($dirs)
     {
-        $this->_dirs = array();
+        $this->dirs = array();
 
         foreach ($dirs as $dirName => $dir) {
             $this->addDir($dirName, $dir);
@@ -264,13 +264,13 @@ class Storage
      */
     public function addDir($dirName, $dir)
     {
-        if (isset($this->_dirs[$dirName])) {
-            $this->_raise("Dir '$dirName' alredy registered");
+        if (isset($this->dirs[$dirName])) {
+            $this->raise("Dir '$dirName' alredy registered");
         }
         if (!$dir instanceof Dir) {
             $dir = new Dir($dir);
         }
-        $this->_dirs[$dirName] = $dir;
+        $this->dirs[$dirName] = $dir;
 
         return $this;
     }
@@ -281,7 +281,7 @@ class Storage
      */
     public function getDir($dirName)
     {
-        return isset($this->_dirs[$dirName]) ? $this->_dirs[$dirName] : null;
+        return isset($this->dirs[$dirName]) ? $this->dirs[$dirName] : null;
     }
 
     /**
@@ -290,7 +290,7 @@ class Storage
      */
     public function setFormats($formats)
     {
-        $this->_formats = array();
+        $this->formats = array();
 
         foreach ($formats as $formatName => $format) {
             $this->addFormat($formatName, $format);
@@ -307,13 +307,13 @@ class Storage
      */
     public function addFormat($formatName, $format)
     {
-        if (isset($this->_formats[$formatName])) {
-            $this->_raise("Format '$formatName' alredy registered");
+        if (isset($this->formats[$formatName])) {
+            $this->raise("Format '$formatName' alredy registered");
         }
         if (!$format instanceof Format) {
             $format = new Format($format);
         }
-        $this->_formats[$formatName] = $format;
+        $this->formats[$formatName] = $format;
 
         return $this;
     }
@@ -324,7 +324,7 @@ class Storage
      */
     public function getFormat($formatName)
     {
-        return isset($this->_formats[$formatName]) ? $this->_formats[$formatName] : null;
+        return isset($this->formats[$formatName]) ? $this->formats[$formatName] : null;
     }
 
     /**
@@ -333,7 +333,7 @@ class Storage
      */
     public function setFormatedImageDirName($dirName)
     {
-        $this->_formatedImageDirName = $dirName;
+        $this->formatedImageDirName = $dirName;
 
         return $this;
     }
@@ -342,7 +342,7 @@ class Storage
      * @param string $message
      * @throws Exception
      */
-    private function _raise($message)
+    private function raise($message)
     {
         throw new Exception($message);
     }
@@ -350,46 +350,46 @@ class Storage
     /**
      * @return ImageTable
      */
-    private function _getImageTable()
+    private function getImageTable()
     {
-        if (null === $this->_imageTable) {
-            $this->_imageTable = new ImageTable(array(
-                Zend_Db_Table_Abstract::ADAPTER => $this->_db,
-                Zend_Db_Table_Abstract::NAME    => $this->_imageTableName,
+        if (null === $this->imageTable) {
+            $this->imageTable = new ImageTable(array(
+                Zend_Db_Table_Abstract::ADAPTER => $this->db,
+                Zend_Db_Table_Abstract::NAME    => $this->imageTableName,
             ));
         }
 
-        return $this->_imageTable;
+        return $this->imageTable;
     }
 
     /**
      * @return FormatedImageTable
      */
-    private function _getFormatedImageTable()
+    private function getFormatedImageTable()
     {
-        if (null === $this->_formatedImageTable) {
-            $this->_formatedImageTable = new FormatedImageTable(array(
-                Zend_Db_Table_Abstract::ADAPTER => $this->_db,
-                Zend_Db_Table_Abstract::NAME    => $this->_formatedImageTableName,
+        if (null === $this->formatedImageTable) {
+            $this->formatedImageTable = new FormatedImageTable(array(
+                Zend_Db_Table_Abstract::ADAPTER => $this->db,
+                Zend_Db_Table_Abstract::NAME    => $this->formatedImageTableName,
             ));
         }
 
-        return $this->_formatedImageTable;
+        return $this->formatedImageTable;
     }
 
     /**
      * @return DirTable
      */
-    private function _getDirTable()
+    private function getDirTable()
     {
-        if (null === $this->_dirTable) {
-            $this->_dirTable = new DirTable(array(
-                Zend_Db_Table_Abstract::ADAPTER => $this->_db,
-                Zend_Db_Table_Abstract::NAME    => $this->_dirTableName,
+        if (null === $this->dirTable) {
+            $this->dirTable = new DirTable(array(
+                Zend_Db_Table_Abstract::ADAPTER => $this->db,
+                Zend_Db_Table_Abstract::NAME    => $this->dirTableName,
             ));
         }
 
-        return $this->_dirTable;
+        return $this->dirTable;
     }
 
     /**
@@ -397,11 +397,11 @@ class Storage
      * @return Image
      * @throws Exception
      */
-    private function _buildImageResult(Zend_Db_Table_Row $imageRow)
+    private function buildImageResult(Zend_Db_Table_Row $imageRow)
     {
         $dir = $this->getDir($imageRow->dir);
         if (!$dir) {
-            $this->_raise("Dir '{$imageRow->dir}' not defined");
+            $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
         $dirUrl = $dir->getUrl();
@@ -414,7 +414,7 @@ class Storage
             $src = $dirUrl . $path;
         }
 
-        if ($this->_forceHttps) {
+        if ($this->forceHttps) {
             $src = preg_replace("/^http:/i", "https:", $src);
         }
 
@@ -431,17 +431,17 @@ class Storage
      * @return string
      * @throws Exception
      */
-    private function _buildImageBlobResult(Zend_Db_Table_Row $imageRow)
+    private function buildImageBlobResult(Zend_Db_Table_Row $imageRow)
     {
         $dir = $this->getDir($imageRow->dir);
         if (!$dir) {
-            $this->_raise("Dir '{$imageRow->dir}' not defined");
+            $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
 
         if (!file_exists($filepath)) {
-            return $this->_raise("File `$filepath` not found");
+            return $this->raise("File `$filepath` not found");
         }
 
         return file_get_contents($filepath);
@@ -452,14 +452,14 @@ class Storage
      * @return Zend_Db_Table_Row
      * @throws Exception
      */
-    private function _getImageRow($imageId)
+    private function getImageRow($imageId)
     {
         $id = (int)$imageId;
         if (strlen($id) != strlen($imageId)) {
-            return $this->_raise("Image id mus be int. `$imageId` given");
+            return $this->raise("Image id mus be int. `$imageId` given");
         }
 
-        $imageRow = $this->_getImageTable()->fetchRow(array(
+        $imageRow = $this->getImageTable()->fetchRow(array(
             'id = ?' => $id
         ));
 
@@ -471,11 +471,11 @@ class Storage
      * @return Zend_Db_Table_Row
      * @throws Exception
      */
-    private function _getImageRows(array $imageIds)
+    private function getImageRows(array $imageIds)
     {
         $result = array();
         if (count($imageIds)) {
-            $result = $this->_getImageTable()->fetchAll(array(
+            $result = $this->getImageTable()->fetchAll(array(
                 'id in (?)' => $imageIds
             ));
         }
@@ -490,9 +490,9 @@ class Storage
      */
     public function getImage($imageId)
     {
-        $imageRow = $this->_getImageRow($imageId);
+        $imageRow = $this->getImageRow($imageId);
 
-        return $imageRow ? $this->_buildImageResult($imageRow) : null;
+        return $imageRow ? $this->buildImageResult($imageRow) : null;
     }
 
     /**
@@ -503,8 +503,8 @@ class Storage
     public function getImages(array $imageIds)
     {
         $result = array();
-        foreach ($this->_getImageRows($imageIds) as $imageRow) {
-            $result[$imageRow['id']] = $this->_buildImageResult($imageRow);
+        foreach ($this->getImageRows($imageIds) as $imageRow) {
+            $result[$imageRow['id']] = $this->buildImageResult($imageRow);
         }
 
         return $result;
@@ -517,23 +517,23 @@ class Storage
      */
     public function getImageBlob($imageId)
     {
-        $imageRow = $this->_getImageRow($imageId);
+        $imageRow = $this->getImageRow($imageId);
 
-        return $imageRow ? $this->_buildImageBlobResult($imageRow) : null;
+        return $imageRow ? $this->buildImageBlobResult($imageRow) : null;
     }
 
-    private function _getFormatedImageRows(array $requests, $formatName)
+    private function getFormatedImageRows(array $requests, $formatName)
     {
-        $imageTable = $this->_getImageTable();
+        $imageTable = $this->getImageTable();
 
         $imagesId = array();
         foreach ($requests as $request) {
             if (!$request instanceof Request) {
-                return $this->_raise('$requests is not array of Autowp\Image\Storage\Request');
+                return $this->raise('$requests is not array of Autowp\Image\Storage\Request');
             }
             $imageId = $request->getImageId();
             if (!$imageId) {
-                $this->_raise("ImageId not provided");
+                $this->raise("ImageId not provided");
             }
 
             $imagesId[] = $imageId;
@@ -544,8 +544,8 @@ class Storage
                 $imageTable->select(true)
                     ->setIntegrityCheck(false) // to fetch image_id
                     ->join(
-                        array('f' => $this->_formatedImageTableName),
-                        $this->_imageTableName . '.id = f.formated_image_id',
+                        array('f' => $this->formatedImageTableName),
+                        $this->imageTableName . '.id = f.formated_image_id',
                         'image_id'
                     )
                     ->where('f.image_id in (?)', $imagesId)
@@ -572,16 +572,16 @@ class Storage
             if (!$destImageRow) {
 
                 // find source image
-                $imageRow = $this->_getImageTable()->fetchRow(array(
+                $imageRow = $this->getImageTable()->fetchRow(array(
                     'id = ?' => $imageId
                 ));
                 if (!$imageRow) {
-                    $this->_raise("Image `$imageId` not found");
+                    $this->raise("Image `$imageId` not found");
                 }
 
                 $dir = $this->getDir($imageRow->dir);
                 if (!$dir) {
-                    $this->_raise("Dir '{$imageRow->dir}' not defined");
+                    $this->raise("Dir '{$imageRow->dir}' not defined");
                 }
 
                 $srcFilePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
@@ -590,13 +590,13 @@ class Storage
                 try {
                     $imagick->readImage($srcFilePath);
                 } catch (ImagickException $e) {
-                    $this->_raise('Imagick: ' . $e->getMessage());
+                    $this->raise('Imagick: ' . $e->getMessage());
                 }
 
                 // format
                 $format = $this->getFormat($formatName);
                 if (!$format) {
-                    $this->_raise("Format `$formatName` not found");
+                    $this->raise("Format `$formatName` not found");
                 }
                 $cFormat = clone $format;
 
@@ -607,7 +607,7 @@ class Storage
 
                 $sampler = $this->getImageSampler();
                 if (!$sampler) {
-                    return $this->_raise("Image sampler not initialized");
+                    return $this->raise("Image sampler not initialized");
                 }
                 $sampler->convertImagick($imagick, $cFormat);
 
@@ -621,7 +621,7 @@ class Storage
                 $formatExt = $cFormat->getFormatExtension();
                 $extension = $formatExt ? $formatExt : $pi['extension'];
                 $formatedImageId = $this->addImageFromImagick(
-                    $imagick, $this->_formatedImageDirName,
+                    $imagick, $this->formatedImageDirName,
                     array(
                         'extension' => $extension,
                         'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename']
@@ -630,7 +630,7 @@ class Storage
 
                 $imagick->clear();
 
-                $formatedImageTable = $this->_getFormatedImageTable();
+                $formatedImageTable = $this->getFormatedImageTable();
                 $formatedImageRow = $formatedImageTable->fetchRow(array(
                     'format = ?'   => (string)$formatName,
                     'image_id = ?' => $imageId,
@@ -647,7 +647,7 @@ class Storage
                 $formatedImageRow->save();
 
                 // result
-                $destImageRow = $this->_getImageTable()->fetchRow(array(
+                $destImageRow = $this->getImageTable()->fetchRow(array(
                     'id = ?' => $formatedImageId
                 ));
             }
@@ -663,12 +663,12 @@ class Storage
      * @param string $formatName
      * @return Zend_Db_Table_Row
      */
-    private function _getFormatedImageRow(Request $request, $formatName)
+    private function getFormatedImageRow(Request $request, $formatName)
     {
-        $result = $this->_getFormatedImageRows(array($request), $formatName);
+        $result = $this->getFormatedImageRows(array($request), $formatName);
 
         if (!isset($result[0])) {
-            $this->_raise("_getFormatedImageRows fails");
+            $this->raise("getFormatedImageRows fails");
         }
 
         return $result[0];
@@ -687,8 +687,8 @@ class Storage
             ));
         }
 
-        return $this->_buildImageBlobResult(
-            $this->_getFormatedImageRow($request, $formatName)
+        return $this->buildImageBlobResult(
+            $this->getFormatedImageRow($request, $formatName)
         );
     }
 
@@ -707,8 +707,8 @@ class Storage
             ));
         }
 
-        return $this->_buildImageResult(
-            $this->_getFormatedImageRow($request, $formatName)
+        return $this->buildImageResult(
+            $this->getFormatedImageRow($request, $formatName)
         );
     }
 
@@ -720,8 +720,8 @@ class Storage
     public function getFormatedImages(array $requests, $formatName)
     {
         $result = array();
-        foreach ($this->_getFormatedImageRows($requests, $formatName) as $key => $row) {
-            $result[$key] = $this->_buildImageResult($row);
+        foreach ($this->getFormatedImageRows($requests, $formatName) as $key => $row) {
+            $result[$key] = $this->buildImageResult($row);
         }
 
         return $result;
@@ -734,14 +734,14 @@ class Storage
      */
     public function removeImage($imageId)
     {
-        $imageTable = $this->_getImageTable();
+        $imageTable = $this->getImageTable();
 
         $imageRow = $imageTable->fetchRow(array(
             'id = ?' => (int)$imageId
         ));
 
         if (!$imageRow) {
-            $this->_raise("Image '$imageId' not found");
+            $this->raise("Image '$imageId' not found");
         }
 
         $this->flush(array(
@@ -749,14 +749,14 @@ class Storage
         ));
 
         // to save remove formated image
-        $this->_getFormatedImageTable()->delete(array(
+        $this->getFormatedImageTable()->delete(array(
             'formated_image_id = ?' => $imageRow->id
         ));
 
         // remove file & row
         $dir = $this->getDir($imageRow->dir);
         if (!$dir) {
-            $this->_raise("Dir '{$imageRow->dir}' not defined");
+            $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
         $filepath = implode(DIRECTORY_SEPARATOR, array(
@@ -769,7 +769,7 @@ class Storage
 
         if (file_exists($filepath)) {
             if (!unlink($filepath)) {
-                return $this->_raise("Error unlink `$filepath`");
+                return $this->raise("Error unlink `$filepath`");
             }
         }
 
@@ -783,11 +783,11 @@ class Storage
      * @return string
      * @throws Exception
      */
-    private function _createImagePath($dirName, array $options = array())
+    private function createImagePath($dirName, array $options = array())
     {
         $dir = $this->getDir($dirName);
         if (!$dir) {
-            $this->_raise("Dir '$dirName' not defined");
+            $this->raise("Dir '$dirName' not defined");
         }
 
         $dirPath = $dir->getPath();
@@ -795,7 +795,7 @@ class Storage
         $namingStrategy = $dir->getNamingStrategy();
         if (!$namingStrategy) {
             $message = "Naming strategy not initialized for `$dirName`";
-            $this->_raise($message);
+            $this->raise($message);
         }
 
 
@@ -813,8 +813,8 @@ class Storage
         $destDir = dirname($destFilePath);
         if (!is_dir($destDir)) {
             $old = umask(0);
-            if (!mkdir($destDir, $this->_dirMode, true)) {
-                $this->_raise("Cannot create dir '$destDir'");
+            if (!mkdir($destDir, $this->dirMode, true)) {
+                $this->raise("Cannot create dir '$destDir'");
             }
             umask($old);
         }
@@ -826,10 +826,10 @@ class Storage
      * @param string $path
      * @throws Exception
      */
-    private function _chmodFile($path)
+    private function chmodFile($path)
     {
-        if (!chmod($path, $this->_fileMode)) {
-            $this->_raise("Cannot chmod file '$path'");
+        if (!chmod($path, $this->fileMode)) {
+            $this->raise("Cannot chmod file '$path'");
         }
     }
 
@@ -855,11 +855,11 @@ class Storage
      * @param Closure $callback
      * @return string
      */
-    private function _lockFile($dirName, array $options, Closure $callback)
+    private function lockFile($dirName, array $options, Closure $callback)
     {
         $dir = $this->getDir($dirName);
         if (!$dir) {
-            $this->_raise("Dir '$dirName' not defined");
+            $this->raise("Dir '$dirName' not defined");
         }
 
         $dirPath = $dir->getPath();
@@ -869,24 +869,24 @@ class Storage
         do {
             $lockAttemptsLeft--;
 
-            $destFileName = $this->_createImagePath($dirName, $options);
+            $destFileName = $this->createImagePath($dirName, $options);
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
 
             $fp = fopen($destFilePath, 'c+');
             if (!$fp) {
-                $this->_raise("Cannot open file '$destFilePath'");
+                $this->raise("Cannot open file '$destFilePath'");
             }
 
             if (!flock($fp, LOCK_EX | LOCK_NB)) {
                 // already locked, try next file
-                return $this->_raise("already locked, try next file");
+                return $this->raise("already locked, try next file");
                 fclose($fp);
                 continue;
             }
 
             if (false !== fgetc($fp)) {
                 // not empty, try next file
-                return $this->_raise("not empty, try next file $destFilePath");
+                return $this->raise("not empty, try next file $destFilePath");
                 flock($fp, LOCK_UN);
                 fclose($fp);
                 continue;
@@ -902,7 +902,7 @@ class Storage
         } while (($lockAttemptsLeft > 0) && !$fileSuccess);
 
         if (!$fileSuccess) {
-            return $this->_raise("Cannot save to `$destFilePath` after few attempts");
+            return $this->raise("Cannot save to `$destFilePath` after few attempts");
         }
 
         return $destFileName;
@@ -916,11 +916,11 @@ class Storage
      * @param Closure $callback
      * @return int
      */
-    private function _generateLockWrite($dirName, array $options, $width, $height, Closure $callback)
+    private function generateLockWrite($dirName, array $options, $width, $height, Closure $callback)
     {
         $dir = $this->getDir($dirName);
         if (!$dir) {
-            $this->_raise("Dir '$dirName' not defined");
+            $this->raise("Dir '$dirName' not defined");
         }
 
         $dirPath = $dir->getPath();
@@ -929,14 +929,14 @@ class Storage
         $insertAttemptException = null;
         do {
 
-            $destFileName = $this->_lockFile($dirName, $options, $callback);
+            $destFileName = $this->lockFile($dirName, $options, $callback);
 
             $filePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
 
-            $this->_chmodFile($filePath);
+            $this->chmodFile($filePath);
 
             // store to db
-            $imageRow = $this->_getImageTable()->createRow(array(
+            $imageRow = $this->getImageTable()->createRow(array(
                 'width'    => $width,
                 'height'   => $height,
                 'dir'      => $dirName,
@@ -974,7 +974,7 @@ class Storage
         $height = $imagick->getImageHeight();
 
         if (!$width || !$height) {
-            $this->_raise("Failed to get image size ($width x $height)");
+            $this->raise("Failed to get image size ($width x $height)");
         }
 
         $format = $imagick->getImageFormat();
@@ -990,12 +990,12 @@ class Storage
                 $options['extension'] = 'png';
                 break;
             default:
-                $this->_raise("Unsupported image type `$format`");
+                $this->raise("Unsupported image type `$format`");
         }
 
-        return $this->_generateLockWrite($dirName, $options, $width, $height, function($fp) use ($imagick) {
+        return $this->generateLockWrite($dirName, $options, $width, $height, function($fp) use ($imagick) {
             if (!$imagick->writeImageFile($fp)) {
-                $this->_raise("Imagick::writeImageFile error");
+                $this->raise("Imagick::writeImageFile error");
             }
         });
     }
@@ -1013,7 +1013,7 @@ class Storage
         $height = (int)$height;
 
         if (!$width || !$height) {
-            $this->_raise("Failed to get image size of '$file' ($width x $height)");
+            $this->raise("Failed to get image size of '$file' ($width x $height)");
         }
 
         if (!isset($options['extension'])) {
@@ -1029,17 +1029,17 @@ class Storage
                     $ext = 'png';
                     break;
                 default:
-                    $this->_raise("Unsupported image type `$type`");
+                    $this->raise("Unsupported image type `$type`");
             }
             $options['extension'] = $ext;
         }
 
-        return $this->_generateLockWrite($dirName, $options, $width, $height, function($fp) use ($file) {
+        return $this->generateLockWrite($dirName, $options, $width, $height, function($fp) use ($file) {
             /**
              * @todo buffered read-write
              */
             if (!fwrite($fp, file_get_contents($file))) {
-                $this->_raise("fwrite error '$file'");
+                $this->raise("fwrite error '$file'");
             }
         });
     }
@@ -1057,17 +1057,17 @@ class Storage
 
         $options = array_merge($defaults, $options);
 
-        $select = $this->_getFormatedImageTable()->select(true);
+        $select = $this->getFormatedImageTable()->select(true);
 
         if ($options['format']) {
-            $select->where($this->_formatedImageTableName . '.format = ?', (string)$options['format']);
+            $select->where($this->formatedImageTableName . '.format = ?', (string)$options['format']);
         }
 
         if ($options['image']) {
-            $select->where($this->_formatedImageTableName . '.image_id = ?', (int)$options['image']);
+            $select->where($this->formatedImageTableName . '.image_id = ?', (int)$options['image']);
         }
 
-        $rows = $this->_getFormatedImageTable()->fetchAll($select);
+        $rows = $this->getFormatedImageTable()->fetchAll($select);
 
         foreach ($rows as $row) {
             $this->removeImage($row->formated_image_id);
@@ -1083,7 +1083,7 @@ class Storage
      */
     public function getDirCounter($dirName)
     {
-        $dirTable = $this->_getDirTable();
+        $dirTable = $this->getDirTable();
         $adapter = $dirTable->getAdapter();
         return (int)$adapter->fetchOne(
             $adapter->select()
@@ -1098,7 +1098,7 @@ class Storage
      */
     public function incDirCounter($dirName)
     {
-        $dirTable = $this->_getDirTable();
+        $dirTable = $this->getDirTable();
 
         $row = $dirTable->fetchRow(array(
             'dir = ?' => $dirName
@@ -1124,7 +1124,7 @@ class Storage
      */
     public function getImageIPTC($imageId)
     {
-        $imageRow = $this->_getImageRow($imageId);
+        $imageRow = $this->getImageRow($imageId);
 
         if (!$imageRow) {
             return false;
@@ -1132,13 +1132,13 @@ class Storage
 
         $dir = $this->getDir($imageRow->dir);
         if (!$dir) {
-            return $this->_raise("Dir '{$imageRow->dir}' not defined");
+            return $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
 
         if (!file_exists($filepath)) {
-            return $this->_raise("File `$filepath` not found");
+            return $this->raise("File `$filepath` not found");
         }
 
         $iptcStr = '';
@@ -1170,7 +1170,7 @@ class Storage
      */
     public function getImageEXIF($imageId)
     {
-        $imageRow = $this->_getImageRow($imageId);
+        $imageRow = $this->getImageRow($imageId);
 
         if (!$imageRow) {
             return false;
@@ -1178,13 +1178,13 @@ class Storage
 
         $dir = $this->getDir($imageRow->dir);
         if (!$dir) {
-            return $this->_raise("Dir '{$imageRow->dir}' not defined");
+            return $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
 
         if (!file_exists($filepath)) {
-            return $this->_raise("File `$filepath` not found");
+            return $this->raise("File `$filepath` not found");
         }
 
         $exifStr = '';
@@ -1237,14 +1237,14 @@ class Storage
      */
     public function changeImageName($imageId, array $options = array())
     {
-        $imageRow = $this->_getImageRow($imageId);
+        $imageRow = $this->getImageRow($imageId);
         if (!$imageRow) {
-            return $this->_raise("Image `$imageId` not found");
+            return $this->raise("Image `$imageId` not found");
         }
 
         $dir = $this->getDir($imageRow->dir);
         if (!$dir) {
-            return $this->_raise("Dir '{$imageRow->dir}' not defined");
+            return $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
         $dirPath = $dir->getPath();
@@ -1259,13 +1259,13 @@ class Storage
         $insertAttemptException = null;
         do {
 
-            $destFileName = $this->_lockFile($imageRow->dir, $options, function($fp) use($imageRow) {
-                fwrite($fp, $this->_buildImageBlobResult($imageRow));
+            $destFileName = $this->lockFile($imageRow->dir, $options, function($fp) use($imageRow) {
+                fwrite($fp, $this->buildImageBlobResult($imageRow));
             });
 
             $filePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
 
-            $this->_chmodFile($filePath);
+            $this->chmodFile($filePath);
 
             // store to db
             $imageRow->setFromArray(array(
@@ -1300,7 +1300,7 @@ class Storage
     {
         $dir = $this->getDir($dirName);
         if (!$dir) {
-            $this->_raise("Dir '$dirName' not defined");
+            $this->raise("Dir '$dirName' not defined");
         }
 
         $dirPath = $dir->getPath();
@@ -1313,7 +1313,7 @@ class Storage
         list($width, $height, $type, $attr) = getimagesize($filePath);
 
         // store to db
-        $imageRow = $this->_getImageTable()->createRow(array(
+        $imageRow = $this->getImageTable()->createRow(array(
             'width'    => $width,
             'height'   => $height,
             'dir'      => $dirName,
@@ -1328,14 +1328,14 @@ class Storage
 
     public function flop($imageId)
     {
-        $imageRow = $this->_getImageRow($imageId);
+        $imageRow = $this->getImageRow($imageId);
         if (!$imageRow) {
-            return $this->_raise("Image `$imageId` not found");
+            return $this->raise("Image `$imageId` not found");
         }
 
         $dir = $this->getDir($imageRow->dir);
         if (!$dir) {
-            $this->_raise("Dir '{$imageRow->dir}' not defined");
+            $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
         $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
