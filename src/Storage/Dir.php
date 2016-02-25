@@ -26,7 +26,7 @@ class Dir
      * @param array $options
      * @throws Exception
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->setOptions($options);
     }
@@ -41,11 +41,11 @@ class Dir
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
 
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            } else {
+            if (!method_exists($this, $method)) {
                 $this->raise("Unexpected option '$key'");
             }
+            
+            $this->$method($value);
         }
 
         return $this;
@@ -113,10 +113,10 @@ class Dir
         if (!$strategy instanceof AbstractStrategy) {
             if (is_array($strategy)) {
                 $strategyName = $strategy['strategy'];
-                $options = isset($strategy['options']) ? $strategy['options'] : array();
+                $options = isset($strategy['options']) ? $strategy['options'] : [];
             } else {
                 $strategyName = $strategy;
-                $options = array();
+                $options = [];
             }
 
             $className = 'Autowp\\Image\\Storage\\NamingStrategy\\' . ucfirst($strategyName);
@@ -145,7 +145,7 @@ class Dir
      * @param string $message
      * @throws Exception
      */
-    private function _raise($message)
+    private function raise($message)
     {
         throw new Exception($message);
     }
