@@ -19,72 +19,72 @@ class Format
     /**
      * @var int
      */
-    private $_fitType;
+    private $fitType;
 
     /**
      * @var int
      */
-    private $_width;
+    private $width;
 
     /**
      * @var int
      */
-    private $_height;
+    private $height;
 
     /**
      * @var string
      */
-    private $_background;
+    private $background;
 
     /**
      * @var int
      */
-    private $_cropLeft;
+    private $cropLeft;
 
     /**
      * @var int
      */
-    private $_cropTop;
+    private $cropTop;
 
     /**
      * @var int
      */
-    private $_cropWidth;
+    private $cropWidth;
 
     /**
      * @var int
      */
-    private $_cropHeight;
+    private $cropHeight;
 
     /**
      * @var boolean
      */
-    private $_ignoreCrop = false;
+    private $ignoreCrop = false;
 
     /**
      * @var boolean
      */
-    private $_proportionalCrop = false;
+    private $proportionalCrop = false;
 
     /**
      * @bool
      */
-    private $_reduceOnly = false;
+    private $reduceOnly = false;
 
     /**
      * @var bool
      */
-    private $_strip = false;
+    private $strip = false;
 
     /**
      * @var int
      */
-    private $_quality = 0;
+    private $quality = 0;
 
     /**
      * @var string
      */
-    private $_format = null;
+    private $format = null;
 
     /**
      * @param array $options
@@ -108,7 +108,7 @@ class Format
             if (method_exists($this, $method)) {
                 $this->$method($value);
             } else {
-                $this->_raise("Unexpected option '$key'");
+                $this->raise("Unexpected option '$key'");
             }
         }
 
@@ -121,7 +121,7 @@ class Format
      */
     public function setFormat($value)
     {
-        $this->_format = $value ? (string)$value : null;
+        $this->format = $value ? (string)$value : null;
 
         return $this;
     }
@@ -131,7 +131,7 @@ class Format
      */
     public function getFormat()
     {
-        return $this->_format;
+        return $this->format;
     }
 
     /**
@@ -139,8 +139,8 @@ class Format
      */
     public function getFormatExtension()
     {
-        if ($this->_format) {
-            switch ($this->_format) {
+        if ($this->format) {
+            switch ($this->format) {
                 case 'jpg':
                 case 'jpeg':
                     return 'jpeg';
@@ -155,7 +155,7 @@ class Format
                     return 'bmp';
 
                 default:
-                    $this->_raise("Unsupported format `{$this->_format}`");
+                    $this->raise("Unsupported format `{$this->format}`");
             }
         }
 
@@ -170,10 +170,10 @@ class Format
     {
         $value = (int)$value;
         if ($value < 0 || $value > 100) {
-            return $this->_raise("Compression quality must be >= 0 and <= 100");
+            return $this->raise("Compression quality must be >= 0 and <= 100");
         }
 
-        $this->_quality = $value;
+        $this->quality = $value;
 
         return $this;
     }
@@ -183,7 +183,7 @@ class Format
      */
     public function getQuality()
     {
-        return $this->_quality;
+        return $this->quality;
     }
 
     /**
@@ -192,7 +192,7 @@ class Format
      */
     public function setStrip($value)
     {
-        $this->_strip = (bool)$value;
+        $this->strip = (bool)$value;
 
         return $this;
     }
@@ -202,7 +202,7 @@ class Format
      */
     public function getStrip()
     {
-        return $this->_strip;
+        return $this->strip;
     }
 
     /**
@@ -211,7 +211,7 @@ class Format
      */
     public function setReduceOnly($reduceOnly)
     {
-        $this->_reduceOnly = (bool)$reduceOnly;
+        $this->reduceOnly = (bool)$reduceOnly;
 
         return $this;
     }
@@ -221,7 +221,7 @@ class Format
      */
     public function getReduceOnly()
     {
-        return $this->_reduceOnly;
+        return $this->reduceOnly;
     }
 
     /**
@@ -236,12 +236,12 @@ class Format
             case self::FIT_TYPE_INNER:
             case self::FIT_TYPE_OUTER:
             case self::FIT_TYPE_MAXIMUM:
-                $this->_fitType = $fitType;
+                $this->fitType = $fitType;
                 break;
 
             default:
                 $message = "Unexpected fit type `$fitType`";
-                $this->_raise($message);
+                $this->raise($message);
         }
 
         return $this;
@@ -252,7 +252,7 @@ class Format
      */
     public function getFitType()
     {
-        return $this->_fitType;
+        return $this->fitType;
     }
 
     /**
@@ -265,9 +265,9 @@ class Format
         $width = (int)$width;
         if ($width < 0) {
             $message = "Unexpected width `$width`";
-            $this->_raise($message);
+            $this->raise($message);
         }
-        $this->_width = $width;
+        $this->width = $width;
 
         return $this;
     }
@@ -277,7 +277,7 @@ class Format
      */
     public function getWidth()
     {
-        return $this->_width;
+        return $this->width;
     }
 
     /**
@@ -290,9 +290,9 @@ class Format
         $height = (int)$height;
         if ($height < 0) {
             $message = "Unexpected height `$height`";
-            $this->_raise($message);
+            $this->raise($message);
         }
-        $this->_height = $height;
+        $this->height = $height;
 
         return $this;
     }
@@ -302,7 +302,7 @@ class Format
      */
     public function getHeight()
     {
-        return $this->_height;
+        return $this->height;
     }
 
     /**
@@ -312,7 +312,7 @@ class Format
      */
     public function setBackground($color)
     {
-        $this->_background = $color;
+        $this->background = $color;
 
         return $this;
     }
@@ -322,7 +322,7 @@ class Format
      */
     public function getBackground()
     {
-        return $this->_background;
+        return $this->background;
     }
 
     /**
@@ -332,22 +332,22 @@ class Format
     public function setCrop(array $crop)
     {
         if (!isset($crop['left'])) {
-            return $this->_raise("Crop left not provided");
+            return $this->raise("Crop left not provided");
         }
         $this->setCropLeft($crop['left']);
 
         if (!isset($crop['top'])) {
-            return $this->_raise("Crop top not provided");
+            return $this->raise("Crop top not provided");
         }
         $this->setCropTop($crop['top']);
 
         if (!isset($crop['width'])) {
-            return $this->_raise("Crop width not provided");
+            return $this->raise("Crop width not provided");
         }
         $this->setCropWidth($crop['width']);
 
         if (!isset($crop['height'])) {
-            return $this->_raise("Crop height not provided");
+            return $this->raise("Crop height not provided");
         }
         $this->setCropHeight($crop['height']);
 
@@ -362,9 +362,9 @@ class Format
     {
         $value = (int)$value;
         if ($value < 0) {
-            return $this->_raise("Crop left cannot be lower than 0");
+            return $this->raise("Crop left cannot be lower than 0");
         }
-        $this->_cropLeft = $value;
+        $this->cropLeft = $value;
 
         return $this;
     }
@@ -377,9 +377,9 @@ class Format
     {
         $value = (int)$value;
         if ($value < 0) {
-            return $this->_raise("Crop top cannot be lower than 0");
+            return $this->raise("Crop top cannot be lower than 0");
         }
-        $this->_cropTop = $value;
+        $this->cropTop = $value;
 
         return $this;
     }
@@ -392,9 +392,9 @@ class Format
     {
         $value = (int)$value;
         if ($value < 0) {
-            return $this->_raise("Crop width cannot be lower than 0");
+            return $this->raise("Crop width cannot be lower than 0");
         }
-        $this->_cropWidth = $value;
+        $this->cropWidth = $value;
 
         return $this;
     }
@@ -407,9 +407,9 @@ class Format
     {
         $value = (int)$value;
         if ($value < 0) {
-            return $this->_raise("Crop height cannot be lower than 0");
+            return $this->raise("Crop height cannot be lower than 0");
         }
-        $this->_cropHeight = $value;
+        $this->cropHeight = $value;
 
         return $this;
     }
@@ -419,14 +419,14 @@ class Format
      */
     public function getCrop()
     {
-        if (!isset($this->_cropLeft, $this->_cropTop, $this->_cropWidth, $this->_cropHeight)) {
+        if (!isset($this->cropLeft, $this->cropTop, $this->cropWidth, $this->cropHeight)) {
             return false;
         }
         return array(
-            'left'   => $this->_cropLeft,
-            'top'    => $this->_cropTop,
-            'width'  => $this->_cropWidth,
-            'height' => $this->_cropHeight
+            'left'   => $this->cropLeft,
+            'top'    => $this->cropTop,
+            'width'  => $this->cropWidth,
+            'height' => $this->cropHeight
         );
     }
 
@@ -436,7 +436,7 @@ class Format
      */
     public function setIgnoreCrop($value)
     {
-        $this->_ignoreCrop = (bool)$value;
+        $this->ignoreCrop = (bool)$value;
 
         return $this;
     }
@@ -446,7 +446,7 @@ class Format
      */
     public function getIgnoreCrop()
     {
-        return $this->_ignoreCrop;
+        return $this->ignoreCrop;
     }
 
     /**
@@ -455,7 +455,7 @@ class Format
      */
     public function setProportionalCrop($value)
     {
-        $this->_proportionalCrop = (bool)$value;
+        $this->proportionalCrop = (bool)$value;
 
         return $this;
     }
@@ -465,14 +465,14 @@ class Format
      */
     public function getProportionalCrop()
     {
-        return $this->_proportionalCrop;
+        return $this->proportionalCrop;
     }
 
     /**
      * @param string $message
      * @throws Exception
      */
-    protected function _raise($message)
+    private function raise($message)
     {
         throw new Exception($message);
     }

@@ -7,27 +7,27 @@ use Autowp\Image\Storage\Exception;
 
 class Request
 {
-    private $_imageId;
+    private $imageId;
 
     /**
      * @var int
      */
-    private $_cropLeft;
+    private $cropLeft;
 
     /**
      * @var int
      */
-    private $_cropTop;
+    private $cropTop;
 
     /**
      * @var int
      */
-    private $_cropWidth;
+    private $cropWidth;
 
     /**
      * @var int
      */
-    private $_cropHeight;
+    private $cropHeight;
 
     /**
      * @param array $options
@@ -51,7 +51,7 @@ class Request
             if (method_exists($this, $method)) {
                 $this->$method($value);
             } else {
-                $this->_raise("Unexpected option '$key'");
+                raise("Unexpected option '$key'");
             }
         }
 
@@ -64,7 +64,7 @@ class Request
      */
     public function setImageId($imageId)
     {
-        $this->_imageId = (int)$imageId;
+        $this->imageId = (int)$imageId;
 
         return $this;
     }
@@ -74,7 +74,7 @@ class Request
      */
     public function getImageId()
     {
-        return $this->_imageId;
+        return $this->imageId;
     }
 
     /**
@@ -84,22 +84,22 @@ class Request
     public function setCrop(array $crop)
     {
         if (!isset($crop['left'])) {
-            return $this->_raise("Crop left not provided");
+            return $this->raise("Crop left not provided");
         }
         $this->setCropLeft($crop['left']);
 
         if (!isset($crop['top'])) {
-            return $this->_raise("Crop top not provided");
+            return $this->raise("Crop top not provided");
         }
         $this->setCropTop($crop['top']);
 
         if (!isset($crop['width'])) {
-            return $this->_raise("Crop width not provided");
+            return $this->raise("Crop width not provided");
         }
         $this->setCropWidth($crop['width']);
 
         if (!isset($crop['height'])) {
-            return $this->_raise("Crop height not provided");
+            return $this->raise("Crop height not provided");
         }
         $this->setCropHeight($crop['height']);
 
@@ -114,9 +114,9 @@ class Request
     {
         $value = (int)$value;
         if ($value < 0) {
-            return $this->_raise("Crop left cannot be lower than 0");
+            return $this->raise("Crop left cannot be lower than 0");
         }
-        $this->_cropLeft = $value;
+        $this->cropLeft = $value;
 
         return $this;
     }
@@ -129,9 +129,9 @@ class Request
     {
         $value = (int)$value;
         if ($value < 0) {
-            return $this->_raise("Crop top cannot be lower than 0");
+            return $this->raise("Crop top cannot be lower than 0");
         }
-        $this->_cropTop = $value;
+        $this->cropTop = $value;
 
         return $this;
     }
@@ -144,9 +144,9 @@ class Request
     {
         $value = (int)$value;
         if ($value < 0) {
-            return $this->_raise("Crop width cannot be lower than 0");
+            return $this->raise("Crop width cannot be lower than 0");
         }
-        $this->_cropWidth = $value;
+        $this->cropWidth = $value;
 
         return $this;
     }
@@ -159,9 +159,9 @@ class Request
     {
         $value = (int)$value;
         if ($value < 0) {
-            return $this->_raise("Crop height cannot be lower than 0");
+            return $this->raise("Crop height cannot be lower than 0");
         }
-        $this->_cropHeight = $value;
+        $this->cropHeight = $value;
 
         return $this;
     }
@@ -171,14 +171,14 @@ class Request
      */
     public function getCrop()
     {
-        if (!isset($this->_cropLeft, $this->_cropTop, $this->_cropWidth, $this->_cropHeight)) {
+        if (!isset($this->cropLeft, $this->cropTop, $this->cropWidth, $this->cropHeight)) {
             return false;
         }
         return array(
-            'left'   => $this->_cropLeft,
-            'top'    => $this->_cropTop,
-            'width'  => $this->_cropWidth,
-            'height' => $this->_cropHeight
+            'left'   => $this->cropLeft,
+            'top'    => $this->cropTop,
+            'width'  => $this->cropWidth,
+            'height' => $this->cropHeight
         );
     }
 
@@ -186,7 +186,7 @@ class Request
      * @param string $message
      * @throws Exception
      */
-    protected function _raise($message)
+    private function raise($message)
     {
         throw new Exception($message);
     }

@@ -10,17 +10,17 @@ class Dir
     /**
      * @var string
      */
-    protected $_path;
+    private $path;
 
     /**
      * @var string
      */
-    protected $_url;
+    private $url;
 
     /**
      * @var AbstractStrategy
      */
-    protected $_namingStrategy;
+    private $namingStrategy;
 
     /**
      * @param array $options
@@ -44,7 +44,7 @@ class Dir
             if (method_exists($this, $method)) {
                 $this->$method($value);
             } else {
-                $this->_raise("Unexpected option '$key'");
+                $this->raise("Unexpected option '$key'");
             }
         }
 
@@ -58,16 +58,16 @@ class Dir
     public function setPath($path)
     {
         if (!is_string($path)) {
-            return $this->_raise("Path must be a string");
+            return $this->raise("Path must be a string");
         }
 
         $path = trim($path);
 
         if (!$path) {
-            return $this->_raise("Path cannot be empty, '$path' given");
+            return $this->raise("Path cannot be empty, '$path' given");
         }
 
-        $this->_path = rtrim($path, DIRECTORY_SEPARATOR);
+        $this->path = rtrim($path, DIRECTORY_SEPARATOR);
 
         return $this;
     }
@@ -77,7 +77,7 @@ class Dir
      */
     public function getPath()
     {
-        return $this->_path;
+        return $this->path;
     }
 
     /**
@@ -87,9 +87,9 @@ class Dir
     public function setUrl($url)
     {
         if (isset($url)) {
-            $this->_url = (string)$url;
+            $this->url = (string)$url;
         } else {
-            $this->_url = null;
+            $this->url = null;
         }
 
         return $this;
@@ -100,7 +100,7 @@ class Dir
      */
     public function getUrl()
     {
-        return $this->_url;
+        return $this->url;
     }
 
     /**
@@ -122,13 +122,13 @@ class Dir
             $className = 'Autowp\\Image\\Storage\\NamingStrategy\\' . ucfirst($strategyName);
             $strategy = new $className($options);
             if (!$strategy instanceof AbstractStrategy) {
-                return $this->_raise("$className is not naming strategy");
+                return $this->raise("$className is not naming strategy");
             }
         }
 
-        $strategy->setDir($this->_path);
+        $strategy->setDir($this->path);
 
-        $this->_namingStrategy = $strategy;
+        $this->namingStrategy = $strategy;
 
         return $this;
     }
@@ -138,14 +138,14 @@ class Dir
      */
     public function getNamingStrategy()
     {
-        return $this->_namingStrategy;
+        return $this->namingStrategy;
     }
 
     /**
      * @param string $message
      * @throws Exception
      */
-    protected function _raise($message)
+    private function _raise($message)
     {
         throw new Exception($message);
     }

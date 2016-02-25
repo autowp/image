@@ -7,22 +7,22 @@ class Image
     /**
      * @var int
      */
-    private $_width;
+    private $width;
 
     /**
      * @var int
      */
-    private $_height;
+    private $height;
 
     /**
      * @var int
      */
-    private $_filesize;
+    private $filesize;
 
     /**
      * @var string
      */
-    private $_src;
+    private $src;
 
     /**
      * @param array $options
@@ -38,10 +38,10 @@ class Image
 
         $options = array_merge($defaults, $options);
 
-        $this->_width    =    (int)$options['width'];
-        $this->_height   =    (int)$options['height'];
-        $this->_filesize =    (int)$options['filesize'];
-        $this->_src      = (string)$options['src'];
+        $this->width    =    (int)$options['width'];
+        $this->height   =    (int)$options['height'];
+        $this->filesize =    (int)$options['filesize'];
+        $this->src      = (string)$options['src'];
     }
 
     /**
@@ -50,10 +50,10 @@ class Image
     public function toArray()
     {
         return array(
-            'width'    => $this->_width,
-            'height'   => $this->_height,
-            'filesize' => $this->_filesize,
-            'src'      => $this->_src
+            'width'    => $this->width,
+            'height'   => $this->height,
+            'filesize' => $this->filesize,
+            'src'      => $this->src
         );
     }
 
@@ -62,7 +62,7 @@ class Image
      */
     public function getSrc()
     {
-        return $this->_src;
+        return $this->src;
     }
 
     /**
@@ -70,7 +70,7 @@ class Image
      */
     public function getWidth()
     {
-        return $this->_width;
+        return $this->width;
     }
 
     /**
@@ -78,7 +78,7 @@ class Image
      */
     public function getHeight()
     {
-        return $this->_height;
+        return $this->height;
     }
 
     /**
@@ -86,6 +86,6 @@ class Image
      */
     public function getFileSize()
     {
-        return $this->_filesize;
+        return $this->filesize;
     }
 }

@@ -8,7 +8,7 @@ use Autowp\Image\Storage\Exception;
 
 class Pattern extends AbstractStrategy
 {
-    private static $_notAllowedParts = ['.', '..'];
+    private static $notAllowedParts = ['.', '..'];
 
     /**
      * @param string $pattern
@@ -21,7 +21,7 @@ class Pattern extends AbstractStrategy
         $result = [];
         $patternComponents = preg_split('|[\\/]+|isu', $pattern);
         foreach ($patternComponents as $component) {
-            if (!in_array($component, self::$_notAllowedParts)) {
+            if (!in_array($component, self::$notAllowedParts)) {
                 if ($component) {
                     $filtered = $filter->filter($component);
                     $result[] = $filtered;

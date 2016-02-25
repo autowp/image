@@ -14,7 +14,7 @@ class Serial
     /**
      * @var int
      */
-    private $_deep = 0;
+    private $deep = 0;
 
     /**
      * @param int $deep
@@ -27,7 +27,7 @@ class Serial
         if ($deep < 0) {
             throw new Exception("Deep cannot be < 0");
         }
-        $this->_deep = $deep;
+        $this->deep = $deep;
 
         return $this;
     }
@@ -37,7 +37,7 @@ class Serial
      */
     public function getDeep()
     {
-        return $this->_deep;
+        return $this->deep;
     }
 
     /**
@@ -87,7 +87,7 @@ class Serial
             throw new Exception("`dir` not initialized");
         }
 
-        $dirPath = $this->_path($index, $this->_deep);
+        $dirPath = $this->path($index, $this->deep);
 
         $filter = new Safe();
 

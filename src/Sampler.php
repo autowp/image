@@ -16,7 +16,7 @@ class Sampler
      * @param Imagick $imagick
      * @param Format $format
      */
-    private function _convertByInnerFit(Imagick $imagick,
+    private function convertByInnerFit(Imagick $imagick,
         Format $format)
     {
         $srcWidth = $imagick->getImageWidth();
@@ -65,7 +65,7 @@ class Sampler
 
             $imagick->setImagePage(0, 0, 0, 0);
             if (!$imagick->cropImage($cropWidth, $cropHeight, $cropLeft, $cropTop)) {
-                return $this->_raise("Error crop");
+                return $this->raise("Error crop");
             }
 
             $imagick->scaleImage(
@@ -78,7 +78,7 @@ class Sampler
      * @param Imagick $imagick
      * @param Format $format
      */
-    private function _convertByOuterFit(Imagick $imagick,
+    private function convertByOuterFit(Imagick $imagick,
         Format $format)
     {
         $srcWidth = $imagick->getImageWidth();
@@ -140,7 +140,7 @@ class Sampler
      * @param Imagick $imagick
      * @param Format $format
      */
-    private function _convertByMaximumFit(Imagick $imagick,
+    private function convertByMaximumFit(Imagick $imagick,
         Format $format)
     {
         $srcWidth = $imagick->getImageWidth();
@@ -194,7 +194,7 @@ class Sampler
      * @param Imagick $imagick
      * @param Format $format
      */
-    private function _convertByWidth(Imagick $imagick,
+    private function convertByWidth(Imagick $imagick,
         Format $format)
     {
         $srcWidth = $imagick->getImageWidth();
@@ -217,7 +217,7 @@ class Sampler
      * @param Imagick $imagick
      * @param Format $format
      */
-    private function _convertByHeight(Imagick $imagick,
+    private function convertByHeight(Imagick $imagick,
         Format $format)
     {
         $srcHeight = $imagick->getImageHeight();
@@ -251,7 +251,7 @@ class Sampler
             if (is_array($format)) {
                 $format = new Format($format);
             } else {
-                return $this->_raise("Unexpected type of format");
+                return $this->raise("Unexpected type of format");
             }
         }
 
@@ -267,7 +267,7 @@ class Sampler
         if ($crop) {
             $cropSet = isset($crop['width'], $crop['height'], $crop['left'], $crop['top']);
             if (!$cropSet) {
-                return $this->_raise('Crop parameters not properly set');
+                return $this->raise('Crop parameters not properly set');
             }
 
             $cropWidth  = (int)$crop['width'];
@@ -280,24 +280,24 @@ class Sampler
 
             $leftValid = ($cropLeft >= 0) && ($cropLeft < $width );
             if (!$leftValid) {
-                return $this->_raise("Crop left out of bounds ('$cropLeft')");
+                return $this->raise("Crop left out of bounds ('$cropLeft')");
             }
 
             $topValid = ($cropTop >= 0) && ($cropTop < $height);
             if (!$topValid) {
-                return $this->_raise("Crop top out of bounds ('$cropTop')");
+                return $this->raise("Crop top out of bounds ('$cropTop')");
             }
 
             $right = $cropLeft + $cropWidth;
             $widthValid  = ($cropWidth > 0) && ($right <= $width );
             if (!$widthValid) {
-                return $this->_raise("Crop width out of bounds ('$cropLeft + $cropWidth' ~ '$width x $height')");
+                return $this->raise("Crop width out of bounds ('$cropLeft + $cropWidth' ~ '$width x $height')");
             }
 
             $bottom = $cropTop + $cropHeight;
             $heightValid = ($cropHeight > 0) && ($bottom <= $height);
             if (!$heightValid) {
-                return $this->_raise("Crop height out of bounds ('$cropTop + $cropHeight' ~ '$width x $height')");
+                return $this->raise("Crop height out of bounds ('$cropTop + $cropHeight' ~ '$width x $height')");
             }
 
             $fWidth = $format->getWidth();
@@ -349,9 +349,9 @@ class Sampler
 
             if ($ratioDiff > 0.001) {
                 if ($cRatio > $fRatio) {
-                    $this->_extendVertical($imagick, $format);
+                    $this->extendVertical($imagick, $format);
                 } else {
-                    $this->_extendHorizontal($imagick, $format);
+                    $this->extendHorizontal($imagick, $format);
                 }
             }
         }
@@ -367,26 +367,26 @@ class Sampler
         if ($format->getWidth() && $format->getHeight()) {
             switch ($format->getFitType()) {
                 case Format::FIT_TYPE_INNER:
-                    $this->_convertByInnerFit($imagick, $format);
+                    $this->convertByInnerFit($imagick, $format);
                     break;
 
                 case Format::FIT_TYPE_OUTER:
-                    $this->_convertByOuterFit($imagick, $format);
+                    $this->convertByOuterFit($imagick, $format);
                     break;
 
                 case Format::FIT_TYPE_MAXIMUM:
-                    $this->_convertByMaximumFit($imagick, $format);
+                    $this->convertByMaximumFit($imagick, $format);
                     break;
 
                 default:
-                    $this->_raise("Unexpected FIT_TYPE `{$format->getFitType()}`");
+                    $this->raise("Unexpected FIT_TYPE `{$format->getFitType()}`");
             }
         } else {
 
             if ($format->getWidth()) {
-                $this->_convertByWidth($imagick, $format);
+                $this->convertByWidth($imagick, $format);
             } elseif ($format->getHeight()) {
-                $this->_convertByHeight($imagick, $format);
+                $this->convertByHeight($imagick, $format);
             }
 
         }
@@ -412,18 +412,18 @@ class Sampler
         } else {
             $imagick = new Imagick();
             if (!$imagick->readImage($source)) {
-                return $this->_raise("Error read image from `$source`");
+                return $this->raise("Error read image from `$source`");
             }
         }
 
         if (!$destFile) {
-            return $this->_raise("Dest file not set");
+            return $this->raise("Dest file not set");
         }
 
         $this->convertImagick($imagick, $format);
 
         if (!$imagick->writeImage($destFile)) {
-            return $this->_raise("Error write image to `$destFile`");
+            return $this->raise("Error write image to `$destFile`");
         }
 
         $imagick->clear();
@@ -456,7 +456,7 @@ class Sampler
      * @param ImagickPixelIterator $iterator
      * @return ImagickPixel
      */
-    private function _extendEdgeColor(ImagickPixelIterator $iterator)
+    private function extendEdgeColor(ImagickPixelIterator $iterator)
     {
         $sum = array(
             'r' => array(),
@@ -500,59 +500,59 @@ class Sampler
      * @param Imagick $imagick
      * @return ImagickPixel
      */
-    private function _extendTopColor(Imagick $imagick)
+    private function extendTopColor(Imagick $imagick)
     {
         $iterator = $imagick->getPixelRegionIterator(0, 0, $imagick->getImageWidth(), 1);
 
-        return $this->_extendEdgeColor($iterator);
+        return $this->extendEdgeColor($iterator);
     }
 
     /**
      * @param Imagick $imagick
      * @return ImagickPixel
      */
-    private function _extendBottomColor(Imagick $imagick)
+    private function extendBottomColor(Imagick $imagick)
     {
         $iterator = $imagick->getPixelRegionIterator(0, $imagick->getImageHeight()-1, $imagick->getImageWidth(), 1);
 
-        return $this->_extendEdgeColor($iterator);
+        return $this->extendEdgeColor($iterator);
     }
 
     /**
      * @param Imagick $imagick
      * @return ImagickPixel
      */
-    private function _extendLeftColor(Imagick $imagick)
+    private function extendLeftColor(Imagick $imagick)
     {
         $iterator = $imagick->getPixelRegionIterator(0, 0, 1, $imagick->getImageHeight());
 
-        return $this->_extendEdgeColor($iterator);
+        return $this->extendEdgeColor($iterator);
     }
 
     /**
      * @param Imagick $imagick
      * @return ImagickPixel
      */
-    private function _extendRightColor(Imagick $imagick)
+    private function extendRightColor(Imagick $imagick)
     {
         $iterator = $imagick->getPixelRegionIterator($imagick->getImageWidth()-1, 0, 1, $imagick->getImageHeight());
 
-        return $this->_extendEdgeColor($iterator);
+        return $this->extendEdgeColor($iterator);
     }
 
     /**
      * @param Imagick $imagick
      * @param Format $format
      */
-    private function _extendVertical(Imagick $imagick, Format $format)
+    private function extendVertical(Imagick $imagick, Format $format)
     {
         $fRatio = $format->getWidth() / $format->getHeight();
 
         $srcWidth = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
 
-        $topColor = $this->_extendTopColor($imagick);
-        $bottomColor = $this->_extendBottomColor($imagick);
+        $topColor = $this->extendTopColor($imagick);
+        $bottomColor = $this->extendBottomColor($imagick);
 
         if ($topColor || $bottomColor) {
 
@@ -610,15 +610,15 @@ class Sampler
      * @param Imagick $imagick
      * @param Format $format
      */
-    private function _extendHorizontal(Imagick $imagick, Format $format)
+    private function extendHorizontal(Imagick $imagick, Format $format)
     {
         $fRatio = $format->getWidth() / $format->getHeight();
 
         $srcWidth = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
 
-        $leftColor = $this->_extendLeftColor($imagick);
-        $rightColor = $this->_extendRightColor($imagick);
+        $leftColor = $this->extendLeftColor($imagick);
+        $rightColor = $this->extendRightColor($imagick);
 
         if ($leftColor || $rightColor) {
 
@@ -677,7 +677,7 @@ class Sampler
      * @param string $message
      * @throws Exception
      */
-    private function _raise($message)
+    private function raise($message)
     {
         throw new Exception($message);
     }

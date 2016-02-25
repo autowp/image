@@ -9,7 +9,7 @@ abstract class AbstractStrategy
     /**
      * @var string
      */
-    private $_dir = null;
+    private $dir = null;
 
     /**
      * @param array $options
@@ -46,7 +46,7 @@ abstract class AbstractStrategy
      */
     public function setDir($dir)
     {
-        $this->_dir = rtrim($dir, DIRECTORY_SEPARATOR);
+        $this->dir = rtrim($dir, DIRECTORY_SEPARATOR);
 
         return $this;
     }
@@ -56,7 +56,7 @@ abstract class AbstractStrategy
      */
     public function getDir()
     {
-        return $this->_dir;
+        return $this->dir;
     }
 
     /**
