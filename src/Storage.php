@@ -1008,9 +1008,11 @@ class Storage
      */
     public function addImageFromFile($file, $dirName, array $options = array())
     {
-        list($width, $height, $type) = getimagesize($file);
-        $width = (int)$width;
-        $height = (int)$height;
+        $imageInfo = getimagesize($file);
+        
+        $width = (int)$imageInfo[0];
+        $height = (int)$imageInfo[1];
+        $type = $imageInfo[2];
 
         if (!$width || !$height) {
             $this->raise("Failed to get image size of '$file' ($width x $height)");
@@ -1144,9 +1146,9 @@ class Storage
         $iptcStr = '';
         getimagesize($filepath, $info);
         if (is_array($info) && array_key_exists('APP13', $info)) {
-            $IPTC = iptcparse($info['APP13']);
-            if (is_array($IPTC)) {
-                foreach ($IPTC as $key => $value) {
+            $iptc = iptcparse($info['APP13']);
+            if (is_array($iptc)) {
+                foreach ($iptc as $key => $value) {
                     $iptcStr .= "<b>IPTC Key:</b> ".htmlspecialchars($key)." <b>Contents:</b> ";
                     foreach ($value as $innerkey => $innervalue) {
                         if ( ($innerkey+1) != count($value) )
@@ -1157,7 +1159,7 @@ class Storage
                     $iptcStr .= '<br />';
                 }
             } else {
-                $iptcStr .= $IPTC;
+                $iptcStr .= $iptc;
             }
         }
 
@@ -1189,11 +1191,11 @@ class Storage
 
         $exifStr = '';
         try {
-            $NotSections = array('FILE', 'COMPUTED');
+            $notSections = array('FILE', 'COMPUTED');
             $exif = @exif_read_data($filepath, 0, true);
             if ($exif !== false) {
                 foreach ($exif as $key => $section) {
-                    if (array_search($key, $NotSections) !== false)
+                    if (array_search($key, $notSections) !== false)
                         continue;
 
                     $exifStr .= '<p>['.htmlspecialchars($key).']';
@@ -1217,7 +1219,9 @@ class Storage
 
     public static function detectExtenstion($filepath)
     {
-        list ($width, $height, $imageType) = getimagesize($filepath);
+        $imageInfo = getimagesize($filepath);
+        
+        $imageType = $imageInfo[2];
 
         // подбираем имя для файла
         switch ($imageType) {
@@ -1310,12 +1314,12 @@ class Storage
             throw new Exception("File `$filePath` not found");
         }
 
-        list($width, $height, $type, $attr) = getimagesize($filePath);
+        $imageInfo = getimagesize($filePath);
 
         // store to db
         $imageRow = $this->getImageTable()->createRow(array(
-            'width'    => $width,
-            'height'   => $height,
+            'width'    => $imageInfo[0],
+            'height'   => $imageInfo[1],
             'dir'      => $dirName,
             'filesize' => filesize($filePath),
             'filepath' => $file,
