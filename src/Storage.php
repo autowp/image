@@ -123,11 +123,11 @@ class Storage
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
 
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            } else {
+            if (!method_exists($this, $method)) {
                 $this->raise("Unexpected option '$key'");
             }
+            
+            $this->$method($value);
         }
 
         return $this;
@@ -1151,10 +1151,10 @@ class Storage
                 foreach ($iptc as $key => $value) {
                     $iptcStr .= "<b>IPTC Key:</b> ".htmlspecialchars($key)." <b>Contents:</b> ";
                     foreach ($value as $innerkey => $innervalue) {
-                        if ( ($innerkey+1) != count($value) )
-                            $iptcStr .= htmlspecialchars($innervalue) . ", ";
-                        else
-                            $iptcStr .= htmlspecialchars($innervalue);
+                        $iptcStr .= htmlspecialchars($innervalue);
+                        if ( ($innerkey+1) != count($value) ) {
+                            $iptcStr .= ", ";
+                        }
                     }
                     $iptcStr .= '<br />';
                 }

@@ -356,12 +356,12 @@ class Sampler
             }
         }
 
-        $bg = $format->getBackground();
-        if (!$bg) {
-            $bg = 'transparent';
+        $background = $format->getBackground();
+        if (!$background) {
+            $background = 'transparent';
         }
-        $imagick->setBackgroundColor($bg);
-        $imagick->setImageBackgroundColor($bg);
+        $imagick->setBackgroundColor($background);
+        $imagick->setImageBackgroundColor($background);
 
 
         if ($format->getWidth() && $format->getHeight()) {
@@ -475,12 +475,12 @@ class Sampler
 
         $count = count($sum['r']);
 
-        $r = $this->standardDeviation($sum['r']);
-        $g = $this->standardDeviation($sum['g']);
-        $b = $this->standardDeviation($sum['b']);
+        $red = $this->standardDeviation($sum['r']);
+        $green = $this->standardDeviation($sum['g']);
+        $blue = $this->standardDeviation($sum['b']);
 
         $limit = 0.01;
-        if ($r > $limit || $g > $limit || $b > $limit) {
+        if ($red > $limit || $green > $limit || $blue > $limit) {
             return false;
         }
 
