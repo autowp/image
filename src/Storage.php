@@ -3,6 +3,7 @@
 namespace Autowp\Image;
 
 use Imagick;
+use ImagickException;
 use Closure;
 
 use Zend_Db_Adapter_Abstract;
