@@ -46,7 +46,7 @@ class Serial
      * @param  string $id Cache id
      * @return string Complete directory path
      */
-    private function _path($index, $deep)
+    private function path($index, $deep)
     {
         $chars = strlen(self::ITEM_PER_DIR - 1); // use log10, fkn n00b
         $path = '';
