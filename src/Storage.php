@@ -127,7 +127,7 @@ class Storage
             if (!method_exists($this, $method)) {
                 $this->raise("Unexpected option '$key'");
             }
-            
+
             $this->$method($value);
         }
 
@@ -613,20 +613,20 @@ class Storage
                 $sampler->convertImagick($imagick, $cFormat);
 
                 // store result
-                $newPath = implode(DIRECTORY_SEPARATOR, array(
+                $newPath = implode(DIRECTORY_SEPARATOR, [
                     $imageRow->dir,
                     $formatName,
                     $imageRow->filepath
-                ));
+                ]);
                 $pi = pathinfo($newPath);
                 $formatExt = $cFormat->getFormatExtension();
                 $extension = $formatExt ? $formatExt : $pi['extension'];
                 $formatedImageId = $this->addImageFromImagick(
                     $imagick, $this->formatedImageDirName,
-                    array(
+                    [
                         'extension' => $extension,
                         'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename']
-                    )
+                    ]
                 );
 
                 $imagick->clear();
@@ -1010,7 +1010,7 @@ class Storage
     public function addImageFromFile($file, $dirName, array $options = array())
     {
         $imageInfo = getimagesize($file);
-        
+
         $width = (int)$imageInfo[0];
         $height = (int)$imageInfo[1];
         $type = $imageInfo[2];
@@ -1221,7 +1221,7 @@ class Storage
     public static function detectExtenstion($filepath)
     {
         $imageInfo = getimagesize($filepath);
-        
+
         $imageType = $imageInfo[2];
 
         // подбираем имя для файла
@@ -1358,5 +1358,114 @@ class Storage
         $this->flush(array(
             'image' => $imageId
         ));
+    }
+
+    public function printBrokenFiles()
+    {
+        $imageTable = $this->getImageTable();
+
+        $db = $imageTable->getAdapter();
+
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from($imageTable->info('name'), ['id', 'filepath', 'dir'])
+        );
+
+        foreach ($rows as $row) {
+            $dir = $this->getDir($row['dir']);
+            if (!$dir) {
+                print $row['id'] . ' ' . $row['filepath'] . " - dir '{$row['dir']}' not defined\n";
+
+            } else {
+
+                $filepath = $dir->getPath() . '/' . $row['filepath'];
+
+                if (!file_exists($filepath)) {
+                    print $row['id'] . ' ' . $filepath . " - file not found\n";
+                }
+            }
+        }
+    }
+
+    public function fixBrokenFiles()
+    {
+        $imageTable = $this->getImageTable();
+        $formatedImageTable = $this->getFormatedImageTable();
+
+        $db = $imageTable->getAdapter();
+
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from($imageTable->info('name'), ['id', 'filepath', 'dir'])
+        );
+
+        foreach ($rows as $row) {
+            $dir = $this->getDir($row['dir']);
+            if (!$dir) {
+
+                print $row['id'] . ' ' . $row['filepath'] . " - dir '{$row['dir']}' not defined. Unable to fix\n";
+
+            } else {
+
+                $filepath = $dir->getPath() . '/' . $row['filepath'];
+
+                if (!file_exists($filepath)) {
+
+                    print $row['id'] . ' ' . $filepath . ' - file not found. ';
+
+                    $fRows = $formatedImageTable->fetchAll([
+                        'formated_image_id = ?' => $row['id']
+                    ]);
+
+                    if (count($fRows)) {
+
+                        foreach ($fRows as $fRow) {
+                            $this->flush([
+                                'format' => $fRow['format'],
+                                'image'  => $fRow['image_id'],
+                            ]);
+                        }
+
+                        print "Flushed\n";
+
+                    } else {
+
+                        print "Unable to fix\n";
+
+                    }
+                }
+            }
+        }
+    }
+
+    public function deleteBrokenFiles($dirname)
+    {
+        $dir = $this->getDir($dirname);
+        if (!$dir) {
+            $this->raise("Dir '{$dirname}' not defined");
+        }
+
+        $imageTable = $this->getImageTable();
+
+        $db = $imageTable->getAdapter();
+
+        $rows = $db->fetchAll(
+            $db->select()
+                ->from($imageTable->info('name'), ['id', 'filepath'])
+                ->where('dir = ?', $dirname)
+        );
+
+        foreach ($rows as $row) {
+            $filepath = $dir->getPath() . '/' . $row['filepath'];
+
+            if (!file_exists($filepath)) {
+
+                print $row['id'] . ' ' . $row['filepath'] . " - file not found. ";
+
+                $this->removeImage($row['id']);
+
+                print "Deleted\n";
+            }
+        }
     }
 }
