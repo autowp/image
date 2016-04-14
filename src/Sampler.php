@@ -294,6 +294,13 @@ class Sampler
                 return $this->raise("Crop width out of bounds ('$cropLeft + $cropWidth' ~ '$width x $height')");
             }
 
+            // try to fix height overflow
+            $bottom = $cropTop + $cropHeight;
+            $overflow = $bottom - $height;
+            if ($overflow <= 1) {
+                $cropHeight -= $overflow;
+            }
+
             $bottom = $cropTop + $cropHeight;
             $heightValid = ($cropHeight > 0) && ($bottom <= $height);
             if (!$heightValid) {
