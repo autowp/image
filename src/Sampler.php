@@ -297,7 +297,7 @@ class Sampler
             // try to fix height overflow
             $bottom = $cropTop + $cropHeight;
             $overflow = $bottom - $height;
-            if ($overflow <= 1) {
+            if ($overflow > 0 && $overflow <= 1) {
                 $cropHeight -= $overflow;
             }
 
