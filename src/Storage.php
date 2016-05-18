@@ -101,9 +101,14 @@ class Storage
     private $imageSampler = null;
 
     /**
-     * @var boll
+     * @var bool
      */
     private $forceHttps = false;
+    
+    /**
+     * @var string
+     */
+    private $useLocks = true;
 
     /**
      * @param array $options
@@ -131,6 +136,17 @@ class Storage
             $this->$method($value);
         }
 
+        return $this;
+    }
+    
+    /**
+     * @param bool $value
+     * @return Storage
+     */
+    public function setUseLocks($value)
+    {
+        $this->useLocks = (bool)$value;
+        
         return $this;
     }
 
@@ -591,7 +607,8 @@ class Storage
                 try {
                     $imagick->readImage($srcFilePath);
                 } catch (ImagickException $e) {
-                    $this->raise('Imagick: ' . $e->getMessage());
+                    //$this->raise('Imagick: ' . $e->getMessage());
+                    continue;
                 }
 
                 // format
@@ -720,7 +737,7 @@ class Storage
      */
     public function getFormatedImages(array $requests, $formatName)
     {
-        $result = array();
+        $result = [];
         foreach ($this->getFormatedImageRows($requests, $formatName) as $key => $row) {
             $result[$key] = $this->buildImageResult($row);
         }
@@ -878,24 +895,30 @@ class Storage
                 $this->raise("Cannot open file '$destFilePath'");
             }
 
-            if (!flock($fp, LOCK_EX | LOCK_NB)) {
-                // already locked, try next file
-                return $this->raise("already locked, try next file");
-                fclose($fp);
-                continue;
+            if ($this->useLocks) {
+                if (!flock($fp, LOCK_EX | LOCK_NB)) {
+                    // already locked, try next file
+                    return $this->raise("already locked, try next file");
+                    fclose($fp);
+                    continue;
+                }
             }
 
             if (false !== fgetc($fp)) {
                 // not empty, try next file
                 return $this->raise("not empty, try next file $destFilePath");
-                flock($fp, LOCK_UN);
+                if ($this->useLocks) {
+                    flock($fp, LOCK_UN);
+                }
                 fclose($fp);
                 continue;
             }
 
             $callback($fp);
 
-            flock($fp, LOCK_UN);
+            if ($this->useLocks) {
+                flock($fp, LOCK_UN);
+            }
             fclose($fp);
 
             $fileSuccess = true;
@@ -1381,7 +1404,8 @@ class Storage
                 $filepath = $dir->getPath() . '/' . $row['filepath'];
 
                 if (!file_exists($filepath)) {
-                    print $row['id'] . ' ' . $filepath . " - file not found\n";
+                    print $row['id'] . ' ' . $row['date_add'] . ' ' . $filepath . " - file not found\n";
+                    
                 }
             }
         }
