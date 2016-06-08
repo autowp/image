@@ -817,9 +817,9 @@ class Storage
         }
 
 
-        $options = array_merge(array(
+        $options = array_merge([
             'count' => $this->getDirCounter($dirName),
-        ), $options);
+        ], $options);
 
         if (!isset($options['extension'])) {
             $options['extension'] = self::EXTENSION_DEFAULT;
@@ -948,6 +948,8 @@ class Storage
         }
 
         $dirPath = $dir->getPath();
+        
+        $this->incDirCounter($dirName);
 
         $insertAttemptsLeft = self::INSERT_MAX_ATTEMPTS;
         $insertAttemptException = null;
@@ -960,14 +962,14 @@ class Storage
             $this->chmodFile($filePath);
 
             // store to db
-            $imageRow = $this->getImageTable()->createRow(array(
+            $imageRow = $this->getImageTable()->createRow([
                 'width'    => $width,
                 'height'   => $height,
                 'dir'      => $dirName,
                 'filesize' => filesize($filePath),
                 'filepath' => $destFileName,
                 'date_add' => new Zend_Db_Expr('now()')
-            ));
+            ]);
             try {
                 $imageRow->save();
                 $insertAttemptException = null;
@@ -980,8 +982,6 @@ class Storage
         if ($insertAttemptException) {
             throw $insertAttemptException;
         }
-
-        $this->incDirCounter($dirName);
 
         return $imageRow->id;
     }
@@ -1126,17 +1126,17 @@ class Storage
     {
         $dirTable = $this->getDirTable();
 
-        $row = $dirTable->fetchRow(array(
+        $row = $dirTable->fetchRow([
             'dir = ?' => $dirName
-        ));
+        ]);
 
         if ($row) {
             $row->count = new Zend_Db_Expr('count + 1');
         } else {
-            $row = $dirTable->createRow(array(
+            $row = $dirTable->createRow([
                 'dir'   => $dirName,
                 'count' => 1
-            ));
+            ]);
         }
 
         $row->save();
