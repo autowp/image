@@ -73,12 +73,12 @@ class Storage
     /**
      * @var array
      */
-    private $dirs = array();
+    private $dirs = [];
 
     /**
      * @var array
      */
-    private $formats = array();
+    private $formats = [];
 
     /**
      * @var int
@@ -104,7 +104,7 @@ class Storage
      * @var bool
      */
     private $forceHttps = false;
-    
+
     /**
      * @var string
      */
@@ -114,7 +114,7 @@ class Storage
      * @param array $options
      * @throws Exception
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->setOptions($options);
     }
@@ -138,7 +138,7 @@ class Storage
 
         return $this;
     }
-    
+
     /**
      * @param bool $value
      * @return Storage
@@ -146,7 +146,7 @@ class Storage
     public function setUseLocks($value)
     {
         $this->useLocks = (bool)$value;
-        
+
         return $this;
     }
 
@@ -198,7 +198,7 @@ class Storage
     public function getImageSampler()
     {
         if (null === $this->imageSampler) {
-            $this->setImageSampler(array());
+            $this->setImageSampler([]);
         }
         return $this->imageSampler;
     }
@@ -264,7 +264,7 @@ class Storage
      */
     public function setDirs($dirs)
     {
-        $this->dirs = array();
+        $this->dirs = [];
 
         foreach ($dirs as $dirName => $dir) {
             $this->addDir($dirName, $dir);
@@ -307,7 +307,7 @@ class Storage
      */
     public function setFormats($formats)
     {
-        $this->formats = array();
+        $this->formats = [];
 
         foreach ($formats as $formatName => $format) {
             $this->addFormat($formatName, $format);
@@ -370,10 +370,10 @@ class Storage
     private function getImageTable()
     {
         if (null === $this->imageTable) {
-            $this->imageTable = new ImageTable(array(
+            $this->imageTable = new ImageTable([
                 Zend_Db_Table_Abstract::ADAPTER => $this->db,
                 Zend_Db_Table_Abstract::NAME    => $this->imageTableName,
-            ));
+            ]);
         }
 
         return $this->imageTable;
@@ -385,10 +385,10 @@ class Storage
     private function getFormatedImageTable()
     {
         if (null === $this->formatedImageTable) {
-            $this->formatedImageTable = new FormatedImageTable(array(
+            $this->formatedImageTable = new FormatedImageTable([
                 Zend_Db_Table_Abstract::ADAPTER => $this->db,
                 Zend_Db_Table_Abstract::NAME    => $this->formatedImageTableName,
-            ));
+            ]);
         }
 
         return $this->formatedImageTable;
@@ -400,10 +400,10 @@ class Storage
     private function getDirTable()
     {
         if (null === $this->dirTable) {
-            $this->dirTable = new DirTable(array(
+            $this->dirTable = new DirTable([
                 Zend_Db_Table_Abstract::ADAPTER => $this->db,
                 Zend_Db_Table_Abstract::NAME    => $this->dirTableName,
-            ));
+            ]);
         }
 
         return $this->dirTable;
@@ -435,12 +435,12 @@ class Storage
             $src = preg_replace("/^http:/i", "https:", $src);
         }
 
-        return new Image(array(
+        return new Image([
             'width'    => $imageRow->width,
             'height'   => $imageRow->height,
             'src'      => $src,
             'filesize' => $imageRow->filesize,
-        ));
+        ]);
     }
 
     /**
@@ -476,9 +476,9 @@ class Storage
             return $this->raise("Image id mus be int. `$imageId` given");
         }
 
-        $imageRow = $this->getImageTable()->fetchRow(array(
+        $imageRow = $this->getImageTable()->fetchRow([
             'id = ?' => $id
-        ));
+        ]);
 
         return $imageRow ? $imageRow : null;
     }
@@ -490,11 +490,11 @@ class Storage
      */
     private function getImageRows(array $imageIds)
     {
-        $result = array();
+        $result = [];
         if (count($imageIds)) {
-            $result = $this->getImageTable()->fetchAll(array(
+            $result = $this->getImageTable()->fetchAll([
                 'id in (?)' => $imageIds
-            ));
+            ]);
         }
 
         return $result;
@@ -519,7 +519,7 @@ class Storage
      */
     public function getImages(array $imageIds)
     {
-        $result = array();
+        $result = [];
         foreach ($this->getImageRows($imageIds) as $imageRow) {
             $result[$imageRow['id']] = $this->buildImageResult($imageRow);
         }
@@ -543,7 +543,7 @@ class Storage
     {
         $imageTable = $this->getImageTable();
 
-        $imagesId = array();
+        $imagesId = [];
         foreach ($requests as $request) {
             if (!$request instanceof Request) {
                 return $this->raise('$requests is not array of Autowp\Image\Storage\Request');
@@ -561,7 +561,7 @@ class Storage
                 $imageTable->select(true)
                     ->setIntegrityCheck(false) // to fetch image_id
                     ->join(
-                        array('f' => $this->formatedImageTableName),
+                        ['f' => $this->formatedImageTableName],
                         $this->imageTableName . '.id = f.formated_image_id',
                         'image_id'
                     )
@@ -569,10 +569,10 @@ class Storage
                     ->where('f.format = ?', (string)$formatName)
             );
         } else {
-            $destImageRows = array();
+            $destImageRows = [];
         }
 
-        $result = array();
+        $result = [];
 
         foreach ($requests as $key => $request) {
 
@@ -589,9 +589,9 @@ class Storage
             if (!$destImageRow) {
 
                 // find source image
-                $imageRow = $this->getImageTable()->fetchRow(array(
+                $imageRow = $this->getImageTable()->fetchRow([
                     'id = ?' => $imageId
-                ));
+                ]);
                 if (!$imageRow) {
                     $this->raise("Image `$imageId` not found");
                 }
@@ -649,25 +649,25 @@ class Storage
                 $imagick->clear();
 
                 $formatedImageTable = $this->getFormatedImageTable();
-                $formatedImageRow = $formatedImageTable->fetchRow(array(
+                $formatedImageRow = $formatedImageTable->fetchRow([
                     'format = ?'   => (string)$formatName,
                     'image_id = ?' => $imageId,
-                ));
+                ]);
                 if (!$formatedImageRow) {
-                    $formatedImageRow = $formatedImageTable->createRow(array(
+                    $formatedImageRow = $formatedImageTable->createRow([
                         'format'            => (string)$formatName,
                         'image_id'          => $imageId,
                         'formated_image_id' => $formatedImageId
-                    ));
+                    ]);
                 } else {
                     $formatedImageRow->formated_image_id = $formatedImageId;
                 }
                 $formatedImageRow->save();
 
                 // result
-                $destImageRow = $this->getImageTable()->fetchRow(array(
+                $destImageRow = $this->getImageTable()->fetchRow([
                     'id = ?' => $formatedImageId
-                ));
+                ]);
             }
 
             $result[$key] = $destImageRow;
@@ -683,7 +683,7 @@ class Storage
      */
     private function getFormatedImageRow(Request $request, $formatName)
     {
-        $result = $this->getFormatedImageRows(array($request), $formatName);
+        $result = $this->getFormatedImageRows([$request], $formatName);
 
         if (!isset($result[0])) {
             $this->raise("getFormatedImageRows fails");
@@ -700,9 +700,9 @@ class Storage
     public function getFormatedImageBlob($request, $formatName)
     {
         if (!$request instanceof Request) {
-            $request = new Request(array(
+            $request = new Request([
                 'imageId' => $request
-            ));
+            ]);
         }
 
         return $this->buildImageBlobResult(
@@ -720,9 +720,9 @@ class Storage
         if (is_array($request)) {
             $request = new Request($request);
         } elseif (!$request instanceof Request) {
-            $request = new Request(array(
+            $request = new Request([
                 'imageId' => $request
-            ));
+            ]);
         }
 
         return $this->buildImageResult(
@@ -754,22 +754,22 @@ class Storage
     {
         $imageTable = $this->getImageTable();
 
-        $imageRow = $imageTable->fetchRow(array(
+        $imageRow = $imageTable->fetchRow([
             'id = ?' => (int)$imageId
-        ));
+        ]);
 
         if (!$imageRow) {
             $this->raise("Image '$imageId' not found");
         }
 
-        $this->flush(array(
+        $this->flush([
             'image' => $imageRow->id
-        ));
+        ]);
 
         // to save remove formated image
-        $this->getFormatedImageTable()->delete(array(
+        $this->getFormatedImageTable()->delete([
             'formated_image_id = ?' => $imageRow->id
-        ));
+        ]);
 
         // remove file & row
         $dir = $this->getDir($imageRow->dir);
@@ -777,10 +777,10 @@ class Storage
             $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
-        $filepath = implode(DIRECTORY_SEPARATOR, array(
+        $filepath = implode(DIRECTORY_SEPARATOR, [
             rtrim($dir->getPath(), DIRECTORY_SEPARATOR),
             $imageRow->filepath
-        ));
+        ]);
 
         // important to delete row first
         $imageRow->delete();
@@ -801,7 +801,7 @@ class Storage
      * @return string
      * @throws Exception
      */
-    private function createImagePath($dirName, array $options = array())
+    private function createImagePath($dirName, array $options = [])
     {
         $dir = $this->getDir($dirName);
         if (!$dir) {
@@ -857,7 +857,7 @@ class Storage
      * @param array $options
      * @throws Exception
      */
-    public function addImageFromBlob($blob, $dirName, array $options = array())
+    public function addImageFromBlob($blob, $dirName, array $options = [])
     {
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);
@@ -948,7 +948,7 @@ class Storage
         }
 
         $dirPath = $dir->getPath();
-        
+
         $this->incDirCounter($dirName);
 
         $insertAttemptsLeft = self::INSERT_MAX_ATTEMPTS;
@@ -992,7 +992,7 @@ class Storage
      * @param array $options
      * @throws Exception
      */
-    public function addImageFromImagick(Imagick $imagick, $dirName, array $options = array())
+    public function addImageFromImagick(Imagick $imagick, $dirName, array $options = [])
     {
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
@@ -1030,7 +1030,7 @@ class Storage
      * @param array $options
      * @throws Exception
      */
-    public function addImageFromFile($file, $dirName, array $options = array())
+    public function addImageFromFile($file, $dirName, array $options = [])
     {
         $imageInfo = getimagesize($file);
 
@@ -1076,10 +1076,10 @@ class Storage
      */
     public function flush(array $options)
     {
-        $defaults = array(
+        $defaults = [
             'format' => null,
             'image'  => null,
-        );
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -1215,7 +1215,7 @@ class Storage
 
         $exifStr = '';
         try {
-            $notSections = array('FILE', 'COMPUTED');
+            $notSections = ['FILE', 'COMPUTED'];
             $exif = @exif_read_data($filepath, 0, true);
             if ($exif !== false) {
                 foreach ($exif as $key => $section) {
@@ -1263,7 +1263,7 @@ class Storage
      * @param array $options
      * @throws Exception
      */
-    public function changeImageName($imageId, array $options = array())
+    public function changeImageName($imageId, array $options = [])
     {
         $imageRow = $this->getImageRow($imageId);
         if (!$imageRow) {
@@ -1296,9 +1296,9 @@ class Storage
             $this->chmodFile($filePath);
 
             // store to db
-            $imageRow->setFromArray(array(
+            $imageRow->setFromArray([
                 'filepath' => $destFileName
-            ));
+            ]);
             try {
                 $imageRow->save();
                 $insertAttemptException = null;
@@ -1341,14 +1341,14 @@ class Storage
         $imageInfo = getimagesize($filePath);
 
         // store to db
-        $imageRow = $this->getImageTable()->createRow(array(
+        $imageRow = $this->getImageTable()->createRow([
             'width'    => $imageInfo[0],
             'height'   => $imageInfo[1],
             'dir'      => $dirName,
             'filesize' => filesize($filePath),
             'filepath' => $file,
             'date_add' => new Zend_Db_Expr('now()')
-        ));
+        ]);
         $imageRow->save();
 
         return $imageRow->id;
@@ -1378,9 +1378,38 @@ class Storage
 
         $imagick->clear();
 
-        $this->flush(array(
+        $this->flush([
             'image' => $imageId
-        ));
+        ]);
+    }
+
+    public function normalize($imageId)
+    {
+        $imageRow = $this->getImageRow($imageId);
+        if (!$imageRow) {
+            return $this->raise("Image `$imageId` not found");
+        }
+
+        $dir = $this->getDir($imageRow->dir);
+        if (!$dir) {
+            $this->raise("Dir '{$imageRow->dir}' not defined");
+        }
+
+        $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
+
+        $imagick = new Imagick();
+        $imagick->readImage($filePath);
+
+        // format
+        $imagick->normalizeImage();
+
+        $imagick->writeImage($filePath);
+
+        $imagick->clear();
+
+        $this->flush([
+            'image' => $imageId
+        ]);
     }
 
     public function printBrokenFiles()
@@ -1405,7 +1434,7 @@ class Storage
 
                 if (!file_exists($filepath)) {
                     print $row['id'] . ' ' . $row['date_add'] . ' ' . $filepath . " - file not found\n";
-                    
+
                 }
             }
         }
