@@ -14,6 +14,7 @@
         "php": ">=5.5.0",
         "ext-imagick": "*",
         "zendframework/zendframework1": "1.*",
+        "zendframework/zend-mvc": "^3.0",
         "autowp/filters": "^1.1"
     },
     "autoload": {
