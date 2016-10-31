@@ -1192,7 +1192,7 @@ class Storage
 
     /**
      * @param int $imageId
-     * @return boolean|string
+     * @return boolean|array
      */
     public function getImageEXIF($imageId)
     {
@@ -1213,32 +1213,7 @@ class Storage
             return $this->raise("File `$filepath` not found");
         }
 
-        $exifStr = '';
-        try {
-            $notSections = ['FILE', 'COMPUTED'];
-            $exif = @exif_read_data($filepath, 0, true);
-            if ($exif !== false) {
-                foreach ($exif as $key => $section) {
-                    if (array_search($key, $notSections) !== false)
-                        continue;
-
-                    $exifStr .= '<p>['.htmlspecialchars($key).']';
-                    foreach ($section as $name => $val) {
-                        $exifStr .= "<br />".htmlspecialchars($name).": ";
-                        if (is_array($val))
-                            $exifStr .= htmlspecialchars(implode(', ', $val));
-                        else
-                            $exifStr .= htmlspecialchars($val);
-                    }
-
-                    $exifStr .= '</p>';
-                }
-            }
-        } catch (Exception $e) {
-            $exifStr .= 'Ошибка при чтении EXIF: '.$e->getMessage();
-        }
-
-        return $exifStr;
+        return exif_read_data($filepath, null, true);
     }
 
     public static function detectExtenstion($filepath)
