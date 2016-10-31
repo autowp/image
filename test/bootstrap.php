@@ -14,9 +14,3 @@ if (class_exists('PHPUnit_Runner_Version', true)) {
  * Setup autoloading
  */
 require __DIR__ . '/../vendor/autoload.php';
-/**
- * Start output buffering, if enabled
- */
-if (defined('TESTS_AUTOWP_OB_ENABLED') && constant('TESTS_AUTOWP_OB_ENABLED')) {
-    ob_start();
-}

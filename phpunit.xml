@@ -9,12 +9,6 @@
         </testsuite>
     </testsuites>
 
-    <groups>
-        <exclude>
-            <group>disable</group>
-        </exclude>
-    </groups>
-
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src</directory>
@@ -23,8 +17,6 @@
 
     <php>
         <ini name="date.timezone" value="UTC"/>
-
         <env name="TESTS_AUTOWP_OB_ENABLED" value="false" />
-
     </php>
 </phpunit>

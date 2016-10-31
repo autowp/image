@@ -1,6 +1,6 @@
 <?php
 
-namespace AutowpTest\Filter;
+namespace AutowpTest\Image;
 
 use Autowp\Image\Storage\NamingStrategy\Pattern;
 

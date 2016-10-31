@@ -7,3 +7,7 @@ install:
   - printf "\n" | pecl install imagick
   
 before_script: composer install --dev
+script: ./vendor/bin/phpunit --coverage-clover ./logs/clover.xml
+
+after_script:
+- ./vendor/bin/coveralls -v
