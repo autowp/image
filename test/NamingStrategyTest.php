@@ -34,7 +34,6 @@ class NamingStrategyTest extends \PHPUnit_Framework_TestCase
             'extension' => $extension
         ]);
         $this->assertSame($result, $generated);
-
     }
     
 }

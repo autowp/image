@@ -2,9 +2,9 @@
 
 namespace Autowp\Image\Storage\NamingStrategy;
 
-use Autowp\Filter\Filename\Safe;
 use Autowp\Image\Storage\Exception;
 use Autowp\Image\Storage\NamingStrategy\AbstractStrategy;
+use Autowp\ZFComponents\Filter\FilenameSafe;
 
 class Serial
     extends AbstractStrategy
@@ -68,13 +68,13 @@ class Serial
      * @param array $options
      * @see AbstractStrategy::generate()
      */
-    public function generate(array $options = array())
+    public function generate(array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'extenstion'    => null,
             'count'         => null,
             'prefferedName' => null,
-        );
+        ];
         $options = array_merge($defaults, $options);
 
         $count = (int)$options['count'];
@@ -89,7 +89,7 @@ class Serial
 
         $dirPath = $this->path($index, $this->deep);
 
-        $filter = new Safe();
+        $filter = new FilenameSafe();
 
         if ($options['prefferedName']) {
             $fileBasename = $filter->filter($options['prefferedName']);

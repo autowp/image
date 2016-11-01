@@ -90,7 +90,7 @@ class Format
      * @param array $options
      * @throws Exception
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->setOptions($options);
     }
@@ -422,12 +422,12 @@ class Format
         if (!isset($this->cropLeft, $this->cropTop, $this->cropWidth, $this->cropHeight)) {
             return false;
         }
-        return array(
+        return [
             'left'   => $this->cropLeft,
             'top'    => $this->cropTop,
             'width'  => $this->cropWidth,
             'height' => $this->cropHeight
-        );
+        ];
     }
 
     /**

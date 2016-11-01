@@ -29,12 +29,12 @@ class Image
      */
     public function __construct(array $options)
     {
-        $defaults = array(
+        $defaults = [
             'width'    => null,
             'height'   => null,
             'filesize' => null,
             'src'      => null
-        );
+        ];
 
         $options = array_merge($defaults, $options);
 
@@ -49,12 +49,12 @@ class Image
      */
     public function toArray()
     {
-        return array(
+        return [
             'width'    => $this->width,
             'height'   => $this->height,
             'filesize' => $this->filesize,
             'src'      => $this->src
-        );
+        ];
     }
 
     /**

@@ -15,7 +15,7 @@ abstract class AbstractStrategy
      * @param array $options
      * @throws Exception
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->setOptions($options);
     }
@@ -63,5 +63,5 @@ abstract class AbstractStrategy
      * @param array $options
      * @return string
      */
-    abstract public function generate(array $options = array());
+    abstract public function generate(array $options = []);
 }

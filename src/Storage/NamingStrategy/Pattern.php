@@ -2,9 +2,9 @@
 
 namespace Autowp\Image\Storage\NamingStrategy;
 
-use Autowp\Filter\Filename\Safe;
 use Autowp\Image\Storage\NamingStrategy\AbstractStrategy;
 use Autowp\Image\Storage\Exception;
+use Autowp\ZFComponents\Filter\FilenameSafe;
 
 class Pattern extends AbstractStrategy
 {
@@ -16,7 +16,7 @@ class Pattern extends AbstractStrategy
      */
     private static function _normalizePattern($pattern)
     {
-        $filter = new Safe();
+        $filter = new FilenameSafe();
 
         $result = [];
         $patternComponents = preg_split('|[\\/]+|isu', $pattern);
@@ -37,12 +37,12 @@ class Pattern extends AbstractStrategy
      * @param array $options
      * @see AbstractStrategy::generate()
      */
-    public function generate(array $options = array())
+    public function generate(array $options = [])
     {
-        $defaults = array(
+        $defaults = [
             'pattern'   => null,
             'extension' => null
-        );
+        ];
         $options = array_merge($defaults, $options);
 
         $ext = (string)$options['extension'];
