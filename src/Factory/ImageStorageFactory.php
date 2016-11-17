@@ -13,9 +13,9 @@ class ImageStorageFactory implements FactoryInterface
     {
         $config = $container->has('config') ? $container->get('config') : [];
         $storageConfig = isset($config['imageStorage']) ? $config['imageStorage'] : [];
-        
+
         $storage = new Storage($storageConfig);
-        
+
         $request = $container->get('Request');
         if ($request instanceof \Zend\Http\Request) {
             if ($request->getServer('HTTPS')) {

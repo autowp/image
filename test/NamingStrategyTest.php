@@ -4,7 +4,6 @@ namespace AutowpTest\Image;
 
 use Autowp\Image\Storage\NamingStrategy\Pattern;
 
-
 /**
  * @group Autowp_Image
  */
@@ -20,7 +19,7 @@ class NamingStrategyTest extends \PHPUnit_Framework_TestCase
             ['../test////test/..', 'test/test.jpg', 'jpg'],
         ];
     }
-    
+
     /**
      * @dataProvider patternsProvider
      */
@@ -35,5 +34,4 @@ class NamingStrategyTest extends \PHPUnit_Framework_TestCase
         ]);
         $this->assertSame($result, $generated);
     }
-    
 }

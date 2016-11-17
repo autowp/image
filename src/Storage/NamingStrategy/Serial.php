@@ -6,8 +6,7 @@ use Autowp\Image\Storage\Exception;
 use Autowp\Image\Storage\NamingStrategy\AbstractStrategy;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
-class Serial
-    extends AbstractStrategy
+class Serial extends AbstractStrategy
 {
     const ITEM_PER_DIR = 1000;
 
@@ -52,7 +51,7 @@ class Serial
         $path = '';
         if ($deep > 0) {
             $cur = floor($index / self::ITEM_PER_DIR);
-            for ($i=0 ; $i < $deep ; $i++) {
+            for ($i = 0; $i < $deep; $i++) {
                 $div = floor($cur / self::ITEM_PER_DIR);
                 $mod = $cur - $div * self::ITEM_PER_DIR;
                 $path = sprintf('%0'.$chars.'d', $mod) . DIRECTORY_SEPARATOR . $path;
@@ -83,7 +82,7 @@ class Serial
         $index = $count + 1;
 
         $dir = $this->getDir();
-        if (!$dir) {
+        if (! $dir) {
             throw new Exception("`dir` not initialized");
         }
 

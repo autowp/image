@@ -129,7 +129,7 @@ class Storage
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
 
-            if (!method_exists($this, $method)) {
+            if (! method_exists($this, $method)) {
                 $this->raise("Unexpected option '$key'");
             }
 
@@ -284,7 +284,7 @@ class Storage
         if (isset($this->dirs[$dirName])) {
             $this->raise("Dir '$dirName' alredy registered");
         }
-        if (!$dir instanceof Dir) {
+        if (! $dir instanceof Dir) {
             $dir = new Dir($dir);
         }
         $this->dirs[$dirName] = $dir;
@@ -327,7 +327,7 @@ class Storage
         if (isset($this->formats[$formatName])) {
             $this->raise("Format '$formatName' alredy registered");
         }
-        if (!$format instanceof Format) {
+        if (! $format instanceof Format) {
             $format = new Format($format);
         }
         $this->formats[$formatName] = $format;
@@ -417,7 +417,7 @@ class Storage
     private function buildImageResult(Zend_Db_Table_Row $imageRow)
     {
         $dir = $this->getDir($imageRow->dir);
-        if (!$dir) {
+        if (! $dir) {
             $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
@@ -425,7 +425,6 @@ class Storage
 
         $src = null;
         if ($dirUrl) {
-
             $path = str_replace('+', '%2B', $imageRow->filepath);
 
             $src = $dirUrl . $path;
@@ -451,13 +450,13 @@ class Storage
     private function buildImageBlobResult(Zend_Db_Table_Row $imageRow)
     {
         $dir = $this->getDir($imageRow->dir);
-        if (!$dir) {
+        if (! $dir) {
             $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
 
-        if (!file_exists($filepath)) {
+        if (! file_exists($filepath)) {
             return $this->raise("File `$filepath` not found");
         }
 
@@ -545,11 +544,11 @@ class Storage
 
         $imagesId = [];
         foreach ($requests as $request) {
-            if (!$request instanceof Request) {
+            if (! $request instanceof Request) {
                 return $this->raise('$requests is not array of Autowp\Image\Storage\Request');
             }
             $imageId = $request->getImageId();
-            if (!$imageId) {
+            if (! $imageId) {
                 $this->raise("ImageId not provided");
             }
 
@@ -575,7 +574,6 @@ class Storage
         $result = [];
 
         foreach ($requests as $key => $request) {
-
             $imageId = $request->getImageId();
 
             $destImageRow = null;
@@ -586,18 +584,17 @@ class Storage
                 }
             }
 
-            if (!$destImageRow) {
-
+            if (! $destImageRow) {
                 // find source image
                 $imageRow = $this->getImageTable()->fetchRow([
                     'id = ?' => $imageId
                 ]);
-                if (!$imageRow) {
+                if (! $imageRow) {
                     $this->raise("Image `$imageId` not found");
                 }
 
                 $dir = $this->getDir($imageRow->dir);
-                if (!$dir) {
+                if (! $dir) {
                     $this->raise("Dir '{$imageRow->dir}' not defined");
                 }
 
@@ -613,7 +610,7 @@ class Storage
 
                 // format
                 $format = $this->getFormat($formatName);
-                if (!$format) {
+                if (! $format) {
                     $this->raise("Format `$formatName` not found");
                 }
                 $cFormat = clone $format;
@@ -624,7 +621,7 @@ class Storage
                 }
 
                 $sampler = $this->getImageSampler();
-                if (!$sampler) {
+                if (! $sampler) {
                     return $this->raise("Image sampler not initialized");
                 }
                 $sampler->convertImagick($imagick, $cFormat);
@@ -639,7 +636,8 @@ class Storage
                 $formatExt = $cFormat->getFormatExtension();
                 $extension = $formatExt ? $formatExt : $pi['extension'];
                 $formatedImageId = $this->addImageFromImagick(
-                    $imagick, $this->formatedImageDirName,
+                    $imagick,
+                    $this->formatedImageDirName,
                     [
                         'extension' => $extension,
                         'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename']
@@ -653,7 +651,7 @@ class Storage
                     'format = ?'   => (string)$formatName,
                     'image_id = ?' => $imageId,
                 ]);
-                if (!$formatedImageRow) {
+                if (! $formatedImageRow) {
                     $formatedImageRow = $formatedImageTable->createRow([
                         'format'            => (string)$formatName,
                         'image_id'          => $imageId,
@@ -685,7 +683,7 @@ class Storage
     {
         $result = $this->getFormatedImageRows([$request], $formatName);
 
-        if (!isset($result[0])) {
+        if (! isset($result[0])) {
             $this->raise("getFormatedImageRows fails");
         }
 
@@ -699,7 +697,7 @@ class Storage
      */
     public function getFormatedImageBlob($request, $formatName)
     {
-        if (!$request instanceof Request) {
+        if (! $request instanceof Request) {
             $request = new Request([
                 'imageId' => $request
             ]);
@@ -719,7 +717,7 @@ class Storage
     {
         if (is_array($request)) {
             $request = new Request($request);
-        } elseif (!$request instanceof Request) {
+        } elseif (! $request instanceof Request) {
             $request = new Request([
                 'imageId' => $request
             ]);
@@ -758,7 +756,7 @@ class Storage
             'id = ?' => (int)$imageId
         ]);
 
-        if (!$imageRow) {
+        if (! $imageRow) {
             $this->raise("Image '$imageId' not found");
         }
 
@@ -773,7 +771,7 @@ class Storage
 
         // remove file & row
         $dir = $this->getDir($imageRow->dir);
-        if (!$dir) {
+        if (! $dir) {
             $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
@@ -786,7 +784,7 @@ class Storage
         $imageRow->delete();
 
         if (file_exists($filepath)) {
-            if (!unlink($filepath)) {
+            if (! unlink($filepath)) {
                 return $this->raise("Error unlink `$filepath`");
             }
         }
@@ -804,14 +802,14 @@ class Storage
     private function createImagePath($dirName, array $options = [])
     {
         $dir = $this->getDir($dirName);
-        if (!$dir) {
+        if (! $dir) {
             $this->raise("Dir '$dirName' not defined");
         }
 
         $dirPath = $dir->getPath();
 
         $namingStrategy = $dir->getNamingStrategy();
-        if (!$namingStrategy) {
+        if (! $namingStrategy) {
             $message = "Naming strategy not initialized for `$dirName`";
             $this->raise($message);
         }
@@ -821,7 +819,7 @@ class Storage
             'count' => $this->getDirCounter($dirName),
         ], $options);
 
-        if (!isset($options['extension'])) {
+        if (! isset($options['extension'])) {
             $options['extension'] = self::EXTENSION_DEFAULT;
         }
 
@@ -829,9 +827,9 @@ class Storage
         $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
 
         $destDir = dirname($destFilePath);
-        if (!is_dir($destDir)) {
+        if (! is_dir($destDir)) {
             $old = umask(0);
-            if (!mkdir($destDir, $this->dirMode, true)) {
+            if (! mkdir($destDir, $this->dirMode, true)) {
                 $this->raise("Cannot create dir '$destDir'");
             }
             umask($old);
@@ -846,7 +844,7 @@ class Storage
      */
     private function chmodFile($path)
     {
-        if (!chmod($path, $this->fileMode)) {
+        if (! chmod($path, $this->fileMode)) {
             $this->raise("Cannot chmod file '$path'");
         }
     }
@@ -876,7 +874,7 @@ class Storage
     private function lockFile($dirName, array $options, Closure $callback)
     {
         $dir = $this->getDir($dirName);
-        if (!$dir) {
+        if (! $dir) {
             $this->raise("Dir '$dirName' not defined");
         }
 
@@ -891,12 +889,12 @@ class Storage
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
 
             $fp = fopen($destFilePath, 'c+');
-            if (!$fp) {
+            if (! $fp) {
                 $this->raise("Cannot open file '$destFilePath'");
             }
 
             if ($this->useLocks) {
-                if (!flock($fp, LOCK_EX | LOCK_NB)) {
+                if (! flock($fp, LOCK_EX | LOCK_NB)) {
                     // already locked, try next file
                     return $this->raise("already locked, try next file");
                     fclose($fp);
@@ -922,10 +920,9 @@ class Storage
             fclose($fp);
 
             $fileSuccess = true;
+        } while (($lockAttemptsLeft > 0) && ! $fileSuccess);
 
-        } while (($lockAttemptsLeft > 0) && !$fileSuccess);
-
-        if (!$fileSuccess) {
+        if (! $fileSuccess) {
             return $this->raise("Cannot save to `$destFilePath` after few attempts");
         }
 
@@ -943,7 +940,7 @@ class Storage
     private function generateLockWrite($dirName, array $options, $width, $height, Closure $callback)
     {
         $dir = $this->getDir($dirName);
-        if (!$dir) {
+        if (! $dir) {
             $this->raise("Dir '$dirName' not defined");
         }
 
@@ -954,7 +951,6 @@ class Storage
         $insertAttemptsLeft = self::INSERT_MAX_ATTEMPTS;
         $insertAttemptException = null;
         do {
-
             $destFileName = $this->lockFile($dirName, $options, $callback);
 
             $filePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
@@ -997,7 +993,7 @@ class Storage
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
 
-        if (!$width || !$height) {
+        if (! $width || ! $height) {
             $this->raise("Failed to get image size ($width x $height)");
         }
 
@@ -1017,8 +1013,8 @@ class Storage
                 $this->raise("Unsupported image type `$format`");
         }
 
-        return $this->generateLockWrite($dirName, $options, $width, $height, function($fp) use ($imagick) {
-            if (!$imagick->writeImageFile($fp)) {
+        return $this->generateLockWrite($dirName, $options, $width, $height, function ($fp) use ($imagick) {
+            if (! $imagick->writeImageFile($fp)) {
                 $this->raise("Imagick::writeImageFile error");
             }
         });
@@ -1038,11 +1034,11 @@ class Storage
         $height = (int)$imageInfo[1];
         $type = $imageInfo[2];
 
-        if (!$width || !$height) {
+        if (! $width || ! $height) {
             $this->raise("Failed to get image size of '$file' ($width x $height)");
         }
 
-        if (!isset($options['extension'])) {
+        if (! isset($options['extension'])) {
             $ext = null;
             switch ($type) {
                 case IMAGETYPE_GIF:
@@ -1060,11 +1056,11 @@ class Storage
             $options['extension'] = $ext;
         }
 
-        return $this->generateLockWrite($dirName, $options, $width, $height, function($fp) use ($file) {
+        return $this->generateLockWrite($dirName, $options, $width, $height, function ($fp) use ($file) {
             /**
              * @todo buffered read-write
              */
-            if (!fwrite($fp, file_get_contents($file))) {
+            if (! fwrite($fp, file_get_contents($file))) {
                 $this->raise("fwrite error '$file'");
             }
         });
@@ -1152,18 +1148,18 @@ class Storage
     {
         $imageRow = $this->getImageRow($imageId);
 
-        if (!$imageRow) {
+        if (! $imageRow) {
             return false;
         }
 
         $dir = $this->getDir($imageRow->dir);
-        if (!$dir) {
+        if (! $dir) {
             return $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
 
-        if (!file_exists($filepath)) {
+        if (! file_exists($filepath)) {
             return $this->raise("File `$filepath` not found");
         }
 
@@ -1176,7 +1172,7 @@ class Storage
                     $iptcStr .= "<b>IPTC Key:</b> ".htmlspecialchars($key)." <b>Contents:</b> ";
                     foreach ($value as $innerkey => $innervalue) {
                         $iptcStr .= htmlspecialchars($innervalue);
-                        if ( ($innerkey+1) != count($value) ) {
+                        if (($innerkey + 1) != count($value)) {
                             $iptcStr .= ", ";
                         }
                     }
@@ -1198,18 +1194,18 @@ class Storage
     {
         $imageRow = $this->getImageRow($imageId);
 
-        if (!$imageRow) {
+        if (! $imageRow) {
             return false;
         }
 
         $dir = $this->getDir($imageRow->dir);
-        if (!$dir) {
+        if (! $dir) {
             return $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
 
-        if (!file_exists($filepath)) {
+        if (! file_exists($filepath)) {
             return $this->raise("File `$filepath` not found");
         }
 
@@ -1241,12 +1237,12 @@ class Storage
     public function changeImageName($imageId, array $options = [])
     {
         $imageRow = $this->getImageRow($imageId);
-        if (!$imageRow) {
+        if (! $imageRow) {
             return $this->raise("Image `$imageId` not found");
         }
 
         $dir = $this->getDir($imageRow->dir);
-        if (!$dir) {
+        if (! $dir) {
             return $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
@@ -1254,15 +1250,14 @@ class Storage
 
         $oldFilePath = $dirPath . DIRECTORY_SEPARATOR . $imageRow->filepath;
 
-        if (!isset($options['extension'])) {
+        if (! isset($options['extension'])) {
             $options['extension'] = self::detectExtenstion($oldFilePath);
         }
 
         $insertAttemptsLeft = self::INSERT_MAX_ATTEMPTS;
         $insertAttemptException = null;
         do {
-
-            $destFileName = $this->lockFile($imageRow->dir, $options, function($fp) use($imageRow) {
+            $destFileName = $this->lockFile($imageRow->dir, $options, function ($fp) use ($imageRow) {
                 fwrite($fp, $this->buildImageBlobResult($imageRow));
             });
 
@@ -1302,14 +1297,14 @@ class Storage
     public function registerImageFile($file, $dirName)
     {
         $dir = $this->getDir($dirName);
-        if (!$dir) {
+        if (! $dir) {
             $this->raise("Dir '$dirName' not defined");
         }
 
         $dirPath = $dir->getPath();
 
         $filePath = $dirPath . DIRECTORY_SEPARATOR . $file;
-        if (!$filePath) {
+        if (! $filePath) {
             throw new Exception("File `$filePath` not found");
         }
 
@@ -1332,12 +1327,12 @@ class Storage
     public function flop($imageId)
     {
         $imageRow = $this->getImageRow($imageId);
-        if (!$imageRow) {
+        if (! $imageRow) {
             return $this->raise("Image `$imageId` not found");
         }
 
         $dir = $this->getDir($imageRow->dir);
-        if (!$dir) {
+        if (! $dir) {
             $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
@@ -1361,12 +1356,12 @@ class Storage
     public function normalize($imageId)
     {
         $imageRow = $this->getImageRow($imageId);
-        if (!$imageRow) {
+        if (! $imageRow) {
             return $this->raise("Image `$imageId` not found");
         }
 
         $dir = $this->getDir($imageRow->dir);
-        if (!$dir) {
+        if (! $dir) {
             $this->raise("Dir '{$imageRow->dir}' not defined");
         }
 
@@ -1400,16 +1395,13 @@ class Storage
 
         foreach ($rows as $row) {
             $dir = $this->getDir($row['dir']);
-            if (!$dir) {
+            if (! $dir) {
                 print $row['id'] . ' ' . $row['filepath'] . " - dir '{$row['dir']}' not defined\n";
-
             } else {
-
                 $filepath = $dir->getPath() . '/' . $row['filepath'];
 
-                if (!file_exists($filepath)) {
+                if (! file_exists($filepath)) {
                     print $row['id'] . ' ' . $row['date_add'] . ' ' . $filepath . " - file not found\n";
-
                 }
             }
         }
@@ -1429,16 +1421,12 @@ class Storage
 
         foreach ($rows as $row) {
             $dir = $this->getDir($row['dir']);
-            if (!$dir) {
-
+            if (! $dir) {
                 print $row['id'] . ' ' . $row['filepath'] . " - dir '{$row['dir']}' not defined. Unable to fix\n";
-
             } else {
-
                 $filepath = $dir->getPath() . '/' . $row['filepath'];
 
-                if (!file_exists($filepath)) {
-
+                if (! file_exists($filepath)) {
                     print $row['id'] . ' ' . $filepath . ' - file not found. ';
 
                     $fRows = $formatedImageTable->fetchAll([
@@ -1446,7 +1434,6 @@ class Storage
                     ]);
 
                     if (count($fRows)) {
-
                         foreach ($fRows as $fRow) {
                             $this->flush([
                                 'format' => $fRow['format'],
@@ -1455,11 +1442,8 @@ class Storage
                         }
 
                         print "Flushed\n";
-
                     } else {
-
                         print "Unable to fix\n";
-
                     }
                 }
             }
@@ -1469,7 +1453,7 @@ class Storage
     public function deleteBrokenFiles($dirname)
     {
         $dir = $this->getDir($dirname);
-        if (!$dir) {
+        if (! $dir) {
             $this->raise("Dir '{$dirname}' not defined");
         }
 
@@ -1486,8 +1470,7 @@ class Storage
         foreach ($rows as $row) {
             $filepath = $dir->getPath() . '/' . $row['filepath'];
 
-            if (!file_exists($filepath)) {
-
+            if (! file_exists($filepath)) {
                 print $row['id'] . ' ' . $row['filepath'] . " - file not found. ";
 
                 $this->removeImage($row['id']);

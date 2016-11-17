@@ -41,10 +41,10 @@ class Dir
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
 
-            if (!method_exists($this, $method)) {
+            if (! method_exists($this, $method)) {
                 $this->raise("Unexpected option '$key'");
             }
-            
+
             $this->$method($value);
         }
 
@@ -57,13 +57,13 @@ class Dir
      */
     public function setPath($path)
     {
-        if (!is_string($path)) {
+        if (! is_string($path)) {
             return $this->raise("Path must be a string");
         }
 
         $path = trim($path);
 
-        if (!$path) {
+        if (! $path) {
             return $this->raise("Path cannot be empty, '$path' given");
         }
 
@@ -110,7 +110,7 @@ class Dir
      */
     public function setNamingStrategy($strategy)
     {
-        if (!$strategy instanceof AbstractStrategy) {
+        if (! $strategy instanceof AbstractStrategy) {
             if (is_array($strategy)) {
                 $strategyName = $strategy['strategy'];
                 $options = isset($strategy['options']) ? $strategy['options'] : [];
@@ -121,7 +121,7 @@ class Dir
 
             $className = 'Autowp\\Image\\Storage\\NamingStrategy\\' . ucfirst($strategyName);
             $strategy = new $className($options);
-            if (!$strategy instanceof AbstractStrategy) {
+            if (! $strategy instanceof AbstractStrategy) {
                 return $this->raise("$className is not naming strategy");
             }
         }

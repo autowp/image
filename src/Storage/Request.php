@@ -48,10 +48,10 @@ class Request
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
 
-            if (!method_exists($this, $method)) {
+            if (! method_exists($this, $method)) {
                 $this->raise("Unexpected option '$key'");
             }
-            
+
             $this->$method($value);
         }
 
@@ -83,22 +83,22 @@ class Request
      */
     public function setCrop(array $crop)
     {
-        if (!isset($crop['left'])) {
+        if (! isset($crop['left'])) {
             return $this->raise("Crop left not provided");
         }
         $this->setCropLeft($crop['left']);
 
-        if (!isset($crop['top'])) {
+        if (! isset($crop['top'])) {
             return $this->raise("Crop top not provided");
         }
         $this->setCropTop($crop['top']);
 
-        if (!isset($crop['width'])) {
+        if (! isset($crop['width'])) {
             return $this->raise("Crop width not provided");
         }
         $this->setCropWidth($crop['width']);
 
-        if (!isset($crop['height'])) {
+        if (! isset($crop['height'])) {
             return $this->raise("Crop height not provided");
         }
         $this->setCropHeight($crop['height']);
@@ -171,7 +171,7 @@ class Request
      */
     public function getCrop()
     {
-        if (!isset($this->cropLeft, $this->cropTop, $this->cropWidth, $this->cropHeight)) {
+        if (! isset($this->cropLeft, $this->cropTop, $this->cropWidth, $this->cropHeight)) {
             return false;
         }
         return [

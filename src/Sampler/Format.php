@@ -151,7 +151,7 @@ class Format
                 case 'gif':
                     return 'gif';
 
-                case 'bmp';
+                case 'bmp':
                     return 'bmp';
 
                 default:
@@ -331,22 +331,22 @@ class Format
      */
     public function setCrop(array $crop)
     {
-        if (!isset($crop['left'])) {
+        if (! isset($crop['left'])) {
             return $this->raise("Crop left not provided");
         }
         $this->setCropLeft($crop['left']);
 
-        if (!isset($crop['top'])) {
+        if (! isset($crop['top'])) {
             return $this->raise("Crop top not provided");
         }
         $this->setCropTop($crop['top']);
 
-        if (!isset($crop['width'])) {
+        if (! isset($crop['width'])) {
             return $this->raise("Crop width not provided");
         }
         $this->setCropWidth($crop['width']);
 
-        if (!isset($crop['height'])) {
+        if (! isset($crop['height'])) {
             return $this->raise("Crop height not provided");
         }
         $this->setCropHeight($crop['height']);
@@ -419,7 +419,7 @@ class Format
      */
     public function getCrop()
     {
-        if (!isset($this->cropLeft, $this->cropTop, $this->cropWidth, $this->cropHeight)) {
+        if (! isset($this->cropLeft, $this->cropTop, $this->cropWidth, $this->cropHeight)) {
             return false;
         }
         return [

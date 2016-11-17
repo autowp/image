@@ -38,9 +38,9 @@ class Image
 
         $options = array_merge($defaults, $options);
 
-        $this->width    =    (int)$options['width'];
-        $this->height   =    (int)$options['height'];
-        $this->filesize =    (int)$options['filesize'];
+        $this->width    = (int)$options['width'];
+        $this->height   = (int)$options['height'];
+        $this->filesize = (int)$options['filesize'];
         $this->src      = (string)$options['src'];
     }
 

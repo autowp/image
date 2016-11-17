@@ -27,7 +27,7 @@ class SamplerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($imagick->getImageWidth(), 102);
         $imagick->clear();
     }
-    
+
     public function testShouldResizeOddHeightPictureStrictlyToTargetHeightByOuterFitType()
     {
         $sampler = new Sampler();
@@ -43,7 +43,7 @@ class SamplerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($imagick->getImageHeight(), 150);
         $imagick->clear();
     }
-    
+
     public function testReduceOnlyWithInnerFitWorks()
     {
         $sampler = new Sampler();
@@ -138,7 +138,7 @@ class SamplerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($imagick->getImageHeight(), 100);
         $imagick->clear();
     }
-    
+
     public function testReduceOnlyWithOuterFitWorks()
     {
         $sampler = new Sampler();
@@ -233,7 +233,7 @@ class SamplerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($imagick->getImageHeight(), 100);
         $imagick->clear();
     }
-    
+
     public function testReduceOnlyWithMaximumFitWorks()
     {
         $sampler = new Sampler();
@@ -328,7 +328,7 @@ class SamplerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($imagick->getImageHeight(), 74);
         $imagick->clear();
     }
-    
+
     public function testReduceOnlyByWidthWorks()
     {
         $sampler = new Sampler();
@@ -371,7 +371,7 @@ class SamplerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($imagick->getImageHeight(), 74);
         $imagick->clear();
     }
-    
+
     public function testReduceOnlyByHeightWorks()
     {
         $sampler = new Sampler();

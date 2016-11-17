@@ -1,8 +1,10 @@
 language: php
 php:
-  - '5.6'
-  - '7.0'
-  
+  - 5.6
+  - 7.0
+  - 7.0.12
+  - 7.1
+  - nightly
 install:
   - printf "\n" | pecl install imagick
   
@@ -11,3 +13,4 @@ script: ./vendor/bin/phpunit --coverage-clover ./logs/clover.xml
 
 after_script:
 - ./vendor/bin/coveralls -v
+- ./vendor/bin/test-reporter -v --coverage-report=./logs/clover.xml

@@ -14,14 +14,14 @@ class Pattern extends AbstractStrategy
      * @param string $pattern
      * @return string
      */
-    private static function _normalizePattern($pattern)
+    private static function normalizePattern($pattern)
     {
         $filter = new FilenameSafe();
 
         $result = [];
         $patternComponents = preg_split('|[\\/]+|isu', $pattern);
         foreach ($patternComponents as $component) {
-            if (!in_array($component, self::$notAllowedParts)) {
+            if (! in_array($component, self::$notAllowedParts)) {
                 if ($component) {
                     $filtered = $filter->filter($component);
                     $result[] = $filtered;
@@ -46,10 +46,10 @@ class Pattern extends AbstractStrategy
         $options = array_merge($defaults, $options);
 
         $ext = (string)$options['extension'];
-        $pattern = self::_normalizePattern($options['pattern']);
+        $pattern = self::normalizePattern($options['pattern']);
 
         $dir = $this->getDir();
-        if (!$dir) {
+        if (! $dir) {
             throw new Exception("`dir` not initialized");
         }
 
@@ -59,7 +59,7 @@ class Pattern extends AbstractStrategy
             if ($pattern) {
                 $nameComponents[] = $pattern;
             }
-            if ($idx or (!$pattern)) {
+            if ($idx or (! $pattern)) {
                 $nameComponents[] = $idx;
             }
             $filename = implode('_', $nameComponents) . ($ext ? '.' . $ext : '');
