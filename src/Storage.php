@@ -1209,7 +1209,7 @@ class Storage
             return $this->raise("File `$filepath` not found");
         }
 
-        return exif_read_data($filepath, null, true);
+        return @exif_read_data($filepath, null, true);
     }
 
     public static function detectExtenstion($filepath)
