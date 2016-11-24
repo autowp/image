@@ -16,7 +16,7 @@
         "zendframework/zendframework1": "1.*",
         "zendframework/zend-mvc": "^3.0",
         "zendframework/zend-mvc-console": ">=1.1",
-        "autowp/zf-components": "^1.0"
+        "autowp/zf-components": ">=1.0.7"
     },
     "autoload": {
         "psr-4": {
