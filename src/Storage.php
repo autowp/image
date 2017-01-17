@@ -525,6 +525,29 @@ class Storage
 
         return $result;
     }
+    
+    /**
+     * @param int $imageId
+     * @return string
+     * @throws Exception
+     */
+    public function getImageFilepath($imageId)
+    {
+        $imageRow = $this->getImageRow($imageId);
+    
+        if (!$imageRow) {
+            return null;
+        }
+    
+        $dir = $this->getDir($imageRow->dir);
+        if (! $dir) {
+            $this->raise("Dir '{$imageRow->dir}' not defined");
+        }
+    
+        $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
+    
+        return $filepath;
+    }
 
     /**
      * @param int $imageId
