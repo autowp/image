@@ -1282,6 +1282,7 @@ class Storage
                 $y = round($y * 2.54);
                 break;
             case 'Undefined':
+            case 'undefined':
                 return null;
             default:
                 $this->raise("Unexpected resolution unit `{$info['units']}`");
