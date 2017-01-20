@@ -1234,6 +1234,65 @@ class Storage
 
         return @exif_read_data($filepath, null, true);
     }
+    
+    /**
+     * @param int $imageId
+     * @return boolean|array
+     */
+    public function getImageResolution($imageId)
+    {
+        $imageRow = $this->getImageRow($imageId);
+    
+        if (! $imageRow) {
+            return false;
+        }
+    
+        $dir = $this->getDir($imageRow->dir);
+        if (! $dir) {
+            return $this->raise("Dir '{$imageRow->dir}' not defined");
+        }
+    
+        $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow->filepath;
+    
+        if (! file_exists($filepath)) {
+            return $this->raise("File `$filepath` not found");
+        }
+    
+        $imagick = new Imagick();
+        $imagick->readImage($filepath);
+    
+        try {
+            $info = $imagick->identifyImage();
+        } catch (ImagickException $e) {
+            return false;
+        }
+    
+        $x = $info['resolution']['x'];
+        $y = $info['resolution']['x'];
+    
+        if (!$x || !$y) {
+            return false;
+        }
+    
+        switch ($info['units']) {
+            case 'PixelsPerInch':
+                break;
+            case 'PixelsPerCentimeter':
+                $x = round($x * 2.54);
+                $y = round($y * 2.54);
+                break;
+            case 'Undefined':
+                return null;
+            default:
+                $this->raise("Unexpected resolution unit `{$info['units']}`");
+                return null;
+        }
+    
+        return [
+            'x' => $x,
+            'y' => $y
+        ];
+    }
 
     public static function detectExtenstion($filepath)
     {
