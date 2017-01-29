@@ -1283,6 +1283,7 @@ class Storage
                 break;
             case 'Undefined':
             case 'undefined':
+            case 'Unrecognized':
                 return null;
             default:
                 $this->raise("Unexpected resolution unit `{$info['units']}`");
