@@ -1,5 +1,5 @@
 create database autowp_image_test default character set utf8;
-GRANT ALL PRIVILEGES ON autowp_image_test.* TO autowp_image_test@localhost IDENTIFIED BY "test";
+GRANT ALL PRIVILEGES ON autowp_image_test.* TO autowp_test@localhost IDENTIFIED BY "test";
 flush privileges;
 \. test/_files/dump.sql
 

@@ -10,7 +10,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_IMAGE_FILE = __DIR__ . '/_files/Towers_Schiphol_small.jpg';
     
-    public function testAddImageFromFile()
+    public function testAddImageFromFileChangeNameAndDelete()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
         
@@ -18,9 +18,19 @@ class StorageTest extends \PHPUnit_Framework_TestCase
         
         $imageStorage = $serviceManager->get(Image\Storage::class);
         
-        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'test');
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
         
         $this->assertNotEmpty($imageId);
+        
+        $imageStorage->changeImageName($imageId, [
+            'pattern' => 'new-name/by-pattern'
+        ]);
+        
+        $imageStorage->removeImage($imageId);
+        
+        $result = $imageStorage->getImage($imageId);
+        
+        $this->assertNull($result);
     }
     
     public function testAddImageFromBlobAndFormat()

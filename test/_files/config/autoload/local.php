@@ -29,6 +29,13 @@ return [
                     ]
                 ]
             ],
+            'naming' => [
+                'path' => $imageDir . "naming",
+                'url'  => 'http://localhost/image/naming/',
+                'namingStrategy' => [
+                    'strategy' => 'pattern'
+                ]
+            ],
         ],
         
         'formatedImageDirName' => 'format',

@@ -1245,7 +1245,7 @@ class Storage
         $insertAttemptsLeft = self::INSERT_MAX_ATTEMPTS;
         $insertAttemptException = null;
         do {
-            $destFileName = $this->createImagePath($dirName, $options);
+            $destFileName = $this->createImagePath($imageRow['dir'], $options);
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
             
             $insertAttemptException = null;
