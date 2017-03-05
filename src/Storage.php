@@ -765,7 +765,6 @@ class Storage
             throw new Exception($message);
         }
 
-
         $options = array_merge([
             'count' => $this->getDirCounter($dirName),
         ], $options);
@@ -833,13 +832,15 @@ class Storage
 
         $dirPath = $dir->getPath();
 
-        $this->incDirCounter($dirName);
-
-        $insertAttemptsLeft = self::INSERT_MAX_ATTEMPTS;
         $insertAttemptException = null;
         $imageId = null;
+        $attemptIndex = 0;
         do {
-            $destFileName = $this->createImagePath($dirName, $options);
+            $this->incDirCounter($dirName);
+            
+            $destFileName = $this->createImagePath($dirName, array_replace($options, [
+                'index' => $attemptIndex
+            ]));
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
             
             $insertAttemptException = null;
@@ -874,9 +875,9 @@ class Storage
                 $insertAttemptException = $e;
             }
             
-            $insertAttemptsLeft--;
+            $attemptIndex++;
             
-        } while (($insertAttemptsLeft > 0) && $insertAttemptException);
+        } while (($attemptIndex < self::INSERT_MAX_ATTEMPTS) && $insertAttemptException);
 
         if ($insertAttemptException) {
             throw $insertAttemptException;
@@ -1226,10 +1227,13 @@ class Storage
             $options['extension'] = self::detectExtenstion($oldFilePath);
         }
 
-        $insertAttemptsLeft = self::INSERT_MAX_ATTEMPTS;
+        $attemptIndex = self::INSERT_MAX_ATTEMPTS;
         $insertAttemptException = null;
+        
         do {
-            $destFileName = $this->createImagePath($imageRow['dir'], $options);
+            $destFileName = $this->createImagePath($imageRow['dir'], array_replace($options, [
+                'index' => $attemptIndex
+            ]));
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
             
             $insertAttemptException = null;
@@ -1253,9 +1257,9 @@ class Storage
                 $insertAttemptException = $e;
             }
             
-            $insertAttemptsLeft--;
+            $attemptIndex++;
             
-        } while (($insertAttemptsLeft > 0) && $insertAttemptException);
+        } while (($attemptIndex < self::INSERT_MAX_ATTEMPTS) && $insertAttemptException);
 
         if ($insertAttemptException) {
             throw $insertAttemptException;

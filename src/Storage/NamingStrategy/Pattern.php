@@ -41,31 +41,29 @@ class Pattern extends AbstractStrategy
     {
         $defaults = [
             'pattern'   => null,
-            'extension' => null
+            'extension' => null,
+            'index'     => null
         ];
         $options = array_merge($defaults, $options);
 
         $ext = (string)$options['extension'];
         $pattern = self::normalizePattern($options['pattern']);
+        $index = (int)$options['index'];
 
         $dir = $this->getDir();
         if (! $dir) {
             throw new Exception("`dir` not initialized");
         }
 
-        $idx = 0;
-        do {
-            $nameComponents = [];
-            if ($pattern) {
-                $nameComponents[] = $pattern;
-            }
-            if ($idx or (! $pattern)) {
-                $nameComponents[] = $idx;
-            }
-            $filename = implode('_', $nameComponents) . ($ext ? '.' . $ext : '');
-            $filePath = $dir . DIRECTORY_SEPARATOR . $filename;
-            $idx++;
-        } while (file_exists($filePath));
+        $nameComponents = [];
+        if ($pattern) {
+            $nameComponents[] = $pattern;
+        }
+        if ($index or (! $pattern)) {
+            $nameComponents[] = $index;
+        }
+        $filename = implode('_', $nameComponents) . ($ext ? '.' . $ext : '');
+        $filePath = $dir . DIRECTORY_SEPARATOR . $filename;
 
         return $filename;
     }

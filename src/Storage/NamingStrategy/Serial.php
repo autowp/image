@@ -56,7 +56,6 @@ class Serial extends AbstractStrategy
                 $mod = $cur - $div * self::ITEM_PER_DIR;
                 $path = sprintf('%0'.$chars.'d', $mod) . DIRECTORY_SEPARATOR . $path;
                 $cur = $div;
-                //$root = $root . substr($hash, 0, $i + 1) . DIRECTORY_SEPARATOR;
             }
         }
         return $path;
@@ -73,36 +72,28 @@ class Serial extends AbstractStrategy
             'extenstion'    => null,
             'count'         => null,
             'prefferedName' => null,
+            'index'         => null
         ];
         $options = array_merge($defaults, $options);
 
         $count = (int)$options['count'];
         $ext = (string)$options['extension'];
+        $index = (int)$options['index'];
 
-        $index = $count + 1;
+        $fileIndex = $count + 1;
 
-        $dir = $this->getDir();
-        if (! $dir) {
-            throw new Exception("`dir` not initialized");
-        }
-
-        $dirPath = $this->path($index, $this->deep);
+        $dirPath = $this->path($fileIndex, $this->deep);
 
         $filter = new FilenameSafe();
 
         if ($options['prefferedName']) {
             $fileBasename = $filter->filter($options['prefferedName']);
         } else {
-            $fileBasename = $index;
+            $fileBasename = $fileIndex;
         }
 
-        $idx = 0;
-        do {
-            $suffix = $idx ? '_' . $idx : '';
-            $filename = $fileBasename . $suffix . ($ext ? '.' . $ext : '');
-            $filePath = $dir . DIRECTORY_SEPARATOR . $dirPath . $filename;
-            $idx++;
-        } while (file_exists($filePath));
+        $suffix = $index ? '_' . $index : '';
+        $filename = $fileBasename . $suffix . ($ext ? '.' . $ext : '');
 
         return $dirPath . $filename;
     }

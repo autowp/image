@@ -19,7 +19,9 @@ class StorageTest extends \PHPUnit_Framework_TestCase
         
         $imageStorage = $serviceManager->get(Image\Storage::class);
         
-        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming', [
+            'pattern' => date('Y-m-d H:i:s')
+        ]);
         
         $this->assertNotEmpty($imageId);
         
@@ -60,6 +62,25 @@ class StorageTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($formatedImage->getSrc());
     }
     
+    public function testAddImageWithPrefferedName()
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+    
+        $serviceManager = $app->getServiceManager();
+    
+        $imageStorage = $serviceManager->get(Image\Storage::class);
+    
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'test', [
+            'prefferedName' => 'zeliboba' . date('Y-m-d H:i:s')
+        ]);
+    
+        $this->assertNotEmpty($imageId);
+    
+        $image = $imageStorage->getImage($imageId);
+    
+        $this->assertContains('zeliboba', $image->getSrc());
+    }
+    
     public function testIptcAndExif()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
@@ -82,6 +103,38 @@ class StorageTest extends \PHPUnit_Framework_TestCase
         
         $resolution = $imageStorage->getImageResolution($imageId);
         $this->assertNotEmpty($resolution);
+    }
+    
+    public function testAddImageAndCrop()
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+    
+        $serviceManager = $app->getServiceManager();
+    
+        $imageStorage = $serviceManager->get(Image\Storage::class);
+    
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
+            'pattern' => date('Y-m-d H:i:s')
+        ]);
+    
+        $this->assertNotEmpty($imageId);
+    
+        $filePath = $imageStorage->getImageFilepath($imageId);
+        $this->assertTrue(file_exists($filePath));
+        $this->assertEquals(filesize(self::TEST_IMAGE_FILE2), filesize($filePath));
+    
+        $formatedImage = $imageStorage->getFormatedImage(new Image\Storage\Request([
+            'imageId'    => $imageId,
+            'cropLeft'   => 1024,
+            'cropTop'    => 768,
+            'cropWidth'  => 1024,
+            'cropHeight' => 768
+        ]), 'picture-gallery');
+        
+        $this->assertEquals(1024, $formatedImage->getWidth());
+        $this->assertEquals(768, $formatedImage->getHeight());
+        $this->assertTrue($formatedImage->getFileSize() > 0);
+        $this->assertNotEmpty($formatedImage->getSrc());
     }
 }
 

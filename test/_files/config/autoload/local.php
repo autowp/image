@@ -2,7 +2,7 @@
 
 namespace Autowp\Image;
 
-$imageDir = __DIR__ . '/../images/';
+$imageDir = __DIR__ . '/../../images/';
 
 return [
     'imageStorage' => [
@@ -48,6 +48,14 @@ return [
                 'height'     => 120,
                 'background' => '#fff',
                 'strip'      => 1
+            ],
+            'picture-gallery' => [
+                'fitType'    => 2,
+                'width'      => 1024,
+                'height'     => 768,
+                'reduceOnly' => 1,
+                'strip'      => 1,
+                'format'     => 'jpeg'
             ],
         ]
     ],
