@@ -2,6 +2,7 @@
 
 return [
     'modules' => [
+        'Zend\Db',
         'Zend\Router',
         'Autowp\Image'
     ],
