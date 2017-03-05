@@ -136,5 +136,50 @@ class StorageTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($formatedImage->getFileSize() > 0);
         $this->assertNotEmpty($formatedImage->getSrc());
     }
+    
+    public function testFlopNormalizeAndMultipleRequest()
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+    
+        $serviceManager = $app->getServiceManager();
+    
+        $imageStorage = $serviceManager->get(Image\Storage::class);
+    
+        $imageId1 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming', [
+            'pattern' => date('Y-m-d H:i:s')
+        ]);
+    
+        $this->assertNotEmpty($imageId1);
+        
+        $imageStorage->flop($imageId1);
+    
+        $imageId2 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
+            'pattern' => date('Y-m-d H:i:s')
+        ]);
+        
+        $this->assertNotEmpty($imageId2);
+        
+        $imageStorage->normalize($imageId2);
+        
+        $images = $imageStorage->getImages([$imageId1, $imageId2]);
+        
+        $this->assertEquals(2, count($images));
+        
+        $request1 = new Image\Storage\Request([
+            'imageId'    => $imageId1
+        ]);
+        
+        $request2 = new Image\Storage\Request([
+            'imageId'    => $imageId2
+        ]);
+        
+        $formatedImages = $imageStorage->getFormatedImages([$request1, $request2], 'test');
+        
+        $this->assertEquals(2, count($formatedImages));
+        
+        // re-request
+        $formatedImages = $imageStorage->getFormatedImages([$request1, $request2], 'test');
+        $this->assertEquals(2, count($formatedImages));
+    }
 }
 

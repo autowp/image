@@ -470,9 +470,7 @@ class Storage
             throw new Exception("Dir '{$imageRow['dir']}' not defined");
         }
     
-        $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
-    
-        return $filepath;
+        return $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
     }
 
     /**
@@ -502,6 +500,7 @@ class Storage
             $imagesId[] = $imageId;
         }
 
+        $destImageRows = [];
         if (count($imagesId)) {
             $select = new Sql\Select($this->imageTable->getTable());
             $select
@@ -514,9 +513,9 @@ class Storage
                     new Sql\Predicate\In('f.image_id', $imagesId),
                     'f.format = ?' => (string)$formatName
                 ]);
-            $destImageRows = $this->imageTable->selectWith($select);
-        } else {
-            $destImageRows = [];
+            foreach ($this->imageTable->selectWith($select) as $row) {
+                $destImageRows[] = $row;
+            }
         }
 
         $result = [];
@@ -526,7 +525,7 @@ class Storage
 
             $destImageRow = null;
             foreach ($destImageRows as $row) {
-                if ($row->image_id == $imageId) {
+                if ($row['image_id'] == $imageId) {
                     $destImageRow = $row;
                     break;
                 }
@@ -1308,17 +1307,10 @@ class Storage
 
     public function flop($imageId)
     {
-        $imageRow = $this->getImageRow($imageId);
-        if (! $imageRow) {
-            throw new Exception("Image `$imageId` not found");
+        $filePath = $this->getImageFilepath($imageId);
+        if (! $filePath) {
+            throw new Exception("Failed to found path for `$imageId`");
         }
-
-        $dir = $this->getDir($imageRow['dir']);
-        if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
-        }
-
-        $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
         $imagick = new Imagick();
         $imagick->readImage($filePath);
@@ -1337,17 +1329,10 @@ class Storage
 
     public function normalize($imageId)
     {
-        $imageRow = $this->getImageRow($imageId);
-        if (! $imageRow) {
-            throw new Exception("Image `$imageId` not found");
+        $filePath = $this->getImageFilepath($imageId);
+        if (! $filePath) {
+            throw new Exception("Failed to found path for `$imageId`");
         }
-
-        $dir = $this->getDir($imageRow['dir']);
-        if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
-        }
-
-        $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
         $imagick = new Imagick();
         $imagick->readImage($filePath);
