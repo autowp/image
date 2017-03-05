@@ -22,7 +22,7 @@ before_script:
   - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
   - mysql -u root -e 'create database autowp_image_test;'
   - mysql -u root < test/_files/dump.sql
-  - mysql -u root -e 'GRANT ALL PRIVILEGES ON autowp_image_test.* TO autowp_image_test@localhost IDENTIFIED BY "test";'
+  - mysql -u root -e 'GRANT ALL PRIVILEGES ON autowp_image_test.* TO autowp_test@localhost IDENTIFIED BY "test";'
 script: ./vendor/bin/phpunit --coverage-clover ./logs/clover.xml
 
 after_script:

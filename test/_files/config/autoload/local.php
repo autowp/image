@@ -49,7 +49,7 @@ return [
         'host'           => 'localhost',
         'charset'        => 'utf8',
         'dbname'         => 'autowp_image_test',
-        'username'       => 'autowp_image_test',
+        'username'       => 'autowp_test',
         'password'       => 'test',
         'driver_options' => [
             \PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'"
