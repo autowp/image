@@ -18,7 +18,6 @@ install:
   - printf "\n" | pecl install imagick
   
 before_script: 
-  - phpenv config-add module/Application/test/_files/travis.php.ini
   - composer install --ignore-platform-reqs
   - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
   - mysql -u root -e 'create database autowp_image_test;'
