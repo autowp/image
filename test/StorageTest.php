@@ -9,6 +9,7 @@ use Autowp\Image;
 class StorageTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_IMAGE_FILE = __DIR__ . '/_files/Towers_Schiphol_small.jpg';
+    const TEST_IMAGE_FILE2 = __DIR__ . '/_files/mazda3_sedan_us-spec_11.jpg';
     
     public function testAddImageFromFileChangeNameAndDelete()
     {
@@ -21,6 +22,10 @@ class StorageTest extends \PHPUnit_Framework_TestCase
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
         
         $this->assertNotEmpty($imageId);
+        
+        $filePath = $imageStorage->getImageFilepath($imageId);
+        $this->assertTrue(file_exists($filePath));
+        $this->assertEquals(filesize(self::TEST_IMAGE_FILE), filesize($filePath));
         
         $imageStorage->changeImageName($imageId, [
             'pattern' => 'new-name/by-pattern'
@@ -53,6 +58,30 @@ class StorageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(120, $formatedImage->getHeight());
         $this->assertTrue($formatedImage->getFileSize() > 0);
         $this->assertNotEmpty($formatedImage->getSrc());
+    }
+    
+    public function testIptcAndExif()
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+    
+        $serviceManager = $app->getServiceManager();
+    
+        $imageStorage = $serviceManager->get(Image\Storage::class);
+    
+        $blob = file_get_contents(self::TEST_IMAGE_FILE2);
+    
+        $imageId = $imageStorage->addImageFromBlob($blob, 'test');
+    
+        $this->assertNotEmpty($imageId);
+    
+        $iptc = $imageStorage->getImageIPTC($imageId);
+        $this->assertNotEmpty($iptc);
+        
+        $exif = $imageStorage->getImageEXIF($imageId);
+        $this->assertNotEmpty($exif);
+        
+        $resolution = $imageStorage->getImageResolution($imageId);
+        $this->assertNotEmpty($resolution);
     }
 }
 

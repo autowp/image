@@ -7,6 +7,7 @@ $imageDir = __DIR__ . '/../images/';
 return [
     'imageStorage' => [
         'imageTableName' => 'image',
+        'dirTableName' => 'image_dir',
         'formatedImageTableName' => 'formated_image',
         'fileMode' => 0644,
         'dirMode' => 0755,

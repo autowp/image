@@ -98,11 +98,6 @@ class Storage
     private $forceHttps = false;
 
     /**
-     * @var string
-     */
-    private $useLocks = true;
-
-    /**
      * @param array $options
      * @throws Exception
      */
@@ -131,17 +126,6 @@ class Storage
 
             $this->$method($value);
         }
-
-        return $this;
-    }
-
-    /**
-     * @param bool $value
-     * @return Storage
-     */
-    public function setUseLocks($value)
-    {
-        $this->useLocks = (bool)$value;
 
         return $this;
     }
