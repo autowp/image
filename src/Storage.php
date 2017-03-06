@@ -25,7 +25,7 @@ class Storage
 {
     const EXTENSION_DEFAULT = 'jpg';
 
-    const INSERT_MAX_ATTEMPTS = 10;
+    const INSERT_MAX_ATTEMPTS = 1000;
 
     /**
      * @var AdapterInterface
@@ -546,6 +546,10 @@ class Storage
                 }
 
                 $srcFilePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
+                
+                if (! file_exists($srcFilePath)) {
+                    throw new Exception("File `$srcFilePath` not found");
+                }
 
                 $imagick = new Imagick();
                 try {
