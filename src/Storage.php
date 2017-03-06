@@ -1230,7 +1230,7 @@ class Storage
             $options['extension'] = self::detectExtenstion($oldFilePath);
         }
 
-        $attemptIndex = self::INSERT_MAX_ATTEMPTS;
+        $attemptIndex = 0;
         $insertAttemptException = null;
         
         do {
