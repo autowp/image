@@ -268,9 +268,10 @@ class Sampler
     /**
      * @param Imagick $imagick
      * @param array $crop
+     * @param Format $format
      * @throws Exception
      */
-    private function cropImage(Imagick $imagick, array $crop)
+    private function cropImage(Imagick $imagick, array $crop, Format $format)
     {
         $cropSet = isset($crop['width'], $crop['height'], $crop['left'], $crop['top']);
         if (! $cropSet) {
