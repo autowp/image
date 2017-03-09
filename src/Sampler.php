@@ -264,6 +264,132 @@ class Sampler
             false
         );
     }
+    
+    /**
+     * @param Imagick $imagick
+     * @param array $crop
+     * @throws Exception
+     */
+    private function cropImage(Imagick $imagick, array $crop)
+    {
+        $cropSet = isset($crop['width'], $crop['height'], $crop['left'], $crop['top']);
+        if (! $cropSet) {
+            return $this->raise('Crop parameters not properly set');
+        }
+        
+        $cropWidth  = (int)$crop['width'];
+        $cropHeight = (int)$crop['height'];
+        $cropLeft   = (int)$crop['left'];
+        $cropTop    = (int)$crop['top'];
+        
+        $width = $imagick->getImageWidth();
+        $height = $imagick->getImageHeight();
+        
+        $leftValid = ($cropLeft >= 0) && ($cropLeft < $width );
+        if (! $leftValid) {
+            return $this->raise("Crop left out of bounds ('$cropLeft')");
+        }
+        
+        $topValid = ($cropTop >= 0) && ($cropTop < $height);
+        if (! $topValid) {
+            return $this->raise("Crop top out of bounds ('$cropTop')");
+        }
+        
+        $right = $cropLeft + $cropWidth;
+        $widthValid  = ($cropWidth > 0) && ($right <= $width );
+        if (! $widthValid) {
+            return $this->raise("Crop width out of bounds ('$cropLeft + $cropWidth' ~ '$width x $height')");
+        }
+        
+        // try to fix height overflow
+        $bottom = $cropTop + $cropHeight;
+        $overflow = $bottom - $height;
+        if ($overflow > 0 && $overflow <= 1) {
+            $cropHeight -= $overflow;
+        }
+        
+        $bottom = $cropTop + $cropHeight;
+        $heightValid = ($cropHeight > 0) && ($bottom <= $height);
+        if (! $heightValid) {
+            return $this->raise("Crop height out of bounds ('$cropTop + $cropHeight' ~ '$width x $height')");
+        }
+        
+        $fWidth = $format->getWidth();
+        $fHeight = $format->getHeight();
+        if ($format->getProportionalCrop() && $fWidth && $fHeight) {
+            // extend crop to format proportions
+            $fRatio = $fWidth / $fHeight;
+            $cRatio = $cropWidth / $cropHeight;
+        
+            if ($cRatio > $fRatio) {
+                // crop wider than format, need more height
+                $targetHeight = round($cropWidth / $fRatio);
+                if ($targetHeight > $height) {
+                    $targetHeight = $height;
+                }
+                $addedHeight = $targetHeight - $cropHeight;
+                $cropTop -= round($addedHeight / 2);
+                if ($cropTop < 0) {
+                    $cropTop = 0;
+                }
+                $cropHeight = $targetHeight;
+            } else {
+                // crop higher than format, need more width
+                $targetWidth = round($cropHeight * $fRatio);
+                if ($targetWidth > $width) {
+                    $targetWidth = $width;
+                }
+                $addedWidth = $targetWidth - $cropWidth;
+                $cropLeft -= round($addedWidth / 2);
+                if ($cropLeft < 0) {
+                    $cropLeft = 0;
+                }
+                $cropWidth = $targetWidth;
+            }
+        }
+        
+        $imagick->cropImage($cropWidth, $cropHeight, $cropLeft, $cropTop);
+    }
+    
+    private function cropToWidest(Imagick $imagick, $widestRatio)
+    {
+        $srcWidth = $imagick->getImageWidth();
+        $srcHeight = $imagick->getImageHeight();
+        
+        $srcRatio = $srcWidth / $srcHeight;
+        
+        $ratioDiff = $srcRatio - $widestRatio;
+        
+        if ($ratioDiff > 0) {
+            $dstWidth = round($widestRatio * $srcHeight);
+            $imagick->cropImage(
+                $dstWidth,
+                $srcHeight,
+                ($srcWidth - $dstWidth) / 2,
+                0
+            );
+        }
+    }
+    
+    private function cropToHighest(Imagick $imagick, $highestRatio)
+    {
+        $srcWidth = $imagick->getImageWidth();
+        $srcHeight = $imagick->getImageHeight();
+    
+        $srcRatio = $srcWidth / $srcHeight;
+    
+        $ratioDiff = $srcRatio - $highestRatio;
+    
+        if ($ratioDiff < 0) {
+            $dstHeight = round($srcWidth / $highestRatio);
+            $imagick->cropImage(
+                $srcWidth,
+                $dstHeight,
+                0,
+                ($srcHeight - $dstHeight) / 2
+            );
+        }
+    }
 
     /**
      * @param Imagick $source
@@ -290,83 +416,19 @@ class Sampler
         }
 
         if ($crop) {
-            $cropSet = isset($crop['width'], $crop['height'], $crop['left'], $crop['top']);
-            if (! $cropSet) {
-                return $this->raise('Crop parameters not properly set');
-            }
-
-            $cropWidth  = (int)$crop['width'];
-            $cropHeight = (int)$crop['height'];
-            $cropLeft   = (int)$crop['left'];
-            $cropTop    = (int)$crop['top'];
-
-            $width = $imagick->getImageWidth();
-            $height = $imagick->getImageHeight();
-
-            $leftValid = ($cropLeft >= 0) && ($cropLeft < $width );
-            if (! $leftValid) {
-                return $this->raise("Crop left out of bounds ('$cropLeft')");
-            }
-
-            $topValid = ($cropTop >= 0) && ($cropTop < $height);
-            if (! $topValid) {
-                return $this->raise("Crop top out of bounds ('$cropTop')");
-            }
-
-            $right = $cropLeft + $cropWidth;
-            $widthValid  = ($cropWidth > 0) && ($right <= $width );
-            if (! $widthValid) {
-                return $this->raise("Crop width out of bounds ('$cropLeft + $cropWidth' ~ '$width x $height')");
-            }
-
-            // try to fix height overflow
-            $bottom = $cropTop + $cropHeight;
-            $overflow = $bottom - $height;
-            if ($overflow > 0 && $overflow <= 1) {
-                $cropHeight -= $overflow;
-            }
-
-            $bottom = $cropTop + $cropHeight;
-            $heightValid = ($cropHeight > 0) && ($bottom <= $height);
-            if (! $heightValid) {
-                return $this->raise("Crop height out of bounds ('$cropTop + $cropHeight' ~ '$width x $height')");
-            }
-
-            $fWidth = $format->getWidth();
-            $fHeight = $format->getHeight();
-            if ($format->getProportionalCrop() && $fWidth && $fHeight) {
-                // extend crop to format proportions
-                $fRatio = $fWidth / $fHeight;
-                $cRatio = $cropWidth / $cropHeight;
-
-                if ($cRatio > $fRatio) {
-                    // crop wider than format, need more height
-                    $targetHeight = round($cropWidth / $fRatio);
-                    if ($targetHeight > $height) {
-                        $targetHeight = $height;
-                    }
-                    $addedHeight = $targetHeight - $cropHeight;
-                    $cropTop -= round($addedHeight / 2);
-                    if ($cropTop < 0) {
-                        $cropTop = 0;
-                    }
-                    $cropHeight = $targetHeight;
-                } else {
-                    // crop higher than format, need more width
-                    $targetWidth = round($cropHeight * $fRatio);
-                    if ($targetWidth > $width) {
-                        $targetWidth = $width;
-                    }
-                    $addedWidth = $targetWidth - $cropWidth;
-                    $cropLeft -= round($addedWidth / 2);
-                    if ($cropLeft < 0) {
-                        $cropLeft = 0;
-                    }
-                    $cropWidth = $targetWidth;
-                }
-            }
-
-            $imagick->cropImage($cropWidth, $cropHeight, $cropLeft, $cropTop);
+            $this->cropImage($imagick, $crop);
+        }
+        
+        // fit by widest
+        $widest = $format->getWidest();
+        if ($widest) {
+            $this->cropToWidest($imagick, $widest);
+        }
+        
+        // fit by highest
+        $highest = $format->getHighest();
+        if ($highest) {
+            $this->cropToHighest($imagick, $highest);
         }
 
         // check for monotone background extend posibility

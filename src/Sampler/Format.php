@@ -85,6 +85,16 @@ class Format
      * @var string
      */
     private $format = null;
+    
+    /**
+     * @var float|null
+     */
+    private $widest = null;
+    
+    /**
+     * @var float|null
+     */
+    private $highest = null;
 
     /**
      * @param array $options
@@ -475,5 +485,64 @@ class Format
     private function raise($message)
     {
         throw new Exception($message);
+    }
+    
+    /**
+     * @param float|null $value
+     * @throws Exception
+     * @return Format
+     */
+    public function setWidest($value)
+    {
+        if ($value === null) {
+            $this->widest = null;
+            return $this;
+        }
+        
+        $widest = (float)$value;
+        if ($widest <= 0) {
+            throw new Exception("widest value must be > 0");
+        }
+        
+        $this->widest = $widest;
+        
+        return $this;
+    }
+    
+    /**
+     * @param float|null $value
+     * @throws Exception
+     * @return Format
+     */
+    public function setHighest($value)
+    {
+        if ($value === null) {
+            $this->highest = null;
+            return $this;
+        }
+        
+        $highest = (float)$value;
+        if ($highest <= 0) {
+            throw new Exception("highest value must be > 0");
+        }
+        $this->highest = $highest;
+        
+        return $this;
+    }
+    
+    /**
+     * @return float|null
+     */
+    public function getWidest()
+    {
+        return $this->widest;
+    }
+    
+    /**
+     * @return float|null
+     */
+    public function getHighest()
+    {
+        return $this->highest;
     }
 }

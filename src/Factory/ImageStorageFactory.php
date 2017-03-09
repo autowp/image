@@ -3,6 +3,7 @@
 namespace Autowp\Image\Factory;
 
 use Interop\Container\ContainerInterface;
+use Zend\Db\Adapter\AdapterInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 use Autowp\Image\Storage;
@@ -14,7 +15,13 @@ class ImageStorageFactory implements FactoryInterface
         $config = $container->has('Config') ? $container->get('Config') : [];
         $storageConfig = isset($config['imageStorage']) ? $config['imageStorage'] : [];
         
-        $storageConfig['dbAdapter'] = $container->get(\Zend\Db\Adapter\AdapterInterface::class);
+        $db = $container->get(AdapterInterface::class);
+        
+        if (! $db instanceof AdapterInterface) {
+            throw new Exception(sprintf("service %s not found", AdapterInterface::class));
+        }
+        
+        $storageConfig['dbAdapter'] = $db;
 
         $storage = new Storage($storageConfig);
 

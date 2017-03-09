@@ -9,7 +9,7 @@ use Closure;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Exception\ExceptionInterface;
 use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\TableGateway;
 
 use Autowp\Image\Sampler;
 use Autowp\Image\Sampler\Format;
@@ -33,7 +33,7 @@ class Storage
     private $db = null;
 
     /**
-     * @var TableGateway
+     * @var TableGateway\TableGateway
      */
     private $imageTable = null;
 
@@ -41,9 +41,14 @@ class Storage
      * @var string
      */
     private $imageTableName = 'image';
+    
+    /**
+     * @var string
+     */
+    private $imageSeqName = 'image_id_seq';
 
     /**
-     * @var TableGateway
+     * @var TableGateway\TableGateway
      */
     private $formatedImageTable = null;
 
@@ -53,7 +58,7 @@ class Storage
     private $formatedImageTableName = 'formated_image';
 
     /**
-     * @var TableGateway
+     * @var TableGateway\TableGateway
      */
     private $dirTable = null;
 
@@ -105,9 +110,20 @@ class Storage
     {
         $this->setOptions($options);
         
-        $this->imageTable = new TableGateway($this->imageTableName, $this->db);
-        $this->formatedImageTable = new TableGateway($this->formatedImageTableName, $this->db);
-        $this->dirTable = new TableGateway($this->dirTableName, $this->db);
+        if (! $this->db instanceof AdapterInterface) {
+            throw new Exception("Db adapter not provided");
+        }
+        
+        $platform = $this->db->getPlatform();
+        $platformName = $platform->getName();
+        
+        $feature = null;
+        if ($platformName == 'PostgreSQL') {
+            $feature = new TableGateway\Feature\SequenceFeature('id', $this->imageSeqName);
+        }
+        $this->imageTable = new TableGateway\TableGateway($this->imageTableName, $this->db, $feature);
+        $this->formatedImageTable = new TableGateway\TableGateway($this->formatedImageTableName, $this->db);
+        $this->dirTable = new TableGateway\TableGateway($this->dirTableName, $this->db);
     }
 
     /**
@@ -873,7 +889,7 @@ class Storage
                 
                 $imageId = $id;
                 
-            } catch (ExceptionInterface $e) {
+            } catch (\Exception $e) {
                 // duplicate or other error
                 $insertAttemptException = $e;
             }
@@ -881,7 +897,7 @@ class Storage
             $attemptIndex++;
             
         } while (($attemptIndex < self::INSERT_MAX_ATTEMPTS) && $insertAttemptException);
-
+        
         if ($insertAttemptException) {
             throw $insertAttemptException;
         }
