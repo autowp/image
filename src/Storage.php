@@ -833,6 +833,14 @@ class Storage
 
         return $imageId;
     }
+    
+    private function indexByAttempt($attempt)
+    {
+        $from = pow(10, $attempt-1);
+        $to = pow(10, $attempt) - 1;
+        
+        return rand($from, $to);
+    }
 
     /**
      * @param string $dirName
@@ -858,7 +866,7 @@ class Storage
             $this->incDirCounter($dirName);
             
             $destFileName = $this->createImagePath($dirName, array_replace($options, [
-                'index' => $attemptIndex
+                'index' => $this->indexByAttempt($attemptIndex)
             ]));
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
             
@@ -1251,7 +1259,7 @@ class Storage
         
         do {
             $destFileName = $this->createImagePath($imageRow['dir'], array_replace($options, [
-                'index' => $attemptIndex
+                'index' => $this->indexByAttempt($attemptIndex)
             ]));
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
             

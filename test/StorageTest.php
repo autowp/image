@@ -19,9 +19,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase
         
         $imageStorage = $serviceManager->get(Image\Storage::class);
         
-        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming', [
-            'pattern' => date('Y-m-d H:i:s')
-        ]);
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
         
         $this->assertNotEmpty($imageId);
         
@@ -71,7 +69,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase
         $imageStorage = $serviceManager->get(Image\Storage::class);
     
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'test', [
-            'prefferedName' => 'zeliboba' . date('Y-m-d H:i:s')
+            'prefferedName' => 'zeliboba'
         ]);
     
         $this->assertNotEmpty($imageId);
@@ -113,9 +111,7 @@ class StorageTest extends \PHPUnit_Framework_TestCase
     
         $imageStorage = $serviceManager->get(Image\Storage::class);
     
-        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
-            'pattern' => date('Y-m-d H:i:s')
-        ]);
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
     
         $this->assertNotEmpty($imageId);
     
@@ -145,17 +141,13 @@ class StorageTest extends \PHPUnit_Framework_TestCase
     
         $imageStorage = $serviceManager->get(Image\Storage::class);
     
-        $imageId1 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming', [
-            'pattern' => date('Y-m-d H:i:s')
-        ]);
+        $imageId1 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
     
         $this->assertNotEmpty($imageId1);
         
         $imageStorage->flop($imageId1);
     
-        $imageId2 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
-            'pattern' => date('Y-m-d H:i:s')
-        ]);
+        $imageId2 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
         
         $this->assertNotEmpty($imageId2);
         
