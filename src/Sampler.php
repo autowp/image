@@ -417,7 +417,7 @@ class Sampler
         }
 
         if ($crop) {
-            $this->cropImage($imagick, $crop);
+            $this->cropImage($imagick, $crop, $format);
         }
         
         // fit by widest
