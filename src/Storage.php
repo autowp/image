@@ -41,7 +41,7 @@ class Storage
      * @var string
      */
     private $imageTableName = 'image';
-    
+
     /**
      * @var string
      */
@@ -109,14 +109,14 @@ class Storage
     public function __construct(array $options = [])
     {
         $this->setOptions($options);
-        
+
         if (! $this->db instanceof AdapterInterface) {
             throw new Exception("Db adapter not provided");
         }
-        
+
         $platform = $this->db->getPlatform();
         $platformName = $platform->getName();
-        
+
         $feature = null;
         if ($platformName == 'PostgreSQL') {
             $feature = new TableGateway\Feature\SequenceFeature('id', $this->imageSeqName);
@@ -467,7 +467,7 @@ class Storage
 
         return $result;
     }
-    
+
     /**
      * @param int $imageId
      * @return string
@@ -476,16 +476,16 @@ class Storage
     public function getImageFilepath($imageId)
     {
         $imageRow = $this->getImageRow($imageId);
-    
+
         if (!$imageRow) {
             return null;
         }
-    
+
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
             throw new Exception("Dir '{$imageRow['dir']}' not defined");
         }
-    
+
         return $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
     }
 
@@ -562,7 +562,7 @@ class Storage
                 }
 
                 $srcFilePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
-                
+
                 if (! file_exists($srcFilePath)) {
                     throw new Exception("File `$srcFilePath` not found");
                 }
@@ -833,12 +833,12 @@ class Storage
 
         return $imageId;
     }
-    
+
     private function indexByAttempt($attempt)
     {
         $from = pow(10, $attempt-1);
         $to = pow(10, $attempt) - 1;
-        
+
         return rand($from, $to);
     }
 
@@ -864,14 +864,14 @@ class Storage
         $attemptIndex = 0;
         do {
             $this->incDirCounter($dirName);
-            
+
             $destFileName = $this->createImagePath($dirName, array_replace($options, [
                 'index' => $this->indexByAttempt($attemptIndex)
             ]));
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
-            
+
             $insertAttemptException = null;
-            
+
             try {
                 // store to db
                 $this->imageTable->insert([
@@ -882,30 +882,30 @@ class Storage
                     'filepath' => $destFileName,
                     'date_add' => new Sql\Expression('now()')
                 ]);
-                
+
                 $id = $this->imageTable->getLastInsertValue();
-                
+
                 $callback($destFilePath);
-                
+
                 $this->chmodFile($destFilePath);
-                
+
                 $this->imageTable->update([
                     'filesize' => filesize($destFilePath)
                 ], [
                     'id' => $id
                 ]);
-                
+
                 $imageId = $id;
-                
+
             } catch (\Exception $e) {
                 // duplicate or other error
                 $insertAttemptException = $e;
             }
-            
+
             $attemptIndex++;
-            
+
         } while (($attemptIndex < self::INSERT_MAX_ATTEMPTS) && $insertAttemptException);
-        
+
         if ($insertAttemptException) {
             throw $insertAttemptException;
         }
@@ -1025,7 +1025,7 @@ class Storage
 
         foreach ($rows as $row) {
             $this->removeImage($row['formated_image_id']);
-            
+
             $this->formatedImageTable->delete([
                 'image_id' => $row['image_id'],
                 'format'   => $row['format']
@@ -1044,13 +1044,13 @@ class Storage
         $select = new Sql\Select($this->dirTable->getTable());
         $select->columns(['count'])
             ->where(['dir = ?' => $dirName]);
-        
+
         $row = $this->dirTable->selectWith($select)->current();
-        
+
         if (!$row) {
             return 0;
         }
-        
+
         return (int)$row['count'];
     }
 
@@ -1151,7 +1151,7 @@ class Storage
 
         return @exif_read_data($filepath, null, true);
     }
-    
+
     /**
      * @param int $imageId
      * @return boolean|array
@@ -1159,38 +1159,38 @@ class Storage
     public function getImageResolution($imageId)
     {
         $imageRow = $this->getImageRow($imageId);
-    
+
         if (! $imageRow) {
             return false;
         }
-    
+
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
             throw new Exception("Dir '{$imageRow['dir']}' not defined");
         }
-    
+
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
-    
+
         if (! file_exists($filepath)) {
             throw new Exception("File `$filepath` not found");
         }
-    
+
         $imagick = new Imagick();
         $imagick->readImage($filepath);
-    
+
         try {
             $info = $imagick->identifyImage();
         } catch (ImagickException $e) {
             return false;
         }
-    
+
         $x = $info['resolution']['x'];
         $y = $info['resolution']['x'];
-    
+
         if (!$x || !$y) {
             return false;
         }
-    
+
         switch ($info['units']) {
             case 'PixelsPerInch':
                 break;
@@ -1205,7 +1205,7 @@ class Storage
             default:
                 throw new Exception("Unexpected resolution unit `{$info['units']}`");
         }
-    
+
         return [
             'x' => $x,
             'y' => $y
@@ -1256,45 +1256,46 @@ class Storage
 
         $attemptIndex = 0;
         $insertAttemptException = null;
-        
+
         do {
             $destFileName = $this->createImagePath($imageRow['dir'], array_replace($options, [
                 'index' => $this->indexByAttempt($attemptIndex)
             ]));
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
-            
+
             $insertAttemptException = null;
-            
+
             try {
+                if ($destFileName == $imageRow['filepath']) {
+                    throw new Exception("Trying to rename to self");
+                }
+
                 $this->imageTable->update([
                     'filepath' => $destFileName
                 ], [
                     'id' => $imageRow['id']
                 ]);
-                
-                $bytesWritten = file_put_contents($destFilePath, $this->buildImageBlobResult($imageRow));
-                if ($bytesWritten === false) {
-                    throw new Exception("Failed to write file");
-                }
-                
-                $this->chmodFile($destFilePath);
-                
-            } catch (ExceptionInterface $e) {
+
+            } catch (\Exception $e) {
                 // duplicate or other error
                 $insertAttemptException = $e;
             }
-            
+
+            if (! $insertAttemptException) {
+                $success = rename($oldFilePath, $destFilePath);
+                if (! $success) {
+                    throw new Exception("Failed to move file");
+                }
+
+                $this->chmodFile($destFilePath);
+            }
+
             $attemptIndex++;
-            
+
         } while (($attemptIndex < self::INSERT_MAX_ATTEMPTS) && $insertAttemptException);
 
         if ($insertAttemptException) {
             throw $insertAttemptException;
-        }
-
-        // remove old file
-        if (file_exists($oldFilePath)) {
-            unlink($oldFilePath);
         }
     }
 
@@ -1442,7 +1443,7 @@ class Storage
         if (! $dir) {
             throw new Exception("Dir '{$dirname}' not defined");
         }
-        
+
         $select = new Sql\Select($this->imageTable->getTable());
         $select->columns(['id', 'filepath'])
             ->where(['dir = ?' => $dirname]);
