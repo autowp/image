@@ -7,7 +7,6 @@ use ImagickException;
 use Closure;
 
 use Zend\Db\Adapter\AdapterInterface;
-use Zend\Db\Exception\ExceptionInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway;
 
@@ -696,6 +695,39 @@ class Storage
         return $this->buildImageResult(
             $this->getFormatedImageRow($request, $formatName)
         );
+    }
+
+    /**
+     * @param int|Request $request
+     * @param string $format
+     * @return string
+     */
+    public function getFormatedImagePath($request, $formatName)
+    {
+        if (is_array($request)) {
+            $request = new Request($request);
+        } elseif (! $request instanceof Request) {
+            $request = new Request([
+                'imageId' => $request
+            ]);
+        }
+
+        $imageRow = $this->getFormatedImageRow($request, $formatName);
+
+        $dir = $this->getDir($imageRow['dir']);
+        if (! $dir) {
+            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+        }
+
+        $dirPath = $dir->getPath();
+
+        $path = null;
+        if ($dirPath) {
+            $dirPath = rtrim($dirPath, '/\\') . DIRECTORY_SEPARATOR;
+            $path = $dirPath . $imageRow['filepath'];
+        }
+
+        return $path;
     }
 
     /**
