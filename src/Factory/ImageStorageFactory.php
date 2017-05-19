@@ -27,7 +27,7 @@ class ImageStorageFactory implements FactoryInterface
 
         $request = $container->get('Request');
         if ($request instanceof \Zend\Http\Request) {
-            if ($request->getServer('HTTPS')) {
+            if ($request->getServer('HTTPS') || $request->getServer('HTTP_X_FORWARDED_PROTO') == 'https') {
                 $storage->setForceHttps(true);
             }
         }
