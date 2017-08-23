@@ -118,7 +118,7 @@ class Format
             if (! method_exists($this, $method)) {
                 $this->raise("Unexpected option '$key'");
             }
-            
+
             $this->$method($value);
         }
 

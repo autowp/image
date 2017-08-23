@@ -33,7 +33,7 @@ abstract class AbstractStrategy
             if (! method_exists($this, $method)) {
                 throw new Exception("Unexpected option '$key'");
             }
-            
+
             $this->$method($value);
         }
 

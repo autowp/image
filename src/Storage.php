@@ -176,7 +176,7 @@ class Storage
         if (is_array($options)) {
             $options = new Sampler($options);
         }
-        
+
         if (! $options instanceof Sampler) {
             $message = "Unexpected imageSampler options. Array or object excepcted";
             throw new Exception($message);
