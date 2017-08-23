@@ -10,6 +10,9 @@ use Autowp\Image\View\Helper\ImageStorage;
 
 class ViewHelperFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new ImageStorage($container->get(Storage::class));

@@ -2,7 +2,6 @@ sudo: required
 dist: trusty
 language: php
 php:
-  - 7.0
   - 7.0.12
   - 7.1
   - nightly
@@ -23,8 +22,11 @@ before_script:
   - mysql -u root -e 'create database autowp_image_test;'
   - mysql -u root < test/_files/dump.sql
   - mysql -u root -e 'GRANT ALL PRIVILEGES ON autowp_image_test.* TO autowp_test@localhost IDENTIFIED BY "test";'
-script: ./vendor/bin/phpunit --coverage-clover ./logs/clover.xml
+script: 
+  - composer cs-check
+  - composer phpmd
+  - ./vendor/bin/phpunit --coverage-clover ./test/logs/clover.xml
 
 after_script:
-- ./vendor/bin/coveralls -v
-- ./vendor/bin/test-reporter -v --coverage-report=./logs/clover.xml
+  - ./vendor/bin/coveralls -v
+  - ./vendor/bin/test-reporter -v --coverage-report=./logs/clover.xml

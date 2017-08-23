@@ -85,12 +85,12 @@ class Format
      * @var string
      */
     private $format = null;
-    
+
     /**
      * @var float|null
      */
     private $widest = null;
-    
+
     /**
      * @var float|null
      */
@@ -115,11 +115,11 @@ class Format
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
 
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            } else {
+            if (! method_exists($this, $method)) {
                 $this->raise("Unexpected option '$key'");
             }
+            
+            $this->$method($value);
         }
 
         return $this;
@@ -200,7 +200,7 @@ class Format
      * @param bool $value
      * @return Format
      */
-    public function setStrip($value)
+    public function setStrip(bool $value)
     {
         $this->strip = (bool)$value;
 
@@ -210,7 +210,17 @@ class Format
     /**
      * @return bool
      */
-    public function getStrip()
+    public function isStrip(): bool
+    {
+        return $this->strip;
+    }
+
+    /**
+     * @return bool
+     * @deprecated
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
+     */
+    public function getStrip(): bool
     {
         return $this->strip;
     }
@@ -219,7 +229,7 @@ class Format
      * @param bool $reduceOnly
      * @return Format
      */
-    public function setReduceOnly($reduceOnly)
+    public function setReduceOnly(bool $reduceOnly)
     {
         $this->reduceOnly = (bool)$reduceOnly;
 
@@ -229,7 +239,17 @@ class Format
     /**
      * @return bool
      */
-    public function getReduceOnly()
+    public function isReduceOnly(): bool
+    {
+        return $this->reduceOnly;
+    }
+
+    /**
+     * @return bool
+     * @deprecated
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
+     */
+    public function getReduceOnly(): bool
     {
         return $this->reduceOnly;
     }
@@ -444,7 +464,7 @@ class Format
      * @param boolean $value
      * @return Format
      */
-    public function setIgnoreCrop($value)
+    public function setIgnoreCrop(bool $value)
     {
         $this->ignoreCrop = (bool)$value;
 
@@ -453,8 +473,18 @@ class Format
 
     /**
      * @return boolean
+     * @deprecated
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
-    public function getIgnoreCrop()
+    public function getIgnoreCrop(): bool
+    {
+        return $this->ignoreCrop;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isIgnoreCrop(): bool
     {
         return $this->ignoreCrop;
     }
@@ -463,7 +493,7 @@ class Format
      * @param boolean $value
      * @return Format
      */
-    public function setProportionalCrop($value)
+    public function setProportionalCrop(bool $value)
     {
         $this->proportionalCrop = (bool)$value;
 
@@ -473,7 +503,17 @@ class Format
     /**
      * @return bool
      */
-    public function getProportionalCrop()
+    public function isProportionalCrop(): bool
+    {
+        return $this->proportionalCrop;
+    }
+
+    /**
+     * @return bool
+     * @deprecated
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
+     */
+    public function getProportionalCrop(): bool
     {
         return $this->proportionalCrop;
     }
@@ -482,11 +522,11 @@ class Format
      * @param string $message
      * @throws Exception
      */
-    private function raise($message)
+    private function raise(string $message)
     {
         throw new Exception($message);
     }
-    
+
     /**
      * @param float|null $value
      * @throws Exception
@@ -498,17 +538,17 @@ class Format
             $this->widest = null;
             return $this;
         }
-        
+
         $widest = (float)$value;
         if ($widest <= 0) {
             throw new Exception("widest value must be > 0");
         }
-        
+
         $this->widest = $widest;
-        
+
         return $this;
     }
-    
+
     /**
      * @param float|null $value
      * @throws Exception
@@ -520,16 +560,16 @@ class Format
             $this->highest = null;
             return $this;
         }
-        
+
         $highest = (float)$value;
         if ($highest <= 0) {
             throw new Exception("highest value must be > 0");
         }
         $this->highest = $highest;
-        
+
         return $this;
     }
-    
+
     /**
      * @return float|null
      */
@@ -537,7 +577,7 @@ class Format
     {
         return $this->widest;
     }
-    
+
     /**
      * @return float|null
      */

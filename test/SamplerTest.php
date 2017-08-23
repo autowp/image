@@ -10,7 +10,7 @@ use Imagick;
 /**
  * @group Autowp_Image
  */
-class SamplerTest extends \PHPUnit_Framework_TestCase
+class SamplerTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldResizeOddWidthPictureStrictlyToTargetWidthByOuterFitType()
     {

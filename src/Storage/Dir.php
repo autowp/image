@@ -86,11 +86,7 @@ class Dir
      */
     public function setUrl($url)
     {
-        if (isset($url)) {
-            $this->url = (string)$url;
-        } else {
-            $this->url = null;
-        }
+        $this->url = isset($url) ? (string)$url : null;
 
         return $this;
     }
@@ -111,12 +107,11 @@ class Dir
     public function setNamingStrategy($strategy)
     {
         if (! $strategy instanceof AbstractStrategy) {
+            $strategyName = $strategy;
+            $options = [];
             if (is_array($strategy)) {
                 $strategyName = $strategy['strategy'];
                 $options = isset($strategy['options']) ? $strategy['options'] : [];
-            } else {
-                $strategyName = $strategy;
-                $options = [];
             }
 
             $className = 'Autowp\\Image\\Storage\\NamingStrategy\\' . ucfirst($strategyName);

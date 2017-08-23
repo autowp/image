@@ -5,7 +5,7 @@ namespace AutowpTest\Image;
 /**
  * @group Autowp_Image
  */
-class ZFIntegrationTest extends \PHPUnit_Framework_TestCase
+class ZFIntegrationTest extends \PHPUnit\Framework\TestCase
 {
     public function testViewHelperRegistered()
     {

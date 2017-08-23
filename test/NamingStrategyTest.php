@@ -7,7 +7,7 @@ use Autowp\Image\Storage\NamingStrategy\Pattern;
 /**
  * @group Autowp_Image
  */
-class NamingStrategyTest extends \PHPUnit_Framework_TestCase
+class NamingStrategyTest extends \PHPUnit\Framework\TestCase
 {
     public static function patternsProvider()
     {

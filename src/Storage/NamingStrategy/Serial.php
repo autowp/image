@@ -86,10 +86,9 @@ class Serial extends AbstractStrategy
 
         $filter = new FilenameSafe();
 
+        $fileBasename = $fileIndex;
         if ($options['prefferedName']) {
             $fileBasename = $filter->filter($options['prefferedName']);
-        } else {
-            $fileBasename = $fileIndex;
         }
 
         $suffix = $index ? '_' . $index : '';

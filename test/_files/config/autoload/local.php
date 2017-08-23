@@ -11,7 +11,7 @@ return [
         'formatedImageTableName' => 'formated_image',
         'fileMode' => 0644,
         'dirMode' => 0755,
-        
+
         'dirs' => [
             'format' => [
                 'path' => $imageDir . "format",
@@ -38,9 +38,9 @@ return [
                 ]
             ],
         ],
-        
+
         'formatedImageDirName' => 'format',
-        
+
         'formats' => [
             'test'    => [
                 'fitType'    => 0,

@@ -10,17 +10,20 @@ use Autowp\Image\Storage;
 
 class ImageStorageFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->has('Config') ? $container->get('Config') : [];
         $storageConfig = isset($config['imageStorage']) ? $config['imageStorage'] : [];
-        
+
         $db = $container->get(AdapterInterface::class);
-        
+
         if (! $db instanceof AdapterInterface) {
             throw new Exception(sprintf("service %s not found", AdapterInterface::class));
         }
-        
+
         $storageConfig['dbAdapter'] = $db;
 
         $storage = new Storage($storageConfig);

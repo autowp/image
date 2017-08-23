@@ -30,6 +30,8 @@ class Module implements
     /**
      * @param Console $console
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getConsoleBanner(Console $console)
     {
@@ -39,6 +41,8 @@ class Module implements
     /**
      * @param Console $console
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getConsoleUsage(Console $console)
     {

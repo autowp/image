@@ -173,16 +173,16 @@ class Storage
      */
     public function setImageSampler($options)
     {
-        if ($options instanceof Sampler) {
-            $imageSampler = $options;
-        } elseif (is_array($options)) {
-            $imageSampler = new Sampler($options);
-        } else {
+        if (is_array($options)) {
+            $options = new Sampler($options);
+        }
+        
+        if (! $options instanceof Sampler) {
             $message = "Unexpected imageSampler options. Array or object excepcted";
             throw new Exception($message);
         }
 
-        $this->imageSampler = $imageSampler;
+        $this->imageSampler = $options;
 
         return $this;
     }
@@ -476,7 +476,7 @@ class Storage
     {
         $imageRow = $this->getImageRow($imageId);
 
-        if (!$imageRow) {
+        if (! $imageRow) {
             return null;
         }
 
@@ -868,7 +868,7 @@ class Storage
 
     private function indexByAttempt($attempt)
     {
-        $from = pow(10, $attempt-1);
+        $from = pow(10, $attempt - 1);
         $to = pow(10, $attempt) - 1;
 
         return rand($from, $to);
@@ -928,14 +928,12 @@ class Storage
                 ]);
 
                 $imageId = $id;
-
             } catch (\Exception $e) {
                 // duplicate or other error
                 $insertAttemptException = $e;
             }
 
             $attemptIndex++;
-
         } while (($attemptIndex < self::INSERT_MAX_ATTEMPTS) && $insertAttemptException);
 
         if ($insertAttemptException) {
@@ -1079,7 +1077,7 @@ class Storage
 
         $row = $this->dirTable->selectWith($select)->current();
 
-        if (!$row) {
+        if (! $row) {
             return 0;
         }
 
@@ -1219,7 +1217,7 @@ class Storage
         $x = $info['resolution']['x'];
         $y = $info['resolution']['x'];
 
-        if (!$x || !$y) {
+        if (! $x || ! $y) {
             return false;
         }
 
@@ -1307,7 +1305,6 @@ class Storage
                 ], [
                     'id' => $imageRow['id']
                 ]);
-
             } catch (\Exception $e) {
                 // duplicate or other error
                 $insertAttemptException = $e;
@@ -1323,7 +1320,6 @@ class Storage
             }
 
             $attemptIndex++;
-
         } while (($attemptIndex < self::INSERT_MAX_ATTEMPTS) && $insertAttemptException);
 
         if ($insertAttemptException) {

@@ -50,11 +50,6 @@ class Pattern extends AbstractStrategy
         $pattern = self::normalizePattern($options['pattern']);
         $index = (int)$options['index'];
 
-        $dir = $this->getDir();
-        if (! $dir) {
-            throw new Exception("`dir` not initialized");
-        }
-
         $nameComponents = [];
         if ($pattern) {
             $nameComponents[] = $pattern;
@@ -63,7 +58,6 @@ class Pattern extends AbstractStrategy
             $nameComponents[] = $index;
         }
         $filename = implode('_', $nameComponents) . ($ext ? '.' . $ext : '');
-        $filePath = $dir . DIRECTORY_SEPARATOR . $filename;
 
         return $filename;
     }

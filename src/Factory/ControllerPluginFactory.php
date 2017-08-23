@@ -10,6 +10,9 @@ use Autowp\Image\Controller\Plugin\ImageStorage;
 
 class ControllerPluginFactory implements FactoryInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         return new ImageStorage($container->get(Storage::class));
