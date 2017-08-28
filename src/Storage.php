@@ -471,7 +471,7 @@ class Storage implements StorageInterface
      * @return string
      * @throws Exception
      */
-    private function getImageFilepath($imageId)
+    public function getImageFilepath($imageId)
     {
         $imageRow = $this->getImageRow($imageId);
 
@@ -1313,41 +1313,6 @@ class Storage implements StorageInterface
         if ($insertAttemptException) {
             throw $insertAttemptException;
         }
-    }
-
-    /**
-     * @param string $file
-     * @param string $dirName
-     * @throws Exception
-     * @return int
-     */
-    private function registerImageFile($file, $dirName)
-    {
-        $dir = $this->getDir($dirName);
-        if (! $dir) {
-            throw new Exception("Dir '$dirName' not defined");
-        }
-
-        $dirPath = $dir->getPath();
-
-        $filePath = $dirPath . DIRECTORY_SEPARATOR . $file;
-        if (! $filePath) {
-            throw new Exception("File `$filePath` not found");
-        }
-
-        $imageInfo = getimagesize($filePath);
-
-        // store to db
-        $this->imageTable->insert([
-            'width'    => $imageInfo[0],
-            'height'   => $imageInfo[1],
-            'dir'      => $dirName,
-            'filesize' => filesize($filePath),
-            'filepath' => $file,
-            'date_add' => new Sql\Expression('now()')
-        ]);
-
-        return $this->imageTable->getLastInsertValue();
     }
 
     public function flop(int $imageId)
