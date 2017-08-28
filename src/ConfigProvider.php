@@ -102,8 +102,11 @@ class ConfigProvider
     public function getDependencyConfig()
     {
         return [
+            'aliases' => [
+                Storage::class => StorageInterface::class
+            ],
             'factories' => [
-                Storage::class => Factory\ImageStorageFactory::class
+                StorageInterface::class => Factory\ImageStorageFactory::class
             ]
         ];
     }

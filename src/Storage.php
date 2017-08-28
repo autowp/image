@@ -20,7 +20,7 @@ use Autowp\Image\Storage\Request;
 /**
  * @author dima
  */
-class Storage
+class Storage implements StorageInterface
 {
     const EXTENSION_DEFAULT = 'jpg';
 
@@ -441,11 +441,10 @@ class Storage
     }
 
     /**
-     * @param int $imageId
-     * @return Image
      * @throws Exception
+     * @return Storage\Image|null
      */
-    public function getImage($imageId)
+    public function getImage(int $imageId)
     {
         $imageRow = $this->getImageRow($imageId);
 
@@ -457,7 +456,7 @@ class Storage
      * @return Image
      * @throws Exception
      */
-    public function getImages(array $imageIds)
+    public function getImages(array $imageIds): array
     {
         $result = [];
         foreach ($this->getImageRows($imageIds) as $imageRow) {
@@ -472,7 +471,7 @@ class Storage
      * @return string
      * @throws Exception
      */
-    public function getImageFilepath($imageId)
+    private function getImageFilepath($imageId)
     {
         $imageRow = $this->getImageRow($imageId);
 
@@ -490,10 +489,10 @@ class Storage
 
     /**
      * @param int $imageId
-     * @return string
+     * @return string|null
      * @throws Exception
      */
-    public function getImageBlob($imageId)
+    public function getImageBlob(int $imageId)
     {
         $imageRow = $this->getImageRow($imageId);
 
@@ -660,14 +659,14 @@ class Storage
     }
 
     /**
-     * @param int|Request $imageId
+     * @param int|Storage\Request $imageId
      * @return string
      * @throws Exception
      */
-    public function getFormatedImageBlob($request, $formatName)
+    public function getFormatedImageBlob($request, string $formatName)
     {
-        if (! $request instanceof Request) {
-            $request = new Request([
+        if (! $request instanceof Storage\Request) {
+            $request = new Storage\Request([
                 'imageId' => $request
             ]);
         }
@@ -678,16 +677,16 @@ class Storage
     }
 
     /**
-     * @param int|Request $request
+     * @param int|Storage\Request $request
      * @param string $format
      * @return Image
      */
-    public function getFormatedImage($request, $formatName)
+    public function getFormatedImage($request, string $formatName)
     {
         if (is_array($request)) {
-            $request = new Request($request);
-        } elseif (! $request instanceof Request) {
-            $request = new Request([
+            $request = new Storage\Request($request);
+        } elseif (! $request instanceof Storage\Request) {
+            $request = new Storage\Request([
                 'imageId' => $request
             ]);
         }
@@ -735,7 +734,7 @@ class Storage
      * @param string $format
      * @return array
      */
-    public function getFormatedImages(array $requests, $formatName)
+    public function getFormatedImages(array $requests, string $formatName)
     {
         $result = [];
         foreach ($this->getFormatedImageRows($requests, $formatName) as $key => $row) {
@@ -750,10 +749,10 @@ class Storage
      * @return Image
      * @throws Exception
      */
-    public function removeImage($imageId)
+    public function removeImage(int $imageId)
     {
         $imageRow = $this->imageTable->select([
-            'id = ?' => (int)$imageId
+            'id = ?' => $imageId
         ])->current();
 
         if (! $imageRow) {
@@ -851,12 +850,9 @@ class Storage
     }
 
     /**
-     * @param string $blob
-     * @param string $dirName
-     * @param array $options
      * @throws Exception
      */
-    public function addImageFromBlob($blob, $dirName, array $options = [])
+    public function addImageFromBlob(string $blob, string $dirName, array $options = [])
     {
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);
@@ -944,12 +940,9 @@ class Storage
     }
 
     /**
-     * @param Imagick $imagick
-     * @param string $dirName
-     * @param array $options
      * @throws Exception
      */
-    public function addImageFromImagick(Imagick $imagick, $dirName, array $options = [])
+    public function addImageFromImagick(Imagick $imagick, string $dirName, array $options = [])
     {
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
@@ -982,12 +975,9 @@ class Storage
     }
 
     /**
-     * @param string $file
-     * @param string $dirName
-     * @param array $options
      * @throws Exception
      */
-    public function addImageFromFile($file, $dirName, array $options = [])
+    public function addImageFromFile(string $file, string $dirName, array $options = [])
     {
         $imageInfo = getimagesize($file);
 
@@ -1088,7 +1078,7 @@ class Storage
      * @param string $dirName
      * @return Storage
      */
-    public function incDirCounter($dirName)
+    private function incDirCounter($dirName)
     {
         $row = $this->dirTable->select([
             'dir = ?' => $dirName
@@ -1114,7 +1104,7 @@ class Storage
      * @param int $imageId
      * @return boolean|string
      */
-    public function getImageIPTC($imageId)
+    public function getImageIPTC(int $imageId)
     {
         $imageRow = $this->getImageRow($imageId);
 
@@ -1160,7 +1150,7 @@ class Storage
      * @param int $imageId
      * @return boolean|array
      */
-    public function getImageEXIF($imageId)
+    public function getImageEXIF(int $imageId)
     {
         $imageRow = $this->getImageRow($imageId);
 
@@ -1186,7 +1176,7 @@ class Storage
      * @param int $imageId
      * @return boolean|array
      */
-    public function getImageResolution($imageId)
+    public function getImageResolution(int $imageId)
     {
         $imageRow = $this->getImageRow($imageId);
 
@@ -1242,7 +1232,7 @@ class Storage
         ];
     }
 
-    public static function detectExtenstion($filepath)
+    private static function detectExtenstion($filepath)
     {
         $imageInfo = getimagesize($filepath);
 
@@ -1260,11 +1250,9 @@ class Storage
     }
 
     /**
-     * @param int $imageId
-     * @param array $options
      * @throws Exception
      */
-    public function changeImageName($imageId, array $options = [])
+    public function changeImageName(int $imageId, array $options = [])
     {
         $imageRow = $this->getImageRow($imageId);
         if (! $imageRow) {
@@ -1333,7 +1321,7 @@ class Storage
      * @throws Exception
      * @return int
      */
-    public function registerImageFile($file, $dirName)
+    private function registerImageFile($file, $dirName)
     {
         $dir = $this->getDir($dirName);
         if (! $dir) {
@@ -1362,7 +1350,7 @@ class Storage
         return $this->imageTable->getLastInsertValue();
     }
 
-    public function flop($imageId)
+    public function flop(int $imageId)
     {
         $filePath = $this->getImageFilepath($imageId);
         if (! $filePath) {
@@ -1384,7 +1372,7 @@ class Storage
         ]);
     }
 
-    public function normalize($imageId)
+    public function normalize(int $imageId)
     {
         $filePath = $this->getImageFilepath($imageId);
         if (! $filePath) {
