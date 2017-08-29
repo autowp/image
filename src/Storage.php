@@ -15,7 +15,6 @@ use Autowp\Image\Sampler\Format;
 use Autowp\Image\Storage\Dir;
 use Autowp\Image\Storage\Exception;
 use Autowp\Image\Storage\Image;
-use Autowp\Image\Storage\Request;
 
 /**
  * @author dima
@@ -503,10 +502,9 @@ class Storage implements StorageInterface
     private function getFormatedImageRows(array $requests, $formatName)
     {
         $imagesId = [];
-        foreach ($requests as $request) {
-            if (! $request instanceof Request) {
-                throw new Exception('$requests is not array of Autowp\Image\Storage\Request');
-            }
+        foreach ($requests as &$request) {
+            $request = $this->castRequest($request);
+
             $imageId = $request->getImageId();
             if (! $imageId) {
                 throw new Exception("ImageId not provided");
@@ -514,6 +512,7 @@ class Storage implements StorageInterface
 
             $imagesId[] = $imageId;
         }
+        unset($request);
 
         $destImageRows = [];
         if (count($imagesId)) {
@@ -644,11 +643,11 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param Request $request
+     * @param Storage\Request $request
      * @param string $formatName
      * @return array|\ArrayObject
      */
-    private function getFormatedImageRow(Request $request, $formatName)
+    private function getFormatedImageRow(Storage\Request $request, $formatName)
     {
         $result = $this->getFormatedImageRows([$request], $formatName);
 
@@ -677,12 +676,7 @@ class Storage implements StorageInterface
         );
     }
 
-    /**
-     * @param int|Storage\Request $request
-     * @param string $format
-     * @return Image
-     */
-    public function getFormatedImage($request, string $formatName)
+    private function castRequest($request): Storage\Request
     {
         if (is_array($request)) {
             $request = new Storage\Request($request);
@@ -692,25 +686,29 @@ class Storage implements StorageInterface
             ]);
         }
 
+        return $request;
+    }
+
+    /**
+     * @param int|Storage\Request $request
+     * @param string $format
+     * @return Image
+     */
+    public function getFormatedImage($request, string $formatName)
+    {
         return $this->buildImageResult(
-            $this->getFormatedImageRow($request, $formatName)
+            $this->getFormatedImageRow($this->castRequest($request), $formatName)
         );
     }
 
     /**
-     * @param int|Request $request
+     * @param int|Storage\Request $request
      * @param string $format
      * @return string
      */
     public function getFormatedImagePath($request, $formatName)
     {
-        if (is_array($request)) {
-            $request = new Request($request);
-        } elseif (! $request instanceof Request) {
-            $request = new Request([
-                'imageId' => $request
-            ]);
-        }
+        $request = $this->castRequest($request);
 
         $imageRow = $this->getFormatedImageRow($request, $formatName);
 
