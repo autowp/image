@@ -516,8 +516,7 @@ class Storage implements StorageInterface
 
         $destImageRows = [];
         if (count($imagesId)) {
-            $select = new Sql\Select($this->imageTable->getTable());
-            $select
+            $select = $this->imageTable->getSql()->select()
                 ->join(
                     ['f' => $this->formatedImageTableName],
                     $this->imageTableName . '.id = f.formated_image_id',
@@ -1026,7 +1025,7 @@ class Storage implements StorageInterface
 
         $options = array_merge($defaults, $options);
 
-        $select = new Sql\Select($this->formatedImageTable->getTable());
+        $select = $this->formatedImageTable->getSql()->select();
 
         if ($options['format']) {
             $select->where([
@@ -1060,8 +1059,8 @@ class Storage implements StorageInterface
      */
     public function getDirCounter($dirName)
     {
-        $select = new Sql\Select($this->dirTable->getTable());
-        $select->columns(['count'])
+        $select = $this->dirTable->getSql()->select()
+            ->columns(['count'])
             ->where(['dir = ?' => $dirName]);
 
         $row = $this->dirTable->selectWith($select)->current();
@@ -1360,8 +1359,8 @@ class Storage implements StorageInterface
 
     public function printBrokenFiles()
     {
-        $select = new Sql\Select($this->imageTable->getTable());
-        $select->columns(['id', 'filepath', 'dir']);
+        $select = $this->imageTable->getSql()->select()
+            ->columns(['id', 'filepath', 'dir']);
 
         $rows = $this->imageTable->selectWith($select);
 
@@ -1381,8 +1380,8 @@ class Storage implements StorageInterface
 
     public function fixBrokenFiles()
     {
-        $select = new Sql\Select($this->imageTable->getTable());
-        $select->columns(['id', 'filepath', 'dir']);
+        $select = $this->imageTable->getSql()->select()
+            ->columns(['id', 'filepath', 'dir']);
 
         $rows = $this->imageTable->selectWith($select);
 
@@ -1424,8 +1423,8 @@ class Storage implements StorageInterface
             throw new Exception("Dir '{$dirname}' not defined");
         }
 
-        $select = new Sql\Select($this->imageTable->getTable());
-        $select->columns(['id', 'filepath'])
+        $select = $this->imageTable->getSql()->select()
+            ->columns(['id', 'filepath'])
             ->where(['dir = ?' => $dirname]);
 
         $rows = $this->imageTable->selectWith($select);
