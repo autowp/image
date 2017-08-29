@@ -8,7 +8,7 @@ class Image
      * @var int
      */
     private $id;
-    
+
     /**
      * @var int
      */
@@ -64,7 +64,7 @@ class Image
             'src'      => $this->src
         ];
     }
-    
+
     public function getId(): int
     {
         return $this->id;
