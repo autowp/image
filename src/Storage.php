@@ -1419,7 +1419,7 @@ class Storage implements StorageInterface
         }
     }
 
-    public function deleteBrokenFiles($dirname)
+    public function deleteBrokenFiles(string $dirname)
     {
         $dir = $this->getDir($dirname);
         if (! $dir) {
@@ -1443,5 +1443,10 @@ class Storage implements StorageInterface
                 print "Deleted\n";
             }
         }
+    }
+
+    public function hasFormat(string $format): bool
+    {
+        return (bool) $this->getFormat($format);
     }
 }
