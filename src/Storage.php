@@ -376,6 +376,7 @@ class Storage implements StorageInterface
         }
 
         return new Image([
+            'id'       => $imageRow['id'],
             'width'    => $imageRow['width'],
             'height'   => $imageRow['height'],
             'src'      => $src,

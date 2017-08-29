@@ -7,6 +7,11 @@ class Image
     /**
      * @var int
      */
+    private $id;
+    
+    /**
+     * @var int
+     */
     private $width;
 
     /**
@@ -30,6 +35,7 @@ class Image
     public function __construct(array $options)
     {
         $defaults = [
+            'id'       => null,
             'width'    => null,
             'height'   => null,
             'filesize' => null,
@@ -38,6 +44,7 @@ class Image
 
         $options = array_merge($defaults, $options);
 
+        $this->id       = (int)$options['id'];
         $this->width    = (int)$options['width'];
         $this->height   = (int)$options['height'];
         $this->filesize = (int)$options['filesize'];
@@ -50,41 +57,35 @@ class Image
     public function toArray()
     {
         return [
+            'id'       => $this->id,
             'width'    => $this->width,
             'height'   => $this->height,
             'filesize' => $this->filesize,
             'src'      => $this->src
         ];
     }
+    
+    public function getId(): int
+    {
+        return $this->id;
+    }
 
-    /**
-     * @return string
-     */
-    public function getSrc()
+    public function getSrc(): string
     {
         return $this->src;
     }
 
-    /**
-     * @return int
-     */
-    public function getWidth()
+    public function getWidth(): int
     {
         return $this->width;
     }
 
-    /**
-     * @return int
-     */
-    public function getHeight()
+    public function getHeight(): int
     {
         return $this->height;
     }
 
-    /**
-     * @return int
-     */
-    public function getFileSize()
+    public function getFileSize(): int
     {
         return $this->filesize;
     }
