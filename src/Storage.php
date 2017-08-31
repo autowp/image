@@ -850,7 +850,7 @@ class Storage implements StorageInterface
     /**
      * @throws Exception
      */
-    public function addImageFromBlob(string $blob, string $dirName, array $options = [])
+    public function addImageFromBlob(string $blob, string $dirName, array $options = []): int
     {
         $imagick = new Imagick();
         $imagick->readImageBlob($blob);
