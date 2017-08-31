@@ -868,15 +868,7 @@ class Storage implements StorageInterface
         return rand($from, $to);
     }
 
-    /**
-     * @param string $dirName
-     * @param array $options
-     * @param int $width
-     * @param int $height
-     * @param Closure $callback
-     * @return int
-     */
-    private function generateLockWrite($dirName, array $options, $width, $height, Closure $callback)
+    private function generateLockWrite(string $dirName, array $options, $width, $height, Closure $callback): int
     {
         $dir = $this->getDir($dirName);
         if (! $dir) {
@@ -940,7 +932,7 @@ class Storage implements StorageInterface
     /**
      * @throws Exception
      */
-    public function addImageFromImagick(Imagick $imagick, string $dirName, array $options = [])
+    public function addImageFromImagick(Imagick $imagick, string $dirName, array $options = []): int
     {
         $width = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
@@ -975,7 +967,7 @@ class Storage implements StorageInterface
     /**
      * @throws Exception
      */
-    public function addImageFromFile(string $file, string $dirName, array $options = [])
+    public function addImageFromFile(string $file, string $dirName, array $options = []): int
     {
         $imageInfo = getimagesize($file);
 

@@ -50,17 +50,17 @@ interface StorageInterface
     /**
      * @throws Exception
      */
-    public function addImageFromBlob(string $blob, string $dirName, array $options = []);
+    public function addImageFromBlob(string $blob, string $dirName, array $options = []): int;
 
     /**
      * @throws Exception
      */
-    public function addImageFromImagick(Imagick $imagick, string $dirName, array $options = []);
+    public function addImageFromImagick(Imagick $imagick, string $dirName, array $options = []): int;
 
     /**
      * @throws Exception
      */
-    public function addImageFromFile(string $file, string $dirName, array $options = []);
+    public function addImageFromFile(string $file, string $dirName, array $options = []): int;
 
     public function flush(array $options);
 
