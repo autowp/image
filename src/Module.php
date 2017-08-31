@@ -23,6 +23,7 @@ class Module implements
             'controller_plugins' => $provider->getControllerPluginConfig(),
             'controllers'        => $provider->getControllersConfig(),
             'service_manager'    => $provider->getDependencyConfig(),
+            'tables'             => $provider->getTablesConfig(),
             'view_helpers'       => $provider->getViewHelperConfig(),
         ];
     }

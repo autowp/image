@@ -6,24 +6,19 @@ use Zend\ServiceManager\Factory\InvokableFactory;
 
 class ConfigProvider
 {
-    /**
-     * @return array
-     */
-    public function __invoke()
+    public function __invoke(): array
     {
         return [
             'console'            => $this->getConsoleConfig(),
             'controller_plugins' => $this->getControllerPluginConfig(),
             'controllers'        => $this->getControllersConfig(),
             'dependencies'       => $this->getDependencyConfig(),
+            'tables'             => $this->getTablesConfig(),
             'view_helpers'       => $this->getViewHelperConfig(),
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getConsoleConfig()
+    public function getConsoleConfig(): array
     {
         return [
             'router' => [
@@ -65,10 +60,7 @@ class ConfigProvider
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getControllerPluginConfig()
+    public function getControllerPluginConfig(): array
     {
         return [
             'aliases' => [
@@ -82,10 +74,7 @@ class ConfigProvider
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getControllersConfig()
+    public function getControllersConfig(): array
     {
         return [
             'factories' => [
@@ -96,10 +85,8 @@ class ConfigProvider
 
     /**
      * Return application-level dependency configuration.
-     *
-     * @return array
      */
-    public function getDependencyConfig()
+    public function getDependencyConfig(): array
     {
         return [
             'aliases' => [
@@ -111,10 +98,22 @@ class ConfigProvider
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getViewHelperConfig()
+    public function getTablesConfig(): array
+    {
+        return [
+            'image' => [
+                'sequences' => [
+                    'id' => 'image_id_seq'
+                ]
+            ],
+            'formated_image' => [
+                'sequences' => []
+            ],
+            'image_dir' => []
+        ];
+    }
+
+    public function getViewHelperConfig(): array
     {
         return [
             'aliases' => [

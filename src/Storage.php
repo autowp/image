@@ -6,9 +6,8 @@ use Imagick;
 use ImagickException;
 use Closure;
 
-use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql;
-use Zend\Db\TableGateway;
+use Zend\Db\TableGateway\TableGateway;
 
 use Autowp\Image\Sampler;
 use Autowp\Image\Sampler\Format;
@@ -26,12 +25,7 @@ class Storage implements StorageInterface
     const INSERT_MAX_ATTEMPTS = 1000;
 
     /**
-     * @var AdapterInterface
-     */
-    private $db = null;
-
-    /**
-     * @var TableGateway\TableGateway
+     * @var TableGateway
      */
     private $imageTable = null;
 
@@ -41,12 +35,7 @@ class Storage implements StorageInterface
     private $imageTableName = 'image';
 
     /**
-     * @var string
-     */
-    private $imageSeqName = 'image_id_seq';
-
-    /**
-     * @var TableGateway\TableGateway
+     * @var TableGateway
      */
     private $formatedImageTable = null;
 
@@ -56,7 +45,7 @@ class Storage implements StorageInterface
     private $formatedImageTableName = 'formated_image';
 
     /**
-     * @var TableGateway\TableGateway
+     * @var TableGateway
      */
     private $dirTable = null;
 
@@ -104,24 +93,17 @@ class Storage implements StorageInterface
      * @param array $options
      * @throws Exception
      */
-    public function __construct(array $options = [])
-    {
+    public function __construct(
+        array $options,
+        TableGateway $imageTable,
+        TableGateway $formatedImageTable,
+        TableGateway $dirTable
+    ) {
         $this->setOptions($options);
 
-        if (! $this->db instanceof AdapterInterface) {
-            throw new Exception("Db adapter not provided");
-        }
-
-        $platform = $this->db->getPlatform();
-        $platformName = $platform->getName();
-
-        $feature = null;
-        if ($platformName == 'PostgreSQL') {
-            $feature = new TableGateway\Feature\SequenceFeature('id', $this->imageSeqName);
-        }
-        $this->imageTable = new TableGateway\TableGateway($this->imageTableName, $this->db, $feature);
-        $this->formatedImageTable = new TableGateway\TableGateway($this->formatedImageTableName, $this->db);
-        $this->dirTable = new TableGateway\TableGateway($this->dirTableName, $this->db);
+        $this->imageTable = $imageTable;
+        $this->formatedImageTable = $formatedImageTable;
+        $this->dirTable = $dirTable;
     }
 
     /**
@@ -215,17 +197,6 @@ class Storage implements StorageInterface
     public function setDirTableName($tableName)
     {
         $this->dirTableName = $tableName;
-
-        return $this;
-    }
-
-    /**
-     * @param AdapterInterface $dbAdapter
-     * @return Storage
-     */
-    public function setDbAdapter(AdapterInterface $dbAdapter)
-    {
-        $this->db = $dbAdapter;
 
         return $this;
     }

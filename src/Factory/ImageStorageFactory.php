@@ -18,15 +18,14 @@ class ImageStorageFactory implements FactoryInterface
         $config = $container->has('Config') ? $container->get('Config') : [];
         $storageConfig = isset($config['imageStorage']) ? $config['imageStorage'] : [];
 
-        $db = $container->get(AdapterInterface::class);
+        $tables = $container->get(\Autowp\ZFComponents\Db\TableManager::class);
 
-        if (! $db instanceof AdapterInterface) {
-            throw new Exception(sprintf("service %s not found", AdapterInterface::class));
-        }
-
-        $storageConfig['dbAdapter'] = $db;
-
-        $storage = new Storage($storageConfig);
+        $storage = new Storage(
+            $storageConfig,
+            $tables->get('image'),
+            $tables->get('formated_image'),
+            $tables->get('image_dir')
+        );
 
         $request = $container->get('Request');
         if ($request instanceof \Zend\Http\Request) {

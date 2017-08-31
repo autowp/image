@@ -2,9 +2,10 @@
 
 return [
     'modules' => [
-        'Zend\Db',
-        'Zend\Router',
-        'Autowp\Image'
+        'Zend\\Db',
+        'Zend\\Router',
+        'Autowp\\Image',
+        'Autowp\\ZFComponents'
     ],
     'module_listener_options' => [
         'module_paths' => [
