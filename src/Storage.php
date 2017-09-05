@@ -521,18 +521,17 @@ class Storage implements StorageInterface
                     'id = ?' => $imageId
                 ])->current();
                 if ($imageRow) {
-
                     $dir = $this->getDir($imageRow['dir']);
                     if (! $dir) {
                         throw new Exception("Dir '{$imageRow['dir']}' not defined");
                     }
-    
+
                     $srcFilePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
-    
+
                     if (! file_exists($srcFilePath)) {
                         throw new Exception("File `$srcFilePath` not found");
                     }
-    
+
                     $imagick = new Imagick();
                     try {
                         $imagick->readImage($srcFilePath);
@@ -540,25 +539,25 @@ class Storage implements StorageInterface
                         throw new Exception('Imagick: ' . $e->getMessage());
                         //continue;
                     }
-    
+
                     // format
                     $format = $this->getFormat($formatName);
                     if (! $format) {
                         throw new Exception("Format `$formatName` not found");
                     }
                     $cFormat = clone $format;
-    
+
                     $crop = $request->getCrop();
                     if ($crop) {
                         $cFormat->setCrop($crop);
                     }
-    
+
                     $sampler = $this->getImageSampler();
                     if (! $sampler) {
                         throw new Exception("Image sampler not initialized");
                     }
                     $sampler->convertImagick($imagick, $cFormat);
-    
+
                     // store result
                     $newPath = implode(DIRECTORY_SEPARATOR, [
                         $imageRow['dir'],
@@ -576,9 +575,9 @@ class Storage implements StorageInterface
                             'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename']
                         ]
                     );
-    
+
                     $imagick->clear();
-    
+
                     $formatedImageRow = $this->formatedImageTable->select([
                         'format = ?'   => (string)$formatName,
                         'image_id = ?' => $imageId,
@@ -639,7 +638,7 @@ class Storage implements StorageInterface
                 'imageId' => $request
             ]);
         }
-        
+
         $row = $this->getFormatedImageRow($request, $formatName);
 
         return $row === null ? null : $this->buildImageBlobResult($row);
@@ -679,7 +678,7 @@ class Storage implements StorageInterface
         $request = $this->castRequest($request);
 
         $imageRow = $this->getFormatedImageRow($request, $formatName);
-        
+
         if (! $imageRow) {
             return null;
         }

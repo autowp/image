@@ -173,4 +173,17 @@ class StorageTest extends \PHPUnit\Framework\TestCase
         $formatedImages = $imageStorage->getFormatedImages([$request1, $request2], 'test');
         $this->assertEquals(2, count($formatedImages));
     }
+
+    public function testGetImageReturnsNull()
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+
+        $serviceManager = $app->getServiceManager();
+
+        $imageStorage = $serviceManager->get(Image\Storage::class);
+
+        $result = $imageStorage->getImage(9999999999);
+
+        $this->assertNull($result);
+    }
 }
