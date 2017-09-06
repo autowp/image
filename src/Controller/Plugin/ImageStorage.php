@@ -9,20 +9,20 @@ use Autowp\Image;
 class ImageStorage extends AbstractPlugin
 {
     /**
-     * @var Image\Storage
+     * @var Image\StorageInterface
      */
     private $imageStorage;
 
     /**
-     * @param Image\Storage $imageStorage
+     * @param Image\StorageInterface $imageStorage
      */
-    public function __construct(Image\Storage $imageStorage)
+    public function __construct(Image\StorageInterface $imageStorage)
     {
         $this->imageStorage = $imageStorage;
     }
 
     /**
-     * @return Image\Storage
+     * @return Image\StorageInterface
      */
     public function __invoke()
     {
