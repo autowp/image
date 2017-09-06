@@ -3,7 +3,6 @@
 namespace Autowp\Image\Factory;
 
 use Interop\Container\ContainerInterface;
-use Zend\Db\Adapter\AdapterInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 use Autowp\Image\Storage;

@@ -3,7 +3,6 @@
 namespace Autowp\Image\Storage\NamingStrategy;
 
 use Autowp\Image\Storage\NamingStrategy\AbstractStrategy;
-use Autowp\Image\Storage\Exception;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 class Pattern extends AbstractStrategy
