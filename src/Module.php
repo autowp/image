@@ -49,6 +49,7 @@ class Module implements
     {
         //description command
         return [
+            'image-storage list-dirs'                     => 'List registered dirs',
             'image-storage list-broken-files'             => 'List broken files',
             'image-storage fix-broken-files'              => 'Try to fix broken files',
             'image-storage flush-format <format>'         => 'Flush formated images by format',

@@ -25,7 +25,7 @@ class ConfigProvider
                 'routes' => [
                     'image-storage' => [
                         'options' => [
-                            'route'    => 'image-storage (list-broken-files|fix-broken-files):action',
+                            'route'    => 'image-storage (list-broken-files|fix-broken-files|list-dirs):action',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
                             ]

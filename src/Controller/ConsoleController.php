@@ -10,6 +10,19 @@ use Autowp\Image;
 
 class ConsoleController extends AbstractActionController
 {
+    public function listDirsAction()
+    {
+        $this->imageStorage()->
+
+        $dirs = $this->imageStorage()->getDirs();
+
+        $console = Console::getInstance();
+
+        foreach ($dirs as $name => $dir) {
+            $console->writeLine($name . ': ' . $dir->getPath());
+        }
+    }
+
     public function flushFormatAction()
     {
         $format = $this->params('format');
