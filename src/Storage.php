@@ -257,7 +257,10 @@ class Storage implements StorageInterface
         return $this;
     }
 
-    public function getDir(string $dirName): Dir
+    /**
+     * @return Dir|null
+     */
+    public function getDir(string $dirName)
     {
         return isset($this->dirs[$dirName]) ? $this->dirs[$dirName] : null;
     }
