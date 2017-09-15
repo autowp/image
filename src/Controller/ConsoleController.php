@@ -12,13 +12,9 @@ class ConsoleController extends AbstractActionController
 {
     public function listDirsAction()
     {
-        $this->imageStorage()->
-
-        $dirs = $this->imageStorage()->getDirs();
-
         $console = Console::getInstance();
 
-        foreach ($dirs as $name => $dir) {
+        foreach ($this->imageStorage()->getDirs() as $name => $dir) {
             $console->writeLine($name . ': ' . $dir->getPath());
         }
     }
