@@ -624,7 +624,8 @@ class Storage implements StorageInterface
         $result = $this->getFormatedImageRows([$request], $formatName);
 
         if (! isset($result[0])) {
-            throw new Exception("getFormatedImageRows fails");
+            //throw new Exception("getFormatedImageRows fails");
+            return null;
         }
 
         return $result[0];
