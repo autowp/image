@@ -1091,7 +1091,7 @@ class Storage implements StorageInterface
         }
 
         $iptcStr = '';
-        getimagesize($filepath, $info);
+        @getimagesize($filepath, $info);
         if (is_array($info) && array_key_exists('APP13', $info)) {
             $iptc = iptcparse($info['APP13']);
             if (is_array($iptc)) {
