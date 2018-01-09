@@ -612,6 +612,8 @@ class Storage implements StorageInterface
                 'format = ?'   => $formatName,
                 'image_id = ?' => $imageId,
             ]);
+
+            throw $e;
         }
 
         return $formatedImageId;
