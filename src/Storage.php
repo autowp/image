@@ -481,7 +481,9 @@ class Storage implements StorageInterface
 
     private function isDuplicateKeyException(\Exception $e)
     {
-        return strpos($e->getMessage(), 'duplicate key') !== false;
+        return
+            strpos($e->getMessage(), 'Duplicate entry') !== false ||
+            strpos($e->getMessage(), 'duplicate key') !== false;
     }
 
     private function doFormatImage(Storage\Request $request, string $formatName): int

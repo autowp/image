@@ -187,6 +187,39 @@ class StorageTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($result);
     }
 
+    public function testRequestFormatedImageAgain()
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+
+        $serviceManager = $app->getServiceManager();
+
+        $imageStorage = $serviceManager->get(Image\Storage::class);
+
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
+
+        $this->assertNotEmpty($imageId);
+
+        $formatName = 'test';
+
+        $formatedImage = $imageStorage->getFormatedImage(new Image\Storage\Request([
+            'imageId' => $imageId,
+        ]), $formatName);
+
+        $this->assertEquals(160, $formatedImage->getWidth());
+        $this->assertEquals(120, $formatedImage->getHeight());
+        $this->assertTrue($formatedImage->getFileSize() > 0);
+        $this->assertNotEmpty($formatedImage->getSrc());
+
+        $formatedImage = $imageStorage->getFormatedImage(new Image\Storage\Request([
+            'imageId' => $imageId,
+        ]), $formatName);
+
+        $this->assertEquals(160, $formatedImage->getWidth());
+        $this->assertEquals(120, $formatedImage->getHeight());
+        $this->assertTrue($formatedImage->getFileSize() > 0);
+        $this->assertNotEmpty($formatedImage->getSrc());
+    }
+
     public function testTimeout()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
@@ -199,15 +232,22 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNotEmpty($imageId);
 
-        $filePath = $imageStorage->getImageFilepath($imageId);
+        $formatName = 'picture-gallery';
+
+        $tables = $serviceManager->get('TableManager');
+        $formatedImageTable = $tables->get('formated_image');
+
+        $formatedImageTable->insert([
+            'format'            => $formatName,
+            'image_id'          => $imageId,
+            'status'            => \Autowp\Image\Storage::STATUS_PROCESSING,
+            'formated_image_id' => null
+        ]);
 
         $formatedImage = $imageStorage->getFormatedImage(new Image\Storage\Request([
             'imageId' => $imageId,
-        ]), 'picture-gallery');
+        ]), $formatName);
 
-        $this->assertEquals(1024, $formatedImage->getWidth());
-        $this->assertEquals(768, $formatedImage->getHeight());
-        $this->assertTrue($formatedImage->getFileSize() > 0);
-        $this->assertNotEmpty($formatedImage->getSrc());
+        $this->assertEmpty($formatedImage);
     }
 }
