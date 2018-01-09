@@ -9,7 +9,6 @@ use Closure;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
-use Autowp\Image\Sampler;
 use Autowp\Image\Sampler\Format;
 use Autowp\Image\Storage\Dir;
 use Autowp\Image\Storage\Exception;
@@ -23,6 +22,12 @@ class Storage implements StorageInterface
     const EXTENSION_DEFAULT = 'jpg';
 
     const INSERT_MAX_ATTEMPTS = 1000;
+
+    const STATUS_DEFAULT = 0,
+          STATUS_PROCESSING = 1,
+          STATUS_FAILED = 2;
+
+    const TIMEOUT = 15;
 
     /**
      * @var TableGateway
@@ -474,7 +479,143 @@ class Storage implements StorageInterface
         return $imageRow ? $this->buildImageBlobResult($imageRow) : null;
     }
 
-    private function getFormatedImageRows(array $requests, $formatName)
+    private function isDuplicateKeyException(\Exception $e)
+    {
+        return strpos($e->getMessage(), 'duplicate key') !== false;
+    }
+
+    private function doFormatImage(Storage\Request $request, string $formatName): int
+    {
+        $imageId = $request->getImageId();
+
+        // find source image
+        $imageRow = $this->imageTable->select([
+            'id = ?' => $imageId
+        ])->current();
+        if (! $imageRow) {
+            return null;
+        }
+
+        $dir = $this->getDir($imageRow['dir']);
+        if (! $dir) {
+            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+        }
+
+        $srcFilePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
+
+        if (! file_exists($srcFilePath)) {
+            throw new Exception("File `$srcFilePath` not found");
+        }
+
+        $imagick = new Imagick();
+        try {
+            $imagick->readImage($srcFilePath);
+        } catch (ImagickException $e) {
+            throw new Exception('Imagick: ' . $e->getMessage());
+            //continue;
+        }
+
+        // format
+        $format = $this->getFormat($formatName);
+        if (! $format) {
+            throw new Exception("Format `$formatName` not found");
+        }
+        $cFormat = clone $format;
+
+        $crop = $request->getCrop();
+        if ($crop) {
+            $cFormat->setCrop($crop);
+        }
+
+        $sampler = $this->getImageSampler();
+        if (! $sampler) {
+            throw new Exception("Image sampler not initialized");
+        }
+
+        try {
+            $this->formatedImageTable->insert([
+                'format'            => $formatName,
+                'image_id'          => $imageId,
+                'status'            => self::STATUS_PROCESSING,
+                'formated_image_id' => null
+            ]);
+        } catch (\Zend\Db\Exception\ExceptionInterface $e) {
+            if (! $this->isDuplicateKeyException($e)) {
+                throw $e;
+            }
+
+            // wait until done
+            $done = false;
+            for ($i = 0; $i < self::TIMEOUT && ! $done; $i++) {
+                $formatedImageRow = $this->formatedImageTable->select([
+                    'format = ?'   => $formatName,
+                    'image_id = ?' => $imageId,
+                ])->current();
+
+                $done = $formatedImageRow['status'] != self::STATUS_PROCESSING;
+
+                if (! $done) {
+                    sleep(1);
+                }
+            }
+
+            if (! $done) {
+                // mark as failed
+                $this->formatedImageTable->update([
+                    'status' => self::STATUS_FAILED
+                ], [
+                    'format = ?'   => $formatName,
+                    'image_id = ?' => $imageId,
+                    'status = ?'   => self::STATUS_PROCESSING
+                ]);
+            }
+
+            return (int)$formatedImageRow['formated_image_id'];
+        }
+
+        try {
+            $sampler->convertImagick($imagick, $cFormat);
+
+            // store result
+            $newPath = implode(DIRECTORY_SEPARATOR, [
+                $imageRow['dir'],
+                $formatName,
+                $imageRow['filepath']
+            ]);
+            $pi = pathinfo($newPath);
+            $formatExt = $cFormat->getFormatExtension();
+            $extension = $formatExt ? $formatExt : $pi['extension'];
+            $formatedImageId = $this->addImageFromImagick(
+                $imagick,
+                $this->formatedImageDirName,
+                [
+                    'extension' => $extension,
+                    'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename']
+                ]
+            );
+
+            $imagick->clear();
+
+            $this->formatedImageTable->update([
+                'formated_image_id' => $formatedImageId,
+                'status'            => self::STATUS_DEFAULT
+            ], [
+                'format = ?'   => $formatName,
+                'image_id = ?' => $imageId,
+            ]);
+        } catch (\Exception $e) {
+            $this->formatedImageTable->update([
+                'status' => self::STATUS_FAILED
+            ], [
+                'format = ?'   => $formatName,
+                'image_id = ?' => $imageId,
+            ]);
+        }
+
+        return $formatedImageId;
+    }
+
+    private function getFormatedImageRows(array $requests, string $formatName)
     {
         $imagesId = [];
         foreach ($requests as &$request) {
@@ -520,92 +661,11 @@ class Storage implements StorageInterface
             }
 
             if (! $destImageRow) {
-                // find source image
-                $imageRow = $this->imageTable->select([
-                    'id = ?' => $imageId
+                $formatedImageId = $this->doFormatImage($request, $formatName);
+                // result
+                $destImageRow = $this->imageTable->select([
+                    'id = ?' => $formatedImageId
                 ])->current();
-                if ($imageRow) {
-                    $dir = $this->getDir($imageRow['dir']);
-                    if (! $dir) {
-                        throw new Exception("Dir '{$imageRow['dir']}' not defined");
-                    }
-
-                    $srcFilePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
-
-                    if (! file_exists($srcFilePath)) {
-                        throw new Exception("File `$srcFilePath` not found");
-                    }
-
-                    $imagick = new Imagick();
-                    try {
-                        $imagick->readImage($srcFilePath);
-                    } catch (ImagickException $e) {
-                        throw new Exception('Imagick: ' . $e->getMessage());
-                        //continue;
-                    }
-
-                    // format
-                    $format = $this->getFormat($formatName);
-                    if (! $format) {
-                        throw new Exception("Format `$formatName` not found");
-                    }
-                    $cFormat = clone $format;
-
-                    $crop = $request->getCrop();
-                    if ($crop) {
-                        $cFormat->setCrop($crop);
-                    }
-
-                    $sampler = $this->getImageSampler();
-                    if (! $sampler) {
-                        throw new Exception("Image sampler not initialized");
-                    }
-                    $sampler->convertImagick($imagick, $cFormat);
-
-                    // store result
-                    $newPath = implode(DIRECTORY_SEPARATOR, [
-                        $imageRow['dir'],
-                        $formatName,
-                        $imageRow['filepath']
-                    ]);
-                    $pi = pathinfo($newPath);
-                    $formatExt = $cFormat->getFormatExtension();
-                    $extension = $formatExt ? $formatExt : $pi['extension'];
-                    $formatedImageId = $this->addImageFromImagick(
-                        $imagick,
-                        $this->formatedImageDirName,
-                        [
-                            'extension' => $extension,
-                            'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename']
-                        ]
-                    );
-
-                    $imagick->clear();
-
-                    $formatedImageRow = $this->formatedImageTable->select([
-                        'format = ?'   => (string)$formatName,
-                        'image_id = ?' => $imageId,
-                    ])->current();
-                    if (! $formatedImageRow) {
-                        $this->formatedImageTable->insert([
-                            'format'            => (string)$formatName,
-                            'image_id'          => $imageId,
-                            'formated_image_id' => $formatedImageId
-                        ]);
-                    } else {
-                        $this->formatedImageTable->update([
-                            'formated_image_id' => $formatedImageId
-                        ], [
-                            'format = ?'   => (string)$formatName,
-                            'image_id = ?' => $imageId,
-                        ]);
-                    }
-
-                    // result
-                    $destImageRow = $this->imageTable->select([
-                        'id = ?' => $formatedImageId
-                    ])->current();
-                }
             }
 
             $result[$key] = $destImageRow;

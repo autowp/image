@@ -13,7 +13,8 @@ CREATE TABLE `image` (
 CREATE TABLE `formated_image` (
     `image_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
     `format` varchar(255) NOT NULL,
-    `formated_image_id` int(10) unsigned NOT NULL,
+    `status` int NOT NULL DEFAULT 0,
+    `formated_image_id` int(10) unsigned NULL DEFAULT NULL,
     PRIMARY KEY (`image_id`, `format`),
     KEY(formated_image_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8

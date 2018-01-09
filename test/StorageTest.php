@@ -182,8 +182,32 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $imageStorage = $serviceManager->get(Image\Storage::class);
 
-        $result = $imageStorage->getImage(9999999999);
+        $result = $imageStorage->getImage(999999999);
 
         $this->assertNull($result);
+    }
+    
+    public function testTimeout()
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+        
+        $serviceManager = $app->getServiceManager();
+        
+        $imageStorage = $serviceManager->get(Image\Storage::class);
+        
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
+        
+        $this->assertNotEmpty($imageId);
+        
+        $filePath = $imageStorage->getImageFilepath($imageId);
+        
+        $formatedImage = $imageStorage->getFormatedImage(new Image\Storage\Request([
+            'imageId' => $imageId,
+        ]), 'picture-gallery');
+        
+        $this->assertEquals(1024, $formatedImage->getWidth());
+        $this->assertEquals(768, $formatedImage->getHeight());
+        $this->assertTrue($formatedImage->getFileSize() > 0);
+        $this->assertNotEmpty($formatedImage->getSrc());
     }
 }

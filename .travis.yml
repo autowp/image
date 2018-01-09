@@ -2,12 +2,12 @@ sudo: required
 dist: trusty
 language: php
 php:
-  - 7.0.12
   - 7.1
   - 7.2
   - nightly
 services:
   - mysql
+  - postgresql
 addons:
   apt:
     packages:
@@ -15,18 +15,23 @@ addons:
     - mysql-client-core-5.6
     - mysql-client-5.6
 install:
-  - printf "\n" | pecl install imagick
+  - pear config-set preferred_state beta
+  - pecl channel-update pecl.php.net
+  - yes | pecl install imagick
   
 before_script: 
   - composer install --ignore-platform-reqs
   - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
   - mysql -u root -e 'create database autowp_image_test;'
-  - mysql -u root < test/_files/dump.sql
+  - mysql -u root < test/_files/dump.mysql.sql
   - mysql -u root -e 'GRANT ALL PRIVILEGES ON autowp_image_test.* TO autowp_test@localhost IDENTIFIED BY "test";'
+  - psql -c 'create database autowp_image_test;' -U postgres
+  - psql --set ON_ERROR_STOP=on -U postgres autowp_image_test < test/_files/dump.pgsql.sql
 script: 
   - composer cs-check
   - composer phpmd
-  - ./vendor/bin/phpunit --coverage-clover ./test/logs/clover.xml
+  - PDODRIVER=pgsql ./vendor/bin/phpunit
+  - PDODRIVER=mysql ./vendor/bin/phpunit --coverage-clover ./test/logs/clover.xml
 
 after_script:
   - ./vendor/bin/coveralls -v
