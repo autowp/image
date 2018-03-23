@@ -21,7 +21,7 @@ class Storage implements StorageInterface
 {
     const EXTENSION_DEFAULT = 'jpg';
 
-    const INSERT_MAX_ATTEMPTS = 1000;
+    const INSERT_MAX_ATTEMPTS = 15;
 
     const STATUS_DEFAULT = 0,
           STATUS_PROCESSING = 1,
@@ -486,10 +486,25 @@ class Storage implements StorageInterface
             strpos($e->getMessage(), 'duplicate key') !== false;
     }
 
-    private function doFormatImage(Storage\Request $request, string $formatName): int
+    /**
+     * @return array|null
+     */
+    private function getRowCrop($row)
     {
-        $imageId = $request->getImageId();
+        if ($row['crop_width'] <= 0 || $row['crop_height'] <= 0) {
+            return null;
+        }
 
+        return [
+            'left'   => $row['crop_left'],
+            'top'    => $row['crop_top'],
+            'width'  => $row['crop_width'],
+            'height' => $row['crop_height'],
+        ];
+    }
+
+    private function doFormatImage(int $imageId, string $formatName): int
+    {
         // find source image
         $imageRow = $this->imageTable->select([
             'id = ?' => $imageId
@@ -523,11 +538,6 @@ class Storage implements StorageInterface
             throw new Exception("Format `$formatName` not found");
         }
         $cFormat = clone $format;
-
-        $crop = $request->getCrop();
-        if ($crop) {
-            $cFormat->setCrop($crop);
-        }
 
         $sampler = $this->getImageSampler();
         if (! $sampler) {
@@ -576,7 +586,7 @@ class Storage implements StorageInterface
         }
 
         try {
-            $sampler->convertImagick($imagick, $cFormat);
+            $sampler->convertImagick($imagick, $this->getRowCrop($imageRow), $cFormat);
 
             // store result
             $newPath = implode(DIRECTORY_SEPARATOR, [
@@ -619,21 +629,8 @@ class Storage implements StorageInterface
         return $formatedImageId;
     }
 
-    private function getFormatedImageRows(array $requests, string $formatName)
+    private function getFormatedImageRows(array $imagesId, string $formatName)
     {
-        $imagesId = [];
-        foreach ($requests as &$request) {
-            $request = $this->castRequest($request);
-
-            $imageId = $request->getImageId();
-            if (! $imageId) {
-                throw new Exception("ImageId not provided");
-            }
-
-            $imagesId[] = $imageId;
-        }
-        unset($request);
-
         $destImageRows = [];
         if (count($imagesId)) {
             $select = $this->imageTable->getSql()->select()
@@ -653,9 +650,7 @@ class Storage implements StorageInterface
 
         $result = [];
 
-        foreach ($requests as $key => $request) {
-            $imageId = $request->getImageId();
-
+        foreach ($imagesId as $key => $imageId) {
             $destImageRow = null;
             foreach ($destImageRows as $row) {
                 if ($row['image_id'] == $imageId) {
@@ -665,7 +660,7 @@ class Storage implements StorageInterface
             }
 
             if (! $destImageRow) {
-                $formatedImageId = $this->doFormatImage($request, $formatName);
+                $formatedImageId = $this->doFormatImage($imageId, $formatName);
                 // result
                 $destImageRow = $this->imageTable->select([
                     'id = ?' => $formatedImageId
@@ -679,13 +674,11 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param Storage\Request $request
-     * @param string $formatName
      * @return array|\ArrayObject|null
      */
-    private function getFormatedImageRow(Storage\Request $request, $formatName)
+    private function getFormatedImageRow(int $imageId, string $formatName)
     {
-        $result = $this->getFormatedImageRows([$request], $formatName);
+        $result = $this->getFormatedImageRows([$imageId], $formatName);
 
         if (! isset($result[0])) {
             //throw new Exception("getFormatedImageRows fails");
@@ -696,57 +689,36 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int|Storage\Request $imageId
+     * @param int $imageId
      * @return string
      * @throws Exception
      */
-    public function getFormatedImageBlob($request, string $formatName)
+    public function getFormatedImageBlob(int $imageId, string $formatName)
     {
-        if (! $request instanceof Storage\Request) {
-            $request = new Storage\Request([
-                'imageId' => $request
-            ]);
-        }
-
-        $row = $this->getFormatedImageRow($request, $formatName);
+        $row = $this->getFormatedImageRow($imageId, $formatName);
 
         return $row === null ? null : $this->buildImageBlobResult($row);
     }
 
-    private function castRequest($request): Storage\Request
-    {
-        if (is_array($request)) {
-            $request = new Storage\Request($request);
-        } elseif (! $request instanceof Storage\Request) {
-            $request = new Storage\Request([
-                'imageId' => $request
-            ]);
-        }
-
-        return $request;
-    }
-
     /**
-     * @param int|Storage\Request $request
+     * @param int $imageId
      * @param string $format
      * @return Image|null
      */
-    public function getFormatedImage($request, string $formatName)
+    public function getFormatedImage(int $imageId, string $formatName)
     {
-        $row = $this->getFormatedImageRow($this->castRequest($request), $formatName);
+        $row = $this->getFormatedImageRow($imageId, $formatName);
         return $row === null ? null : $this->buildImageResult($row);
     }
 
     /**
-     * @param int|Storage\Request $request
+     * @param int $imageId
      * @param string $format
      * @return string|null
      */
-    public function getFormatedImagePath($request, $formatName)
+    public function getFormatedImagePath(int $imageId, $formatName)
     {
-        $request = $this->castRequest($request);
-
-        $imageRow = $this->getFormatedImageRow($request, $formatName);
+        $imageRow = $this->getFormatedImageRow($imageId, $formatName);
 
         if (! $imageRow) {
             return null;
@@ -768,15 +740,10 @@ class Storage implements StorageInterface
         return $path;
     }
 
-    /**
-     * @param array $images
-     * @param string $format
-     * @return array
-     */
-    public function getFormatedImages(array $requests, string $formatName)
+    public function getFormatedImages(array $imagesId, string $formatName): array
     {
         $result = [];
-        foreach ($this->getFormatedImageRows($requests, $formatName) as $key => $row) {
+        foreach ($this->getFormatedImageRows($imagesId, $formatName) as $key => $row) {
             $result[$key] = $row === null ? null : $this->buildImageResult($row);
         }
 
@@ -934,12 +901,16 @@ class Storage implements StorageInterface
             try {
                 // store to db
                 $this->imageTable->insert([
-                    'width'    => $width,
-                    'height'   => $height,
-                    'dir'      => $dirName,
-                    'filesize' => 0,
-                    'filepath' => $destFileName,
-                    'date_add' => new Sql\Expression('now()')
+                    'width'       => $width,
+                    'height'      => $height,
+                    'dir'         => $dirName,
+                    'filesize'    => 0,
+                    'filepath'    => $destFileName,
+                    'date_add'    => new Sql\Expression('now()'),
+                    'crop_left'   => 0,
+                    'crop_top'    => 0,
+                    'crop_width'  => 0,
+                    'crop_height' => 0
                 ]);
 
                 $id = $this->imageTable->getLastInsertValue();
@@ -1478,5 +1449,58 @@ class Storage implements StorageInterface
     public function hasFormat(string $format): bool
     {
         return (bool) $this->getFormat($format);
+    }
+
+    public function setImageCrop(int $imageId, $crop)
+    {
+        if (! is_array($crop)) {
+            $crop = [];
+        }
+
+        if (! isset($crop['left'])) {
+            $crop['left'] = 0;
+        }
+
+        if (! isset($crop['top'])) {
+            $crop['top'] = 0;
+        }
+
+        if (! isset($crop['width'])) {
+            $crop['width'] = 0;
+        }
+
+        if (! isset($crop['height'])) {
+            $crop['height'] = 0;
+        }
+
+        $left = (int)$crop['left'];
+        $top = (int)$crop['top'];
+        $width = (int)$crop['width'];
+        $height = (int)$crop['height'];
+
+        if ($left < 0 || $top < 0 || $width <= 0 || $height <= 0) {
+            $left = 0;
+            $top = 0;
+            $width = 0;
+            $height = 0;
+        }
+
+        $this->imageTable->update([
+            'crop_left'   => $left,
+            'crop_top'    => $top,
+            'crop_width'  => $width,
+            'crop_height' => $height,
+        ], [
+            'id' => $imageId
+        ]);
+
+        foreach ($this->formats as $formatName => $format) {
+            if (! $format->getIgnoreCrop()) {
+                $this->flush([
+                    'format' => $formatName,
+                    'image'  => $imageId
+                ]);
+            }
+        }
     }
 }

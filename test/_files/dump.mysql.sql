@@ -11,6 +11,10 @@ CREATE TABLE `image` (
   `height` int(10) unsigned NOT NULL,
   `date_add` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `dir` varchar(255) NOT NULL,
+  `crop_left` smallint unsigned NOT NULL DEFAULT 0,
+  `crop_top` smallint unsigned NOT NULL DEFAULT 0,
+  `crop_width` smallint unsigned NOT NULL DEFAULT 0,
+  `crop_height` smallint unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `filename` (`filepath`,`dir`),
   KEY `image_dir_id` (`dir`)

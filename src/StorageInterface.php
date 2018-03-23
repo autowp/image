@@ -20,25 +20,25 @@ interface StorageInterface
     public function getImageBlob(int $imageId);
 
     /**
-     * @param int|Storage\Request $imageId
+     * @param int $imageId
      * @return string
      * @throws Exception
      */
-    public function getFormatedImageBlob($request, string $formatName);
+    public function getFormatedImageBlob(int $imageId, string $formatName);
 
     /**
-     * @param int|Storage\Request $request
+     * @param int $imageId
      * @param string $format
      * @return Image
      */
-    public function getFormatedImage($request, string $formatName);
+    public function getFormatedImage(int $imageId, string $formatName);
 
     /**
-     * @param array $images
+     * @param array $imagesId
      * @param string $format
      * @return array
      */
-    public function getFormatedImages(array $requests, string $formatName);
+    public function getFormatedImages(array $imagesId, string $formatName);
 
     /**
      * @param int $imageId

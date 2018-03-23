@@ -112,6 +112,12 @@ class StorageTest extends \PHPUnit\Framework\TestCase
         $imageStorage = $serviceManager->get(Image\Storage::class);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
+        $imageStorage->setImageCrop($imageId, [
+            'cropLeft'   => 1024,
+            'cropTop'    => 768,
+            'cropWidth'  => 1024,
+            'cropHeight' => 768
+        ]);
 
         $this->assertNotEmpty($imageId);
 
@@ -119,13 +125,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue(file_exists($filePath));
         $this->assertEquals(filesize(self::TEST_IMAGE_FILE2), filesize($filePath));
 
-        $formatedImage = $imageStorage->getFormatedImage(new Image\Storage\Request([
-            'imageId'    => $imageId,
-            'cropLeft'   => 1024,
-            'cropTop'    => 768,
-            'cropWidth'  => 1024,
-            'cropHeight' => 768
-        ]), 'picture-gallery');
+        $formatedImage = $imageStorage->getFormatedImage($imageId, 'picture-gallery');
 
         $this->assertEquals(1024, $formatedImage->getWidth());
         $this->assertEquals(768, $formatedImage->getHeight());
@@ -157,20 +157,12 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(2, count($images));
 
-        $request1 = new Image\Storage\Request([
-            'imageId'    => $imageId1
-        ]);
-
-        $request2 = new Image\Storage\Request([
-            'imageId'    => $imageId2
-        ]);
-
-        $formatedImages = $imageStorage->getFormatedImages([$request1, $request2], 'test');
+        $formatedImages = $imageStorage->getFormatedImages([$imageId1, $imageId2], 'test');
 
         $this->assertEquals(2, count($formatedImages));
 
         // re-request
-        $formatedImages = $imageStorage->getFormatedImages([$request1, $request2], 'test');
+        $formatedImages = $imageStorage->getFormatedImages([$imageId1, $imageId2], 'test');
         $this->assertEquals(2, count($formatedImages));
     }
 
@@ -201,18 +193,14 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $formatName = 'test';
 
-        $formatedImage = $imageStorage->getFormatedImage(new Image\Storage\Request([
-            'imageId' => $imageId,
-        ]), $formatName);
+        $formatedImage = $imageStorage->getFormatedImage($imageId, $formatName);
 
         $this->assertEquals(160, $formatedImage->getWidth());
         $this->assertEquals(120, $formatedImage->getHeight());
         $this->assertTrue($formatedImage->getFileSize() > 0);
         $this->assertNotEmpty($formatedImage->getSrc());
 
-        $formatedImage = $imageStorage->getFormatedImage(new Image\Storage\Request([
-            'imageId' => $imageId,
-        ]), $formatName);
+        $formatedImage = $imageStorage->getFormatedImage($imageId, $formatName);
 
         $this->assertEquals(160, $formatedImage->getWidth());
         $this->assertEquals(120, $formatedImage->getHeight());
@@ -244,9 +232,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
             'formated_image_id' => null
         ]);
 
-        $formatedImage = $imageStorage->getFormatedImage(new Image\Storage\Request([
-            'imageId' => $imageId,
-        ]), $formatName);
+        $formatedImage = $imageStorage->getFormatedImage($imageId, $formatName);
 
         $this->assertEmpty($formatedImage);
     }

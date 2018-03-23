@@ -18,7 +18,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $file = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
         $imagick = new Imagick();
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'     => Format::FIT_TYPE_OUTER,
             'width'      => 102,
             'height'     => 149,
@@ -34,7 +34,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $file = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
         $imagick = new Imagick();
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 101,
             'height'     => 150,
@@ -51,7 +51,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick = new Imagick();
         // both size less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 150,
             'height'     => 200,
@@ -62,7 +62,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // width less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 150,
             'height'     => 100,
@@ -73,7 +73,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // height less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 50,
             'height'     => 200,
@@ -84,7 +84,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // not less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 50,
             'height'     => 100,
@@ -95,7 +95,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // both size less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 150,
             'height'     => 200,
@@ -106,7 +106,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // width less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 150,
             'height'     => 100,
@@ -117,7 +117,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // height less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 50,
             'height'     => 200,
@@ -128,7 +128,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // not less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 50,
             'height'     => 100,
@@ -146,7 +146,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick = new Imagick();
         // both size less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 150,
             'height'     => 200,
@@ -157,7 +157,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // width less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 150,
             'height'     => 100,
@@ -168,7 +168,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // height less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 50,
             'height'     => 200,
@@ -179,7 +179,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // not less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 50,
             'height'     => 100,
@@ -190,7 +190,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // both size less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 150,
             'height'     => 200,
@@ -201,7 +201,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // width less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 150,
             'height'     => 100,
@@ -212,7 +212,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // height less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 50,
             'height'     => 200,
@@ -223,7 +223,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // not less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 50,
             'height'     => 100,
@@ -241,7 +241,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick = new Imagick();
         // both size less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 150,
             'height'     => 200,
@@ -252,7 +252,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // width less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 150,
             'height'     => 100,
@@ -263,7 +263,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // height less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 50,
             'height'     => 200,
@@ -274,7 +274,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // not less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 50,
             'height'     => 100,
@@ -285,7 +285,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // both size less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 150,
             'height'     => 200,
@@ -296,7 +296,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // width less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 150,
             'height'     => 100,
@@ -307,7 +307,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // height less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 50,
             'height'     => 200,
@@ -318,7 +318,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // not less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 50,
             'height'     => 100,
@@ -336,7 +336,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick = new Imagick();
         // width less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'width'      => 150,
             'reduceOnly' => true
         ]);
@@ -345,7 +345,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // not less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'width'      => 50,
             'reduceOnly' => true
         ]);
@@ -354,7 +354,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // width less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'width'      => 150,
             'reduceOnly' => false
         ]);
@@ -363,7 +363,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // not less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'width'      => 50,
             'reduceOnly' => false
         ]);
@@ -379,7 +379,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick = new Imagick();
         // height less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'height'     => 200,
             'reduceOnly' => true
         ]);
@@ -388,7 +388,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // not less
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'height'     => 100,
             'reduceOnly' => true
         ]);
@@ -397,7 +397,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // height less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'height'     => 200,
             'reduceOnly' => false
         ]);
@@ -406,7 +406,7 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
         // not less, reduceOnly off
         $imagick->readImage($file); //101x149
-        $sampler->convertImagick($imagick, [
+        $sampler->convertImagick($imagick, null, [
             'height'     => 100,
             'reduceOnly' => false
         ]);
