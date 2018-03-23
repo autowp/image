@@ -597,7 +597,13 @@ class Storage implements StorageInterface
 
             $cropSuffix = '';
             if ($crop) {
-                $cropSuffix = '_' . sprintf("%04x%04x%04x%04x", $crop['left'], $crop['top'], $crop['width'], $crop['height']);
+                $cropSuffix = '_' . sprintf(
+                    "%04x%04x%04x%04x",
+                    $crop['left'],
+                    $crop['top'],
+                    $crop['width'],
+                    $crop['height']
+                );
             }
 
             $sampler->convertImagick($imagick, $crop, $cFormat);
