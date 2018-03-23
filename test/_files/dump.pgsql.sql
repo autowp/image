@@ -7,6 +7,10 @@ CREATE TABLE image (
   filesize int NOT NULL,
   width int NOT NULL,
   height int NOT NULL,
+  crop_left smallint NOT NULL DEFAULT 0,
+  crop_top smallint NOT NULL DEFAULT 0,
+  crop_width smallint NOT NULL DEFAULT 0,
+  crop_height smallint NOT NULL DEFAULT 0,
   date_add timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   dir varchar(255) NOT NULL,
   PRIMARY KEY (id)

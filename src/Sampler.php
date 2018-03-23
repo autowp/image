@@ -392,10 +392,11 @@ class Sampler
 
     /**
      * @param Imagick $source
+     * @param array|null $crop
      * @param array|Format $format
      * @throws Exception
      */
-    public function convertImagick(Imagick $imagick, $format)
+    public function convertImagick(Imagick $imagick, $crop, $format)
     {
         if (! $format instanceof Format) {
             if (is_array($format)) {
@@ -409,12 +410,7 @@ class Sampler
             $imagick->setImageCompressionQuality($quality);
         }
 
-        $crop = false;
-        if (! $format->isIgnoreCrop()) {
-            $crop = $format->getCrop();
-        }
-
-        if ($crop) {
+        if ($crop && ! $format->isIgnoreCrop()) {
             $this->cropImage($imagick, $crop, $format);
         }
 
@@ -510,7 +506,7 @@ class Sampler
             return $this->raise("Dest file not set");
         }
 
-        $this->convertImagick($imagick, $format);
+        $this->convertImagick($imagick, null, $format);
 
         if (! $imagick->writeImage($destFile)) {
             return $this->raise("Error write image to `$destFile`");

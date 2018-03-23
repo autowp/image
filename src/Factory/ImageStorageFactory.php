@@ -6,6 +6,7 @@ use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 use Autowp\Image\Storage;
+use Autowp\Image\Processor;
 
 class ImageStorageFactory implements FactoryInterface
 {
@@ -23,7 +24,8 @@ class ImageStorageFactory implements FactoryInterface
             $storageConfig,
             $tables->get('image'),
             $tables->get('formated_image'),
-            $tables->get('image_dir')
+            $tables->get('image_dir'),
+            $container->get(Processor\ProcessorPluginManager::class)
         );
 
         $request = $container->get('Request');
