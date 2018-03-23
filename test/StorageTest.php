@@ -113,10 +113,10 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
         $imageStorage->setImageCrop($imageId, [
-            'cropLeft'   => 1024,
-            'cropTop'    => 768,
-            'cropWidth'  => 1024,
-            'cropHeight' => 768
+            'left'   => 1024,
+            'top'    => 768,
+            'width'  => 1020,
+            'height' => 500
         ]);
 
         $this->assertNotEmpty($imageId);
@@ -127,10 +127,12 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $formatedImage = $imageStorage->getFormatedImage($imageId, 'picture-gallery');
 
-        $this->assertEquals(1024, $formatedImage->getWidth());
-        $this->assertEquals(768, $formatedImage->getHeight());
+        $this->assertEquals(1020, $formatedImage->getWidth());
+        $this->assertEquals(500, $formatedImage->getHeight());
         $this->assertTrue($formatedImage->getFileSize() > 0);
         $this->assertNotEmpty($formatedImage->getSrc());
+
+        $this->assertContains('0400030003fc01f4', $formatedImage->getSrc());
     }
 
     public function testFlopNormalizeAndMultipleRequest()

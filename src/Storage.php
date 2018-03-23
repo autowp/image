@@ -593,7 +593,14 @@ class Storage implements StorageInterface
         }
 
         try {
-            $sampler->convertImagick($imagick, $this->getRowCrop($imageRow), $cFormat);
+            $crop = $this->getRowCrop($imageRow);
+
+            $cropSuffix = '';
+            if ($crop) {
+                $cropSuffix = '_' . sprintf("%04x%04x%04x%04x", $crop['left'], $crop['top'], $crop['width'], $crop['height']);
+            }
+
+            $sampler->convertImagick($imagick, $crop, $cFormat);
 
             foreach ($cFormat->getProcessors() as $processorName) {
                 $processor = $this->processors->get($processorName);
@@ -614,7 +621,7 @@ class Storage implements StorageInterface
                 $this->formatedImageDirName,
                 [
                     'extension' => $extension,
-                    'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename']
+                    'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename'] . $cropSuffix
                 ]
             );
 
@@ -1465,6 +1472,10 @@ class Storage implements StorageInterface
 
     public function setImageCrop(int $imageId, $crop)
     {
+        if (! $imageId) {
+            throw new Exception("Invalid image id provided `$imageId`");
+        }
+
         if (! is_array($crop)) {
             $crop = [];
         }
