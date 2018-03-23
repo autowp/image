@@ -25,6 +25,7 @@ class Module implements
             'service_manager'    => $provider->getDependencyConfig(),
             'tables'             => $provider->getTablesConfig(),
             'view_helpers'       => $provider->getViewHelperConfig(),
+            'image_processors'   => $provider->getImageProcessorsConfig(),
         ];
     }
 

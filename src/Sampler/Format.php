@@ -77,6 +77,11 @@ class Format
     private $highest = null;
 
     /**
+     * @var array
+     */
+    private $processors = [];
+
+    /**
      * @param array $options
      * @throws Exception
      */
@@ -103,6 +108,18 @@ class Format
         }
 
         return $this;
+    }
+
+    public function setProcessors(array $value): Format
+    {
+        $this->processors = (array)$value;
+
+        return $this;
+    }
+
+    public function getProcessors(): array
+    {
+        return $this->processors;
     }
 
     /**

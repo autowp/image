@@ -236,4 +236,26 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEmpty($formatedImage);
     }
+
+    public function testNormalizeProcessor()
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+
+        $serviceManager = $app->getServiceManager();
+
+        $imageStorage = $serviceManager->get(Image\Storage::class);
+
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
+
+        $this->assertNotEmpty($imageId);
+
+        $formatName = 'with-processor';
+
+        $formatedImage = $imageStorage->getFormatedImage($imageId, $formatName);
+
+        $this->assertEquals(160, $formatedImage->getWidth());
+        $this->assertEquals(120, $formatedImage->getHeight());
+        $this->assertTrue($formatedImage->getFileSize() > 0);
+        $this->assertNotEmpty($formatedImage->getSrc());
+    }
 }

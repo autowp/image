@@ -95,6 +95,11 @@ class Storage implements StorageInterface
     private $forceHttps = false;
 
     /**
+     * @var Processor\ProcessorPluginManager
+     */
+    private $processors;
+
+    /**
      * @param array $options
      * @throws Exception
      */
@@ -102,13 +107,15 @@ class Storage implements StorageInterface
         array $options,
         TableGateway $imageTable,
         TableGateway $formatedImageTable,
-        TableGateway $dirTable
+        TableGateway $dirTable,
+        Processor\ProcessorPluginManager $processors
     ) {
         $this->setOptions($options);
 
         $this->imageTable = $imageTable;
         $this->formatedImageTable = $formatedImageTable;
         $this->dirTable = $dirTable;
+        $this->processors = $processors;
     }
 
     /**
@@ -587,6 +594,11 @@ class Storage implements StorageInterface
 
         try {
             $sampler->convertImagick($imagick, $this->getRowCrop($imageRow), $cFormat);
+
+            foreach ($cFormat->getProcessors() as $processorName) {
+                $processor = $this->processors->get($processorName);
+                $processor->process($imagick);
+            }
 
             // store result
             $newPath = implode(DIRECTORY_SEPARATOR, [

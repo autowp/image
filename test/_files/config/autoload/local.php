@@ -85,7 +85,18 @@ return [
                 'strip'      => 1,
                 'format'     => 'jpeg'
             ],
-        ]
+            'with-processor' => [
+                'fitType'    => 0,
+                'width'      => 160,
+                'height'     => 120,
+                'background' => '#fff',
+                'strip'      => 1,
+                'processors' => [
+                    'normalize',
+                    'negate'
+                ]
+            ]
+        ],
     ],
     'db' => $db
 ];

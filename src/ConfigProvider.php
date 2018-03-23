@@ -15,6 +15,21 @@ class ConfigProvider
             'dependencies'       => $this->getDependencyConfig(),
             'tables'             => $this->getTablesConfig(),
             'view_helpers'       => $this->getViewHelperConfig(),
+            'image_processors'   => $this->getImageProcessorsConfig(),
+        ];
+    }
+
+    public function getImageProcessorsConfig(): array
+    {
+        return [
+            'aliases' => [
+                'normalize' => Processor\Normalize::class,
+                'negate' => Processor\Negate::class,
+            ],
+            'factories' => [
+                Processor\Normalize::class => InvokableFactory::class,
+                Processor\Negate::class => InvokableFactory::class,
+            ]
         ];
     }
 
@@ -93,7 +108,8 @@ class ConfigProvider
                 Storage::class => StorageInterface::class
             ],
             'factories' => [
-                StorageInterface::class => Factory\ImageStorageFactory::class
+                StorageInterface::class                 => Factory\ImageStorageFactory::class,
+                Processor\ProcessorPluginManager::class => Processor\ProcessorPluginManagerFactory::class,
             ]
         ];
     }
