@@ -1071,7 +1071,9 @@ class Storage implements StorageInterface
         $rows = $this->formatedImageTable->selectWith($select);
 
         foreach ($rows as $row) {
-            $this->removeImage($row['formated_image_id']);
+            if ($row['formated_image_id']) {
+                $this->removeImage($row['formated_image_id']);
+            }
 
             $this->formatedImageTable->delete([
                 'image_id' => $row['image_id'],
