@@ -112,14 +112,20 @@ class StorageTest extends \PHPUnit\Framework\TestCase
         $imageStorage = $serviceManager->get(Image\Storage::class);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
-        $imageStorage->setImageCrop($imageId, [
+        $this->assertNotEmpty($imageId);
+
+        $crop = [
             'left'   => 1024,
             'top'    => 768,
             'width'  => 1020,
             'height' => 500
-        ]);
+        ];
 
-        $this->assertNotEmpty($imageId);
+        $imageStorage->setImageCrop($imageId, $crop);
+
+        $this->assertEquals($crop, $imageStorage->getImageCrop($imageId));
+
+
 
         $filePath = $imageStorage->getImageFilepath($imageId);
         $this->assertTrue(file_exists($filePath));

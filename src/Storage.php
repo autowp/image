@@ -1478,6 +1478,30 @@ class Storage implements StorageInterface
         return (bool) $this->getFormat($format);
     }
 
+    /**
+     * @param integer $imageId
+     * @return array|null
+     */
+    public function getImageCrop(int $imageId)
+    {
+        $row = $this->getImageRow($imageId);
+
+        if (! $row) {
+            return null;
+        }
+
+        if ($row['crop_width'] <= 0 || $row['crop_height'] <= 0) {
+            return null;
+        }
+
+        return [
+            'left'   => (int)$row['crop_left'],
+            'top'    => (int)$row['crop_top'],
+            'width'  => (int)$row['crop_width'],
+            'height' => (int)$row['crop_height'],
+        ];
+    }
+
     public function setImageCrop(int $imageId, $crop)
     {
         if (! $imageId) {
