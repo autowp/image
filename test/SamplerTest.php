@@ -414,4 +414,29 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($imagick->getImageHeight(), 100);
         $imagick->clear();
     }
+
+    public function testAnimationPreservedDueResample()
+    {
+        $file = dirname(__FILE__) . '/_files/icon-animation.gif';
+
+        $imagick = new Imagick();
+        $imagick->readImage($file);
+
+        $frames = $imagick->getNumberImages();
+
+        $sampler = new Sampler();
+
+        $imagick = $sampler->convertImagick($imagick, null, [
+            'fitType' => '0',
+            'width'  => 200,
+            'height' => 200,
+        ]);
+
+        $this->assertGreaterThan(1, $imagick->getNumberImages());
+
+        $this->assertSame($imagick->getImageWidth(), 200);
+        $this->assertSame($imagick->getImageHeight(), 200);
+
+        $imagick->clear();
+    }
 }

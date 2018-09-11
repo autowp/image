@@ -12,15 +12,22 @@ use Autowp\Image\Sampler\Exception;
 
 class Sampler
 {
-    /**
-     * @param Imagick $imagick
-     * @param Format $format
-     */
-    private function convertByInnerFit(
-        Imagick $imagick,
-        Format $format
-    ) {
+    private function scaleImage(Imagick $imagick, int $width, int $height): Imagick
+    {
+        if ($imagick->getImageFormat() == 'GIF') {
+            foreach ($imagick as $i) {
+                print "SCALE\n";
+                $i->scaleImage($width, $height, false);
+            }
+        } else {
+            $imagick->scaleImage($width, $height, false);
+        }
 
+        return $imagick;
+    }
+
+    private function convertByInnerFit(Imagick $imagick, Format $format): Imagick
+    {
         $srcWidth = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
         $srcRatio = $srcWidth / $srcHeight;
@@ -37,20 +44,12 @@ class Sampler
                 // resize by height
                 $scaleHeight = $format->getHeight();
                 $scaleWidth = round($scaleHeight * $srcRatio);
-                $imagick->scaleImage(
-                    $scaleWidth,
-                    $scaleHeight,
-                    false
-                );
+                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             } elseif (! $widthLess) {
                 // resize by width
                 $scaleWidth = $format->getWidth();
                 $scaleHeight = round($scaleWidth / $srcRatio);
-                $imagick->scaleImage(
-                    $scaleWidth,
-                    $scaleHeight,
-                    false
-                );
+                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             }
         } else {
             // высчитываем размеры обрезания
@@ -68,27 +67,15 @@ class Sampler
                 $cropTop = (int)floor(($srcHeight - $cropHeight) / 2);
             }
 
-            $imagick->setImagePage(0, 0, 0, 0);
-            if (! $imagick->cropImage($cropWidth, $cropHeight, $cropLeft, $cropTop)) {
-                return $this->raise("Error crop");
-            }
-
-            $imagick->scaleImage(
-                $format->getWidth(),
-                $format->getHeight(),
-                false
-            );
+            $imagick = $this->crop($imagick, $cropWidth, $cropHeight, $cropLeft, $cropTop);
+            $imagick = $this->scaleImage($imagick, $format->getWidth(), $format->getHeight());
         }
+
+        return $imagick;
     }
 
-    /**
-     * @param Imagick $imagick
-     * @param Format $format
-     */
-    private function convertByOuterFit(
-        Imagick $imagick,
-        Format $format
-    ) {
+    private function convertByOuterFit(Imagick $imagick, Format $format): Imagick
+    {
 
         $srcWidth = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
@@ -106,20 +93,12 @@ class Sampler
                 // resize by height
                 $scaleHeight = $format->getHeight();
                 $scaleWidth = round($scaleHeight * $srcRatio);
-                $imagick->scaleImage(
-                    $scaleWidth,
-                    $scaleHeight,
-                    false
-                );
+                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             } elseif (! $widthLess) {
                 // resize by width
                 $scaleWidth = $format->getWidth();
                 $scaleHeight = round($scaleWidth / $srcRatio);
-                $imagick->scaleImage(
-                    $scaleWidth,
-                    $scaleHeight,
-                    false
-                );
+                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             }
         } else {
             if ($ratio < $srcRatio) {
@@ -132,11 +111,7 @@ class Sampler
                 $scaleHeight = $format->getHeight();
             }
 
-            $imagick->scaleImage(
-                $scaleWidth,
-                $scaleHeight,
-                false
-            );
+            $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
         }
 
         // extend by bg-space
@@ -149,17 +124,12 @@ class Sampler
             -$borderLeft,
             -$borderTop
         );
+
+        return $imagick;
     }
 
-    /**
-     * @param Imagick $imagick
-     * @param Format $format
-     */
-    private function convertByMaximumFit(
-        Imagick $imagick,
-        Format $format
-    ) {
-
+    private function convertByMaximumFit(Imagick $imagick, Format $format): Imagick
+    {
         $srcWidth = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
         $srcRatio = $srcWidth / $srcHeight;
@@ -175,20 +145,12 @@ class Sampler
                 // resize by height
                 $scaleHeight = $format->getHeight();
                 $scaleWidth = round($scaleHeight * $srcRatio);
-                $imagick->scaleImage(
-                    $scaleWidth,
-                    $scaleHeight,
-                    false
-                );
+                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             } elseif (! $widthLess) {
                 // resize by width
                 $scaleWidth = $format->getWidth();
                 $scaleHeight = round($scaleWidth / $srcRatio);
-                $imagick->scaleImage(
-                    $scaleWidth,
-                    $scaleHeight,
-                    false
-                );
+                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             }
         } else {
             // высчитываем размеры обрезания
@@ -201,22 +163,14 @@ class Sampler
                 $scaleHeight = $format->getHeight();
             }
 
-            $imagick->scaleImage(
-                $scaleWidth,
-                $scaleHeight,
-                false
-            );
+            $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
         }
+
+        return $imagick;
     }
 
-    /**
-     * @param Imagick $imagick
-     * @param Format $format
-     */
-    private function convertByWidth(
-        Imagick $imagick,
-        Format $format
-    ) {
+    private function convertByWidth(Imagick $imagick, Format $format): Imagick
+    {
 
         $srcWidth = $imagick->getImageWidth();
         $srcRatio = $srcWidth / $imagick->getImageHeight();
@@ -231,17 +185,13 @@ class Sampler
 
         $scaleHeight = round($scaleWidth / $srcRatio);
 
-        $imagick->scaleImage($scaleWidth, $scaleHeight, false);
+        $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
+
+        return $imagick;
     }
 
-    /**
-     * @param Imagick $imagick
-     * @param Format $format
-     */
-    private function convertByHeight(
-        Imagick $imagick,
-        Format $format
-    ) {
+    private function convertByHeight(Imagick $imagick, Format $format): Imagick
+    {
 
         $srcHeight = $imagick->getImageHeight();
         $srcRatio = $imagick->getImageWidth() / $srcHeight;
@@ -256,20 +206,29 @@ class Sampler
 
         $scaleWidth = round($scaleHeight * $srcRatio);
 
-        $imagick->scaleImage(
-            $scaleWidth,
-            $scaleHeight,
-            false
-        );
+        $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
+
+        return $imagick;
+    }
+
+    private function crop(Imagick $imagick, int $width, int $height, int $left, int $top): Imagick
+    {
+        if ($imagick->getImageFormat() == 'GIF') {
+            foreach ($imagick as $i) {
+                $i->cropImage($width, $height, $left, $top);
+            }
+        } else {
+            $imagick->setImagePage(0, 0, 0, 0);
+            $imagick->cropImage($width, $height, $left, $top);
+        }
+
+        return $imagick;
     }
 
     /**
-     * @param Imagick $imagick
-     * @param array $crop
-     * @param Format $format
      * @throws Exception
      */
-    private function cropImage(Imagick $imagick, array $crop, Format $format)
+    private function cropImage(Imagick $imagick, array $crop, Format $format): Imagick
     {
         $cropSet = isset($crop['width'], $crop['height'], $crop['left'], $crop['top']);
         if (! $cropSet) {
@@ -347,10 +306,12 @@ class Sampler
             }
         }
 
-        $imagick->cropImage($cropWidth, $cropHeight, $cropLeft, $cropTop);
+        $imagick = $this->crop($imagick, $cropWidth, $cropHeight, $cropLeft, $cropTop);
+
+        return $imagick;
     }
 
-    private function cropToWidest(Imagick $imagick, $widestRatio)
+    private function cropToWidest(Imagick $imagick, $widestRatio): Imagick
     {
         $srcWidth = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
@@ -361,16 +322,13 @@ class Sampler
 
         if ($ratioDiff > 0) {
             $dstWidth = round($widestRatio * $srcHeight);
-            $imagick->cropImage(
-                $dstWidth,
-                $srcHeight,
-                ($srcWidth - $dstWidth) / 2,
-                0
-            );
+            $imagick = $this->crop($imagick, $dstWidth, $srcHeight, ($srcWidth - $dstWidth) / 2, 0);
         }
+
+        return $imagick;
     }
 
-    private function cropToHighest(Imagick $imagick, $highestRatio)
+    private function cropToHighest(Imagick $imagick, $highestRatio): Imagick
     {
         $srcWidth = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
@@ -381,13 +339,10 @@ class Sampler
 
         if ($ratioDiff < 0) {
             $dstHeight = round($srcWidth / $highestRatio);
-            $imagick->cropImage(
-                $srcWidth,
-                $dstHeight,
-                0,
-                ($srcHeight - $dstHeight) / 2
-            );
+            $imagick = $this->crop($imagick, $srcWidth, $dstHeight, 0, ($srcHeight - $dstHeight) / 2);
         }
+
+        return $imagick;
     }
 
     /**
@@ -396,7 +351,7 @@ class Sampler
      * @param array|Format $format
      * @throws Exception
      */
-    public function convertImagick(Imagick $imagick, $crop, $format)
+    public function convertImagick(Imagick $imagick, $crop, $format): Imagick
     {
         if (! $format instanceof Format) {
             if (is_array($format)) {
@@ -451,19 +406,26 @@ class Sampler
         $imagick->setBackgroundColor($background);
         $imagick->setImageBackgroundColor($background);
 
+        if ($imagick->getImageFormat() == 'GIF') {
+            $decomposited = $imagick->coalesceImages();
+            $imagick->clear();
+            unset($imagick);
+        } else {
+            $decomposited = $imagick;
+        }
 
         if ($format->getWidth() && $format->getHeight()) {
             switch ($format->getFitType()) {
                 case Format::FIT_TYPE_INNER:
-                    $this->convertByInnerFit($imagick, $format);
+                    $decomposited = $this->convertByInnerFit($decomposited, $format);
                     break;
 
                 case Format::FIT_TYPE_OUTER:
-                    $this->convertByOuterFit($imagick, $format);
+                    $decomposited = $this->convertByOuterFit($decomposited, $format);
                     break;
 
                 case Format::FIT_TYPE_MAXIMUM:
-                    $this->convertByMaximumFit($imagick, $format);
+                    $decomposited = $this->convertByMaximumFit($decomposited, $format);
                     break;
 
                 default:
@@ -471,10 +433,19 @@ class Sampler
             }
         } else {
             if ($format->getWidth()) {
-                $this->convertByWidth($imagick, $format);
+                $decomposited = $this->convertByWidth($decomposited, $format);
             } elseif ($format->getHeight()) {
-                $this->convertByHeight($imagick, $format);
+                $decomposited = $this->convertByHeight($decomposited, $format);
             }
+        }
+
+        if ($decomposited->getImageFormat() == 'GIF') {
+            $decomposited->optimizeImageLayers();
+            $imagick = $decomposited->deconstructImages();
+            $decomposited->clear();
+            unset($decomposited);
+        } else {
+            $imagick = $decomposited;
         }
 
         if ($format->getStrip()) {
@@ -484,6 +455,8 @@ class Sampler
         if ($imageFormat = $format->getFormat()) {
             $imagick->setImageFormat($imageFormat);
         }
+
+        return $imagick;
     }
 
     /**
@@ -506,7 +479,7 @@ class Sampler
             return $this->raise("Dest file not set");
         }
 
-        $this->convertImagick($imagick, null, $format);
+        $imagick = $this->convertImagick($imagick, null, $format);
 
         if (! $imagick->writeImage($destFile)) {
             return $this->raise("Error write image to `$destFile`");

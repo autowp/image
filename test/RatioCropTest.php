@@ -20,7 +20,7 @@ class RatioCropTest extends \PHPUnit\Framework\TestCase
         // height less
         $imagick->readImage($file); //1000x229
 
-        $sampler->convertImagick($imagick, null, [
+        $imagick = $sampler->convertImagick($imagick, null, [
             'widest' => 4 / 3
         ]);
         $this->assertSame($imagick->getImageWidth(), 305);
@@ -37,7 +37,7 @@ class RatioCropTest extends \PHPUnit\Framework\TestCase
         // height less
         $imagick->readImage($file); //101x149
 
-        $sampler->convertImagick($imagick, null, [
+        $imagick = $sampler->convertImagick($imagick, null, [
             'highest' => 1 / 1
         ]);
         $this->assertSame($imagick->getImageWidth(), 101);

@@ -606,7 +606,7 @@ class Storage implements StorageInterface
                 );
             }
 
-            $sampler->convertImagick($imagick, $crop, $cFormat);
+            $imagick = $sampler->convertImagick($imagick, $crop, $cFormat);
 
             foreach ($cFormat->getProcessors() as $processorName) {
                 $processor = $this->processors->get($processorName);
