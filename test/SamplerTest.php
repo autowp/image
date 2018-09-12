@@ -422,8 +422,6 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick = new Imagick();
         $imagick->readImage($file);
 
-        $frames = $imagick->getNumberImages();
-
         $sampler = new Sampler();
 
         $imagick = $sampler->convertImagick($imagick, null, [

@@ -16,7 +16,6 @@ class Sampler
     {
         if ($imagick->getImageFormat() == 'GIF') {
             foreach ($imagick as $i) {
-                print "SCALE\n";
                 $i->scaleImage($width, $height, false);
             }
         } else {
