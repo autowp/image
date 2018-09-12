@@ -437,4 +437,30 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
 
         $imagick->clear();
     }
+
+    public function testResizeGif()
+    {
+        $file = dirname(__FILE__) . '/_files/rudolp-jumping-rope.gif';
+
+        $imagick = new Imagick();
+        $imagick->readImage($file);
+
+        $sampler = new Sampler();
+
+        $imagick = $sampler->convertImagick($imagick, null, [
+            'fitType'    => '0',
+            'width'      => 80,
+            'height'     => 80,
+            'background' => 'transparent'
+        ]);
+
+        $this->assertGreaterThan(1, $imagick->getNumberImages());
+
+        $imagick->writeImages('zzz.gif', true);
+
+        $this->assertSame($imagick->getImageWidth(), 80);
+        $this->assertSame($imagick->getImageHeight(), 80);
+
+        $imagick->clear();
+    }
 }

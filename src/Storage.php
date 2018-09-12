@@ -995,7 +995,7 @@ class Storage implements StorageInterface
         }
 
         return $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath) use ($imagick) {
-            if (! $imagick->writeImage($filePath)) {
+            if (! $imagick->writeImages($filePath, true)) {
                 throw new Exception("Imagick::writeImage error");
             }
         });
@@ -1357,7 +1357,7 @@ class Storage implements StorageInterface
         // format
         $imagick->flopImage();
 
-        $imagick->writeImage($filePath);
+        $imagick->writeImages($filePath, true);
 
         $imagick->clear();
 
@@ -1379,7 +1379,7 @@ class Storage implements StorageInterface
         // format
         $imagick->normalizeImage();
 
-        $imagick->writeImage($filePath);
+        $imagick->writeImages($filePath, true);
 
         $imagick->clear();
 

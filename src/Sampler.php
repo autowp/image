@@ -215,6 +215,7 @@ class Sampler
         if ($imagick->getImageFormat() == 'GIF') {
             foreach ($imagick as $i) {
                 $i->cropImage($width, $height, $left, $top);
+                $i->setImagePage($width, $height, 0, 0);
             }
         } else {
             $imagick->setImagePage(0, 0, 0, 0);
@@ -399,11 +400,10 @@ class Sampler
         }
 
         $background = $format->getBackground();
-        if (! $background) {
-            $background = 'transparent';
+        if ($background) {
+            $imagick->setBackgroundColor($background);
+            $imagick->setImageBackgroundColor($background);
         }
-        $imagick->setBackgroundColor($background);
-        $imagick->setImageBackgroundColor($background);
 
         if ($imagick->getImageFormat() == 'GIF') {
             $decomposited = $imagick->coalesceImages();
@@ -480,7 +480,7 @@ class Sampler
 
         $imagick = $this->convertImagick($imagick, null, $format);
 
-        if (! $imagick->writeImage($destFile)) {
+        if (! $imagick->writeImages($destFile, true)) {
             return $this->raise("Error write image to `$destFile`");
         }
 
