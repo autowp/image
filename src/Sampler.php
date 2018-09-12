@@ -369,16 +369,24 @@ class Sampler
             $this->cropImage($imagick, $crop, $format);
         }
 
+        if ($imagick->getImageFormat() == 'GIF') {
+            $decomposited = $imagick->coalesceImages();
+            $imagick->clear();
+            unset($imagick);
+        } else {
+            $decomposited = $imagick;
+        }
+
         // fit by widest
         $widest = $format->getWidest();
         if ($widest) {
-            $this->cropToWidest($imagick, $widest);
+            $this->cropToWidest($decomposited, $widest);
         }
 
         // fit by highest
         $highest = $format->getHighest();
         if ($highest) {
-            $this->cropToHighest($imagick, $highest);
+            $this->cropToHighest($decomposited, $highest);
         }
 
         // check for monotone background extend posibility
@@ -386,31 +394,23 @@ class Sampler
         $fHeight = $format->getHeight();
         if ($format->isProportionalCrop() && $fWidth && $fHeight) {
             $fRatio = $format->getWidth() / $format->getHeight();
-            $cRatio = $imagick->getImageWidth() / $imagick->getImageHeight();
+            $cRatio = $decomposited->getImageWidth() / $decomposited->getImageHeight();
 
             $ratioDiff = abs($fRatio - $cRatio);
 
             if ($ratioDiff > 0.001) {
                 if ($cRatio > $fRatio) {
-                    $this->extendVertical($imagick, $format);
+                    $this->extendVertical($decomposited, $format);
                 } else {
-                    $this->extendHorizontal($imagick, $format);
+                    $this->extendHorizontal($decomposited, $format);
                 }
             }
         }
 
         $background = $format->getBackground();
         if ($background) {
-            $imagick->setBackgroundColor($background);
-            $imagick->setImageBackgroundColor($background);
-        }
-
-        if ($imagick->getImageFormat() == 'GIF') {
-            $decomposited = $imagick->coalesceImages();
-            $imagick->clear();
-            unset($imagick);
-        } else {
-            $decomposited = $imagick;
+            $decomposited->setBackgroundColor($background);
+            $decomposited->setImageBackgroundColor($background);
         }
 
         if ($format->getWidth() && $format->getHeight()) {

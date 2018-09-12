@@ -456,10 +456,34 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertGreaterThan(1, $imagick->getNumberImages());
 
-        $imagick->writeImages('zzz.gif', true);
-
         $this->assertSame($imagick->getImageWidth(), 80);
         $this->assertSame($imagick->getImageHeight(), 80);
+
+        $imagick->clear();
+    }
+
+    public function testResizeGifWithProportionsConstraints()
+    {
+        $file = dirname(__FILE__) . '/_files/rudolp-jumping-rope.gif';
+
+        $imagick = new Imagick();
+        $imagick->readImage($file);
+
+        $sampler = new Sampler();
+
+        $imagick = $sampler->convertImagick($imagick, null, [
+            'fitType'    => '0',
+            'width'      => 456,
+            'background' => '',
+            'widest'     => 16 / 9,
+            'highest'    => 9 / 16,
+            'reduceOnly' => true,
+        ]);
+
+        $this->assertGreaterThan(1, $imagick->getNumberImages());
+
+        $this->assertSame($imagick->getImageWidth(), 456);
+        $this->assertSame($imagick->getImageHeight(), 342);
 
         $imagick->clear();
     }
