@@ -3,7 +3,6 @@
 namespace Autowp\Image\Storage\NamingStrategy;
 
 use Autowp\Image\Storage\Exception;
-use Autowp\Image\Storage\NamingStrategy\AbstractStrategy;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
 class Serial extends AbstractStrategy
@@ -20,7 +19,7 @@ class Serial extends AbstractStrategy
      * @throws Exception
      * @return Serial
      */
-    public function setDeep($deep)
+    public function setDeep($deep): Serial
     {
         $deep = (int)$deep;
         if ($deep < 0) {
@@ -34,7 +33,7 @@ class Serial extends AbstractStrategy
     /**
      * @return int
      */
-    public function getDeep()
+    public function getDeep(): int
     {
         return $this->deep;
     }
@@ -42,10 +41,11 @@ class Serial extends AbstractStrategy
     /**
      * Return the complete directory path of a filename (including hashedDirectoryStructure)
      *
-     * @param  string $id Cache id
-     * @return string Complete directory path
+     * @param int $index
+     * @param int $deep
+     * @return string
      */
-    private function path($index, $deep)
+    private function path(int $index, int $deep)
     {
         $chars = strlen(self::ITEM_PER_DIR - 1); // use log10, fkn n00b
         $path = '';
@@ -62,14 +62,14 @@ class Serial extends AbstractStrategy
     }
 
     /**
-     * @param string $dir
      * @param array $options
+     * @return string
      * @see AbstractStrategy::generate()
      */
-    public function generate(array $options = [])
+    public function generate(array $options = []): string
     {
         $defaults = [
-            'extenstion'    => null,
+            'extension'     => null,
             'count'         => null,
             'prefferedName' => null,
             'index'         => null

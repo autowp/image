@@ -7,75 +7,115 @@ use Imagick;
 interface StorageInterface
 {
     /**
-     * @throws Exception
+     * @param int $imageId
+     * @throws Storage\Exception
      * @return Storage\Image|null
      */
-    public function getImage(int $imageId);
+    public function getImage(int $imageId): ?Storage\Image;
 
+    /**
+     * @param array $imageIds
+     * @return array
+     */
     public function getImages(array $imageIds): array;
 
     /**
+     * @param $imageId
      * @return string|null
      */
-    public function getImageBlob(int $imageId);
+    public function getImageBlob(int $imageId): ?string;
 
     /**
      * @param int $imageId
+     * @param string $formatName
      * @return string
-     * @throws Exception
+     * @throws Storage\Exception
      */
-    public function getFormatedImageBlob(int $imageId, string $formatName);
+    public function getFormatedImageBlob(int $imageId, string $formatName): ?string;
 
     /**
      * @param int $imageId
-     * @param string $format
-     * @return Image
+     * @param string $formatName
+     * @return Storage\Image|null
      */
-    public function getFormatedImage(int $imageId, string $formatName);
+    public function getFormatedImage(int $imageId, string $formatName): ?Storage\Image;
 
     /**
      * @param array $imagesId
-     * @param string $format
+     * @param string $formatName
      * @return array
      */
-    public function getFormatedImages(array $imagesId, string $formatName);
+    public function getFormatedImages(array $imagesId, string $formatName): array;
 
     /**
      * @param int $imageId
-     * @return Image
-     * @throws Exception
+     * @return StorageInterface
+     * @throws Storage\Exception
      */
-    public function removeImage(int $imageId);
+    public function removeImage(int $imageId): StorageInterface;
 
     /**
-     * @throws Exception
+     * @param string $blob
+     * @param string $dirName
+     * @param array $options
+     * @return int
      */
     public function addImageFromBlob(string $blob, string $dirName, array $options = []): int;
 
     /**
-     * @throws Exception
+     * @param Imagick $imagick
+     * @param string $dirName
+     * @param array $options
+     * @return int
      */
     public function addImageFromImagick(Imagick $imagick, string $dirName, array $options = []): int;
 
     /**
-     * @throws Exception
+     * @param string $file
+     * @param string $dirName
+     * @param array $options
+     * @return int
+     * @throws Storage\Exception
      */
     public function addImageFromFile(string $file, string $dirName, array $options = []): int;
 
-    public function flush(array $options);
-
-    public function getImageIPTC(int $imageId);
-
-    public function getImageEXIF(int $imageId);
-
-    public function getImageResolution(int $imageId);
+    /**
+     * @param array $options
+     * @return StorageInterface
+     */
+    public function flush(array $options): StorageInterface;
 
     /**
-     * @throws Exception
+     * @param int $imageId
+     * @return string|null
      */
-    public function changeImageName(int $imageId, array $options = []);
+    public function getImageIPTC(int $imageId): ?string;
 
-    public function flop(int $imageId);
+    /**
+     * @param int $imageId
+     * @return array|null
+     */
+    public function getImageEXIF(int $imageId): ?array;
 
-    public function normalize(int $imageId);
+    /**
+     * @param int $imageId
+     * @return array|null
+     */
+    public function getImageResolution(int $imageId): ?array;
+
+    /**
+     * @param int $imageId
+     * @param array $options
+     */
+    public function changeImageName(int $imageId, array $options = []): void;
+
+    /**
+     * @param int $imageId
+     */
+    public function flop(int $imageId): void;
+
+    /**
+     * @param int $imageId
+     */
+    public function normalize(int $imageId): void;
 }

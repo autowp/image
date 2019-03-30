@@ -2,9 +2,10 @@
 
 namespace Autowp\Image\Processor;
 
+use RuntimeException;
+
 use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\Exception\InvalidServiceException;
-use Zend\ServiceManager\Factory\InvokableFactory;
 
 class ProcessorPluginManager extends AbstractPluginManager
 {
@@ -14,13 +15,7 @@ class ProcessorPluginManager extends AbstractPluginManager
      *
      * @var array
      */
-    protected $factories = [
-        ArraySerializable::class                => InvokableFactory::class,
-        ClassMethods::class                     => InvokableFactory::class,
-        DelegatingHydrator::class               => DelegatingHydratorFactory::class,
-        ObjectProperty::class                   => InvokableFactory::class,
-        Reflection::class                       => InvokableFactory::class,
-    ];
+    protected $factories = [];
 
     /**
      * Whether or not to share by default (v3)
@@ -72,7 +67,7 @@ class ProcessorPluginManager extends AbstractPluginManager
         try {
             $this->validate($plugin);
         } catch (InvalidServiceException $e) {
-            throw new Exception\RuntimeException($e->getMessage(), $e->getCode(), $e);
+            throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

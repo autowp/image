@@ -6,12 +6,18 @@ use Autowp\Image\Sampler;
 use Autowp\Image\Sampler\Format;
 
 use Imagick;
+use ImagickException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group Autowp_Image
  */
-class SamplerTest extends \PHPUnit\Framework\TestCase
+class SamplerTest extends TestCase
 {
+    /**
+     * @throws Sampler\Exception
+     * @throws ImagickException
+     */
     public function testShouldResizeOddWidthPictureStrictlyToTargetWidthByOuterFitType()
     {
         $sampler = new Sampler();
@@ -28,6 +34,10 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
     public function testShouldResizeOddHeightPictureStrictlyToTargetHeightByOuterFitType()
     {
         $sampler = new Sampler();
@@ -44,6 +54,10 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
     public function testReduceOnlyWithInnerFitWorks()
     {
         $sampler = new Sampler();
@@ -139,6 +153,10 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
     public function testReduceOnlyWithOuterFitWorks()
     {
         $sampler = new Sampler();
@@ -234,6 +252,10 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
     public function testReduceOnlyWithMaximumFitWorks()
     {
         $sampler = new Sampler();
@@ -329,6 +351,10 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
     public function testReduceOnlyByWidthWorks()
     {
         $sampler = new Sampler();
@@ -372,6 +398,10 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
     public function testReduceOnlyByHeightWorks()
     {
         $sampler = new Sampler();
@@ -415,6 +445,10 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
     public function testAnimationPreservedDueResample()
     {
         $file = dirname(__FILE__) . '/_files/icon-animation.gif';
@@ -438,6 +472,10 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
     public function testResizeGif()
     {
         $file = dirname(__FILE__) . '/_files/rudolp-jumping-rope.gif';
@@ -462,6 +500,10 @@ class SamplerTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
     public function testResizeGifWithProportionsConstraints()
     {
         $file = dirname(__FILE__) . '/_files/rudolp-jumping-rope.gif';

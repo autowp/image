@@ -4,14 +4,19 @@ namespace Autowp\Image;
 
 use Imagick;
 use ImagickDraw;
+use ImagickException;
 use ImagickPixel;
 use ImagickPixelIterator;
 
-use Autowp\Image\Sampler\Format;
-use Autowp\Image\Sampler\Exception;
-
 class Sampler
 {
+    /**
+     * @param Imagick $imagick
+     * @param int $width
+     * @param int $height
+     * @return Imagick
+     * @throws ImagickException
+     */
     private function scaleImage(Imagick $imagick, int $width, int $height): Imagick
     {
         if ($imagick->getImageFormat() == 'GIF') {
@@ -25,7 +30,13 @@ class Sampler
         return $imagick;
     }
 
-    private function convertByInnerFit(Imagick $imagick, Format $format): Imagick
+    /**
+     * @param Imagick $imagick
+     * @param Sampler\Format $format
+     * @return Imagick
+     * @throws ImagickException
+     */
+    private function convertByInnerFit(Imagick $imagick, Sampler\Format $format): Imagick
     {
         $srcWidth = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
@@ -73,7 +84,13 @@ class Sampler
         return $imagick;
     }
 
-    private function convertByOuterFit(Imagick $imagick, Format $format): Imagick
+    /**
+     * @param Imagick $imagick
+     * @param Sampler\Format $format
+     * @return Imagick
+     * @throws ImagickException
+     */
+    private function convertByOuterFit(Imagick $imagick, Sampler\Format $format): Imagick
     {
 
         $srcWidth = $imagick->getImageWidth();
@@ -127,7 +144,13 @@ class Sampler
         return $imagick;
     }
 
-    private function convertByMaximumFit(Imagick $imagick, Format $format): Imagick
+    /**
+     * @param Imagick $imagick
+     * @param Sampler\Format $format
+     * @return Imagick
+     * @throws ImagickException
+     */
+    private function convertByMaximumFit(Imagick $imagick, Sampler\Format $format): Imagick
     {
         $srcWidth = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
@@ -168,7 +191,13 @@ class Sampler
         return $imagick;
     }
 
-    private function convertByWidth(Imagick $imagick, Format $format): Imagick
+    /**
+     * @param Imagick $imagick
+     * @param Sampler\Format $format
+     * @return Imagick
+     * @throws ImagickException
+     */
+    private function convertByWidth(Imagick $imagick, Sampler\Format $format): Imagick
     {
 
         $srcWidth = $imagick->getImageWidth();
@@ -187,7 +216,13 @@ class Sampler
         return $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
     }
 
-    private function convertByHeight(Imagick $imagick, Format $format): Imagick
+    /**
+     * @param Imagick $imagick
+     * @param Sampler\Format $format
+     * @return Imagick
+     * @throws ImagickException
+     */
+    private function convertByHeight(Imagick $imagick, Sampler\Format $format): Imagick
     {
 
         $srcHeight = $imagick->getImageHeight();
@@ -206,6 +241,14 @@ class Sampler
         return $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
     }
 
+    /**
+     * @param Imagick $imagick
+     * @param int $width
+     * @param int $height
+     * @param int $left
+     * @param int $top
+     * @return Imagick
+     */
     private function crop(Imagick $imagick, int $width, int $height, int $left, int $top): Imagick
     {
         if ($imagick->getImageFormat() == 'GIF') {
@@ -222,13 +265,17 @@ class Sampler
     }
 
     /**
-     * @throws Exception
+     * @param Imagick $imagick
+     * @param array $crop
+     * @param Sampler\Format $format
+     * @return Imagick
+     * @throws Sampler\Exception
      */
-    private function cropImage(Imagick $imagick, array $crop, Format $format): Imagick
+    private function cropImage(Imagick $imagick, array $crop, Sampler\Format $format): Imagick
     {
         $cropSet = isset($crop['width'], $crop['height'], $crop['left'], $crop['top']);
         if (! $cropSet) {
-            return $this->raise('Crop parameters not properly set');
+            throw new Sampler\Exception('Crop parameters not properly set');
         }
 
         $cropWidth  = (int)$crop['width'];
@@ -241,18 +288,20 @@ class Sampler
 
         $leftValid = ($cropLeft >= 0) && ($cropLeft < $width );
         if (! $leftValid) {
-            return $this->raise("Crop left out of bounds ('$cropLeft')");
+            throw new Sampler\Exception("Crop left out of bounds ('$cropLeft')");
         }
 
         $topValid = ($cropTop >= 0) && ($cropTop < $height);
         if (! $topValid) {
-            return $this->raise("Crop top out of bounds ('$cropTop')");
+            throw new Sampler\Exception("Crop top out of bounds ('$cropTop')");
         }
 
         $right = $cropLeft + $cropWidth;
         $widthValid  = ($cropWidth > 0) && ($right <= $width );
         if (! $widthValid) {
-            return $this->raise("Crop width out of bounds ('$cropLeft + $cropWidth' ~ '$width x $height')");
+            throw new Sampler\Exception(
+                "Crop width out of bounds ('$cropLeft + $cropWidth' ~ '$width x $height')"
+            );
         }
 
         // try to fix height overflow
@@ -265,7 +314,9 @@ class Sampler
         $bottom = $cropTop + $cropHeight;
         $heightValid = ($cropHeight > 0) && ($bottom <= $height);
         if (! $heightValid) {
-            return $this->raise("Crop height out of bounds ('$cropTop + $cropHeight' ~ '$width x $height')");
+            throw new Sampler\Exception(
+                "Crop height out of bounds ('$cropTop + $cropHeight' ~ '$width x $height')"
+            );
         }
 
         $fWidth = $format->getWidth();
@@ -305,6 +356,11 @@ class Sampler
         return $this->crop($imagick, $cropWidth, $cropHeight, $cropLeft, $cropTop);
     }
 
+    /**
+     * @param Imagick $imagick
+     * @param $widestRatio
+     * @return Imagick
+     */
     private function cropToWidest(Imagick $imagick, $widestRatio): Imagick
     {
         $srcWidth = $imagick->getImageWidth();
@@ -322,6 +378,11 @@ class Sampler
         return $imagick;
     }
 
+    /**
+     * @param Imagick $imagick
+     * @param $highestRatio
+     * @return Imagick
+     */
     private function cropToHighest(Imagick $imagick, $highestRatio): Imagick
     {
         $srcWidth = $imagick->getImageWidth();
@@ -340,19 +401,20 @@ class Sampler
     }
 
     /**
-     * @param Imagick $source
-     * @param array|null $crop
-     * @param array|Format $format
-     * @throws Exception
+     * @param Imagick $imagick
+     * @param $crop
+     * @param $format
+     * @return Imagick
+     * @throws ImagickException
+     * @throws Sampler\Exception
      */
     public function convertImagick(Imagick $imagick, $crop, $format): Imagick
     {
-        if (! $format instanceof Format) {
-            if (is_array($format)) {
-                $format = new Format($format);
-            } else {
-                return $this->raise("Unexpected type of format");
+        if (! $format instanceof Sampler\Format) {
+            if (! is_array($format)) {
+                throw new Sampler\Exception("Unexpected type of format");
             }
+            $format = new Sampler\Format($format);
         }
 
         if ($quality = $format->getQuality()) {
@@ -409,20 +471,20 @@ class Sampler
 
         if ($format->getWidth() && $format->getHeight()) {
             switch ($format->getFitType()) {
-                case Format::FIT_TYPE_INNER:
+                case Sampler\Format::FIT_TYPE_INNER:
                     $decomposited = $this->convertByInnerFit($decomposited, $format);
                     break;
 
-                case Format::FIT_TYPE_OUTER:
+                case Sampler\Format::FIT_TYPE_OUTER:
                     $decomposited = $this->convertByOuterFit($decomposited, $format);
                     break;
 
-                case Format::FIT_TYPE_MAXIMUM:
+                case Sampler\Format::FIT_TYPE_MAXIMUM:
                     $decomposited = $this->convertByMaximumFit($decomposited, $format);
                     break;
 
                 default:
-                    $this->raise("Unexpected FIT_TYPE `{$format->getFitType()}`");
+                    throw new Sampler\Exception("Unexpected FIT_TYPE `{$format->getFitType()}`");
             }
         } else {
             if ($format->getWidth()) {
@@ -441,7 +503,7 @@ class Sampler
             $imagick = $decomposited;
         }
 
-        if ($format->getStrip()) {
+        if ($format->isStrip()) {
             $imagick->stripImage();
         }
 
@@ -454,33 +516,40 @@ class Sampler
 
     /**
      * @param Imagick|string $source
-     * @param array|Format $format
-     * @throws Exception
+     * @param $destFile
+     * @param array|Sampler\Format $format
+     * @throws Sampler\Exception
+     * @throws ImagickException
      */
-    public function convertToFile($source, $destFile, $format)
+    public function convertToFile($source, $destFile, $format): void
     {
         if ($source instanceof Imagick) {
             $imagick = clone $source; // to prevent modifying source
         } else {
             $imagick = new Imagick();
             if (! $imagick->readImage($source)) {
-                return $this->raise("Error read image from `$source`");
+                throw new Sampler\Exception("Error read image from `$source`");
             }
         }
 
         if (! $destFile) {
-            return $this->raise("Dest file not set");
+            throw new Sampler\Exception("Dest file not set");
         }
 
         $imagick = $this->convertImagick($imagick, null, $format);
 
         if (! $imagick->writeImages($destFile, true)) {
-            return $this->raise("Error write image to `$destFile`");
+            throw new Sampler\Exception("Error write image to `$destFile`");
         }
 
         $imagick->clear();
     }
 
+    /**
+     * @param array $values
+     * @param bool $sample
+     * @return bool|float
+     */
     private function standardDeviation(array $values, $sample = false)
     {
         $count = count($values);
@@ -508,7 +577,7 @@ class Sampler
      * @param ImagickPixelIterator $iterator
      * @return ImagickPixel
      */
-    private function extendEdgeColor(ImagickPixelIterator $iterator)
+    private function extendEdgeColor(ImagickPixelIterator $iterator): ?ImagickPixel
     {
         $sum = [
             'r' => [],
@@ -533,7 +602,7 @@ class Sampler
 
         $limit = 0.01;
         if ($red > $limit || $green > $limit || $blue > $limit) {
-            return false;
+            return null;
         }
 
         $avgR = array_sum($sum['r']) / $count;
@@ -594,9 +663,9 @@ class Sampler
 
     /**
      * @param Imagick $imagick
-     * @param Format $format
+     * @param Sampler\Format $format
      */
-    private function extendVertical(Imagick $imagick, Format $format)
+    private function extendVertical(Imagick $imagick, Sampler\Format $format)
     {
         $fRatio = $format->getWidth() / $format->getHeight();
 
@@ -659,9 +728,9 @@ class Sampler
 
     /**
      * @param Imagick $imagick
-     * @param Format $format
+     * @param Sampler\Format $format
      */
-    private function extendHorizontal(Imagick $imagick, Format $format)
+    private function extendHorizontal(Imagick $imagick, Sampler\Format $format)
     {
         $fRatio = $format->getWidth() / $format->getHeight();
 
@@ -720,15 +789,5 @@ class Sampler
                 $imagick->drawImage($draw);
             }
         }
-    }
-
-
-    /**
-     * @param string $message
-     * @throws Exception
-     */
-    private function raise($message)
-    {
-        throw new Exception($message);
     }
 }

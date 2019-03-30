@@ -2,17 +2,15 @@
 
 namespace Autowp\Image;
 
+use ArrayObject;
+use Closure;
+use Exception;
 use Imagick;
 use ImagickException;
-use Closure;
 
+use Zend\Db\Exception\ExceptionInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
-
-use Autowp\Image\Sampler\Format;
-use Autowp\Image\Storage\Dir;
-use Autowp\Image\Storage\Exception;
-use Autowp\Image\Storage\Image;
 
 /**
  * @author dima
@@ -100,8 +98,13 @@ class Storage implements StorageInterface
     private $processors;
 
     /**
+     * Storage constructor.
      * @param array $options
-     * @throws Exception
+     * @param TableGateway $imageTable
+     * @param TableGateway $formatedImageTable
+     * @param TableGateway $dirTable
+     * @param Processor\ProcessorPluginManager $processors
+     * @throws Storage\Exception
      */
     public function __construct(
         array $options,
@@ -121,7 +124,7 @@ class Storage implements StorageInterface
     /**
      * @param array $options
      * @return Storage
-     * @throws Exception
+     * @throws Storage\Exception
      */
     public function setOptions(array $options)
     {
@@ -129,7 +132,7 @@ class Storage implements StorageInterface
             $method = 'set' . ucfirst($key);
 
             if (! method_exists($this, $method)) {
-                throw new Exception("Unexpected option '$key'");
+                throw new Storage\Exception("Unexpected option '$key'");
             }
 
             $this->$method($value);
@@ -163,16 +166,17 @@ class Storage implements StorageInterface
     /**
      * @param array|Sampler $options
      * @return Storage
+     * @throws Storage\Exception
      */
     public function setImageSampler($options)
     {
         if (is_array($options)) {
-            $options = new Sampler($options);
+            $options = new Sampler();
         }
 
         if (! $options instanceof Sampler) {
-            $message = "Unexpected imageSampler options. Array or object excepcted";
-            throw new Exception($message);
+            $message = "Unexpected imageSampler options. Array or object expected";
+            throw new Storage\Exception($message);
         }
 
         $this->imageSampler = $options;
@@ -182,6 +186,7 @@ class Storage implements StorageInterface
 
     /**
      * @return Sampler
+     * @throws Storage\Exception
      */
     public function getImageSampler()
     {
@@ -236,10 +241,11 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param array $dirs
-     * @return Storage
+     * @param $dirs
+     * @return StorageInterface
+     * @throws Storage\Exception
      */
-    public function setDirs($dirs)
+    public function setDirs($dirs): StorageInterface
     {
         $this->dirs = [];
 
@@ -252,17 +258,17 @@ class Storage implements StorageInterface
 
     /**
      * @param string $dirName
-     * @param Dir|mixed $dir
+     * @param Storage\Dir|mixed $dir
      * @return Storage
-     * @throws Exception
+     * @throws Storage\Exception
      */
     public function addDir($dirName, $dir)
     {
         if (isset($this->dirs[$dirName])) {
-            throw new Exception("Dir '$dirName' alredy registered");
+            throw new Storage\Exception("Dir '$dirName' already registered");
         }
-        if (! $dir instanceof Dir) {
-            $dir = new Dir($dir);
+        if (! $dir instanceof Storage\Dir) {
+            $dir = new Storage\Dir($dir);
         }
         $this->dirs[$dirName] = $dir;
 
@@ -270,23 +276,29 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @return Dir|null
+     * @param string $dirName
+     * @return Storage\Dir|null
      */
-    public function getDir(string $dirName)
+    public function getDir(string $dirName): ?Storage\Dir
     {
         return isset($this->dirs[$dirName]) ? $this->dirs[$dirName] : null;
     }
 
+    /**
+     * @return array
+     */
     public function getDirs(): array
     {
         return $this->dirs;
     }
 
     /**
-     * @param array $formats
-     * @return Storage
+     * @param $formats
+     * @return StorageInterface
+     * @throws Sampler\Exception
+     * @throws Storage\Exception
      */
-    public function setFormats($formats)
+    public function setFormats($formats): StorageInterface
     {
         $this->formats = [];
 
@@ -298,18 +310,19 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param string $formatName
-     * @param Format|mixed $format
-     * @return Storage
-     * @throws Exception
+     * @param $formatName
+     * @param $format
+     * @return StorageInterface
+     * @throws Sampler\Exception
+     * @throws Storage\Exception
      */
-    public function addFormat($formatName, $format)
+    public function addFormat($formatName, $format): StorageInterface
     {
         if (isset($this->formats[$formatName])) {
-            throw new Exception("Format '$formatName' alredy registered");
+            throw new Storage\Exception("Format '$formatName' already registered");
         }
-        if (! $format instanceof Format) {
-            $format = new Format($format);
+        if (! $format instanceof Sampler\Format) {
+            $format = new Sampler\Format($format);
         }
         $this->formats[$formatName] = $format;
 
@@ -317,8 +330,8 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param string $dirName
-     * @return Format
+     * @param string $formatName
+     * @return Sampler\Format
      */
     public function getFormat($formatName)
     {
@@ -337,15 +350,15 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param array|\ArrayObject $imageRow
-     * @return Image
-     * @throws Exception
+     * @param array|ArrayObject $imageRow
+     * @return Storage\Image
+     * @throws Storage\Exception
      */
     private function buildImageResult($imageRow)
     {
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         $dirUrl = $dir->getUrl();
@@ -361,7 +374,7 @@ class Storage implements StorageInterface
             $src = preg_replace("/^http:/i", "https:", $src);
         }
 
-        return new Image([
+        return new Storage\Image([
             'id'       => $imageRow['id'],
             'width'    => $imageRow['width'],
             'height'   => $imageRow['height'],
@@ -371,21 +384,21 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param array|\ArrayObject $imageRow
+     * @param array|ArrayObject $imageRow
      * @return string
-     * @throws Exception
+     * @throws Storage\Exception
      */
     private function buildImageBlobResult($imageRow)
     {
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
         if (! file_exists($filepath)) {
-            throw new Exception("File `$filepath` not found");
+            throw new Storage\Exception("File `$filepath` not found");
         }
 
         return file_get_contents($filepath);
@@ -393,14 +406,14 @@ class Storage implements StorageInterface
 
     /**
      * @param int $imageId
-     * @return array|\ArrayObject
-     * @throws Exception
+     * @return array|ArrayObject
+     * @throws Storage\Exception
      */
     private function getImageRow($imageId)
     {
         $id = (int)$imageId;
         if (strlen($id) != strlen($imageId)) {
-            throw new Exception("Image id mus be int. `$imageId` given");
+            throw new Storage\Exception("Image id mus be int. `$imageId` given");
         }
 
         $imageRow = $this->imageTable->select([
@@ -412,8 +425,7 @@ class Storage implements StorageInterface
 
     /**
      * @param array $imageIds
-     * @return array|\ArrayObject
-     * @throws Exception
+     * @return array|ArrayObject
      */
     private function getImageRows(array $imageIds)
     {
@@ -428,10 +440,11 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @throws Exception
+     * @param int $imageId
+     * @throws Storage\Exception
      * @return Storage\Image|null
      */
-    public function getImage(int $imageId)
+    public function getImage(int $imageId): ?Storage\Image
     {
         $imageRow = $this->getImageRow($imageId);
 
@@ -440,8 +453,8 @@ class Storage implements StorageInterface
 
     /**
      * @param array $imageIds
-     * @return Image
-     * @throws Exception
+     * @return array
+     * @throws Storage\Exception
      */
     public function getImages(array $imageIds): array
     {
@@ -456,7 +469,7 @@ class Storage implements StorageInterface
     /**
      * @param int $imageId
      * @return string
-     * @throws Exception
+     * @throws Storage\Exception
      */
     public function getImageFilepath($imageId)
     {
@@ -468,7 +481,7 @@ class Storage implements StorageInterface
 
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         return $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
@@ -477,16 +490,16 @@ class Storage implements StorageInterface
     /**
      * @param int $imageId
      * @return string|null
-     * @throws Exception
+     * @throws Storage\Exception
      */
-    public function getImageBlob(int $imageId)
+    public function getImageBlob(int $imageId): ?string
     {
         $imageRow = $this->getImageRow($imageId);
 
         return $imageRow ? $this->buildImageBlobResult($imageRow) : null;
     }
 
-    private function isDuplicateKeyException(\Exception $e)
+    private function isDuplicateKeyException(Exception $e)
     {
         return
             strpos($e->getMessage(), 'Duplicate entry') !== false ||
@@ -494,9 +507,10 @@ class Storage implements StorageInterface
     }
 
     /**
+     * @param $row
      * @return array|null
      */
-    private function getRowCrop($row)
+    private function getRowCrop($row): ?array
     {
         if ($row['crop_width'] <= 0 || $row['crop_height'] <= 0) {
             return null;
@@ -510,6 +524,13 @@ class Storage implements StorageInterface
         ];
     }
 
+    /**
+     * @param int $imageId
+     * @param string $formatName
+     * @return int
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
     private function doFormatImage(int $imageId, string $formatName): int
     {
         // find source image
@@ -522,33 +543,33 @@ class Storage implements StorageInterface
 
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         $srcFilePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
         if (! file_exists($srcFilePath)) {
-            throw new Exception("File `$srcFilePath` not found");
+            throw new Storage\Exception("File `$srcFilePath` not found");
         }
 
         $imagick = new Imagick();
         try {
             $imagick->readImage($srcFilePath);
         } catch (ImagickException $e) {
-            throw new Exception('Imagick: ' . $e->getMessage());
+            throw new Storage\Exception('Imagick: ' . $e->getMessage());
             //continue;
         }
 
         // format
         $format = $this->getFormat($formatName);
         if (! $format) {
-            throw new Exception("Format `$formatName` not found");
+            throw new Storage\Exception("Format `$formatName` not found");
         }
         $cFormat = clone $format;
 
         $sampler = $this->getImageSampler();
         if (! $sampler) {
-            throw new Exception("Image sampler not initialized");
+            throw new Storage\Exception("Image sampler not initialized");
         }
 
         try {
@@ -558,13 +579,14 @@ class Storage implements StorageInterface
                 'status'            => self::STATUS_PROCESSING,
                 'formated_image_id' => null
             ]);
-        } catch (\Zend\Db\Exception\ExceptionInterface $e) {
+        } catch (ExceptionInterface $e) {
             if (! $this->isDuplicateKeyException($e)) {
                 throw $e;
             }
 
             // wait until done
             $done = false;
+            $formatedImageRow = null;
             for ($i = 0; $i < self::TIMEOUT && ! $done; $i++) {
                 $formatedImageRow = $this->formatedImageTable->select([
                     'format = ?'   => $formatName,
@@ -587,6 +609,10 @@ class Storage implements StorageInterface
                     'image_id = ?' => $imageId,
                     'status = ?'   => self::STATUS_PROCESSING
                 ]);
+            }
+
+            if (! $formatedImageRow) {
+                throw new Storage\Exception("Failed to format image");
             }
 
             return (int)$formatedImageRow['formated_image_id'];
@@ -640,7 +666,7 @@ class Storage implements StorageInterface
                 'format = ?'   => $formatName,
                 'image_id = ?' => $imageId,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->formatedImageTable->update([
                 'status' => self::STATUS_FAILED
             ], [
@@ -654,6 +680,13 @@ class Storage implements StorageInterface
         return $formatedImageId;
     }
 
+    /**
+     * @param array $imagesId
+     * @param string $formatName
+     * @return array
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
     private function getFormatedImageRows(array $imagesId, string $formatName)
     {
         $destImageRows = [];
@@ -699,14 +732,18 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @return array|\ArrayObject|null
+     * @param int $imageId
+     * @param string $formatName
+     * @return mixed|null
+     * @throws ImagickException
+     * @throws Storage\Exception
      */
     private function getFormatedImageRow(int $imageId, string $formatName)
     {
         $result = $this->getFormatedImageRows([$imageId], $formatName);
 
         if (! isset($result[0])) {
-            //throw new Exception("getFormatedImageRows fails");
+            //throw new Storage\Exception("getFormatedImageRows fails");
             return null;
         }
 
@@ -715,10 +752,12 @@ class Storage implements StorageInterface
 
     /**
      * @param int $imageId
-     * @return string
-     * @throws Exception
+     * @param string $formatName
+     * @return string|null
+     * @throws ImagickException
+     * @throws Storage\Exception
      */
-    public function getFormatedImageBlob(int $imageId, string $formatName)
+    public function getFormatedImageBlob(int $imageId, string $formatName): ?string
     {
         $row = $this->getFormatedImageRow($imageId, $formatName);
 
@@ -727,10 +766,12 @@ class Storage implements StorageInterface
 
     /**
      * @param int $imageId
-     * @param string $format
-     * @return Image|null
+     * @param string $formatName
+     * @return Storage\Image|null
+     * @throws ImagickException
+     * @throws Storage\Exception
      */
-    public function getFormatedImage(int $imageId, string $formatName)
+    public function getFormatedImage(int $imageId, string $formatName): ?Storage\Image
     {
         $row = $this->getFormatedImageRow($imageId, $formatName);
         return $row === null ? null : $this->buildImageResult($row);
@@ -738,8 +779,10 @@ class Storage implements StorageInterface
 
     /**
      * @param int $imageId
-     * @param string $format
+     * @param $formatName
      * @return string|null
+     * @throws ImagickException
+     * @throws Storage\Exception
      */
     public function getFormatedImagePath(int $imageId, $formatName)
     {
@@ -751,7 +794,7 @@ class Storage implements StorageInterface
 
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         $dirPath = $dir->getPath();
@@ -765,6 +808,13 @@ class Storage implements StorageInterface
         return $path;
     }
 
+    /**
+     * @param array $imagesId
+     * @param string $formatName
+     * @return array
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
     public function getFormatedImages(array $imagesId, string $formatName): array
     {
         $result = [];
@@ -777,17 +827,17 @@ class Storage implements StorageInterface
 
     /**
      * @param int $imageId
-     * @return Image
-     * @throws Exception
+     * @return StorageInterface
+     * @throws Storage\Exception
      */
-    public function removeImage(int $imageId)
+    public function removeImage(int $imageId): StorageInterface
     {
         $imageRow = $this->imageTable->select([
             'id = ?' => $imageId
         ])->current();
 
         if (! $imageRow) {
-            throw new Exception("Image '$imageId' not found");
+            throw new Storage\Exception("Image '$imageId' not found");
         }
 
         $this->flush([
@@ -802,7 +852,7 @@ class Storage implements StorageInterface
         // remove file & row
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         $filepath = implode(DIRECTORY_SEPARATOR, [
@@ -816,24 +866,23 @@ class Storage implements StorageInterface
         ]);
 
         if (file_exists($filepath) && ! unlink($filepath)) {
-            throw new Exception("Error unlink `$filepath`");
+            throw new Storage\Exception("Error unlink `$filepath`");
         }
 
         return $this;
     }
 
     /**
-     * @param string $dirName
-     * @param string $ext
+     * @param $dirName
      * @param array $options
      * @return string
-     * @throws Exception
+     * @throws Storage\Exception
      */
     private function createImagePath($dirName, array $options = [])
     {
         $dir = $this->getDir($dirName);
         if (! $dir) {
-            throw new Exception("Dir '$dirName' not defined");
+            throw new Storage\Exception("Dir '$dirName' not defined");
         }
 
         $dirPath = $dir->getPath();
@@ -841,7 +890,7 @@ class Storage implements StorageInterface
         $namingStrategy = $dir->getNamingStrategy();
         if (! $namingStrategy) {
             $message = "Naming strategy not initialized for `$dirName`";
-            throw new Exception($message);
+            throw new Storage\Exception($message);
         }
 
         $options = array_merge([
@@ -859,7 +908,7 @@ class Storage implements StorageInterface
         if (! is_dir($destDir)) {
             $old = umask(0);
             if (! mkdir($destDir, $this->dirMode, true)) {
-                throw new Exception("Cannot create dir '$destDir'");
+                throw new Storage\Exception("Cannot create dir '$destDir'");
             }
             umask($old);
         }
@@ -869,17 +918,22 @@ class Storage implements StorageInterface
 
     /**
      * @param string $path
-     * @throws Exception
+     * @throws Storage\Exception
      */
     private function chmodFile($path)
     {
         if (! chmod($path, $this->fileMode)) {
-            throw new Exception("Cannot chmod file '$path'");
+            throw new Storage\Exception("Cannot chmod file '$path'");
         }
     }
 
     /**
-     * @throws Exception
+     * @param string $blob
+     * @param string $dirName
+     * @param array $options
+     * @return int
+     * @throws ImagickException
+     * @throws Storage\Exception
      */
     public function addImageFromBlob(string $blob, string $dirName, array $options = []): int
     {
@@ -899,11 +953,20 @@ class Storage implements StorageInterface
         return rand($from, $to);
     }
 
+    /**
+     * @param string $dirName
+     * @param array $options
+     * @param $width
+     * @param $height
+     * @param Closure $callback
+     * @return int
+     * @throws Storage\Exception
+     */
     private function generateLockWrite(string $dirName, array $options, $width, $height, Closure $callback): int
     {
         $dir = $this->getDir($dirName);
         if (! $dir) {
-            throw new Exception("Dir '$dirName' not defined");
+            throw new Storage\Exception("Dir '$dirName' not defined");
         }
 
         $dirPath = $dir->getPath();
@@ -949,7 +1012,7 @@ class Storage implements StorageInterface
                 ]);
 
                 $imageId = $id;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // duplicate or other error
                 $insertAttemptException = $e;
             }
@@ -965,7 +1028,11 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @throws Exception
+     * @param Imagick $imagick
+     * @param string $dirName
+     * @param array $options
+     * @return int
+     * @throws Storage\Exception
      */
     public function addImageFromImagick(Imagick $imagick, string $dirName, array $options = []): int
     {
@@ -973,7 +1040,7 @@ class Storage implements StorageInterface
         $height = $imagick->getImageHeight();
 
         if (! $width || ! $height) {
-            throw new Exception("Failed to get image size ($width x $height)");
+            throw new Storage\Exception("Failed to get image size ($width x $height)");
         }
 
         $format = $imagick->getImageFormat();
@@ -989,18 +1056,22 @@ class Storage implements StorageInterface
                 $options['extension'] = 'png';
                 break;
             default:
-                throw new Exception("Unsupported image type `$format`");
+                throw new Storage\Exception("Unsupported image type `$format`");
         }
 
         return $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath) use ($imagick) {
             if (! $imagick->writeImages($filePath, true)) {
-                throw new Exception("Imagick::writeImage error");
+                throw new Storage\Exception("Imagick::writeImage error");
             }
         });
     }
 
     /**
-     * @throws Exception
+     * @param string $file
+     * @param string $dirName
+     * @param array $options
+     * @return int
+     * @throws Storage\Exception
      */
     public function addImageFromFile(string $file, string $dirName, array $options = []): int
     {
@@ -1011,7 +1082,7 @@ class Storage implements StorageInterface
         $type = $imageInfo[2];
 
         if (! $width || ! $height) {
-            throw new Exception("Failed to get image size of '$file' ($width x $height)");
+            throw new Storage\Exception("Failed to get image size of '$file' ($width x $height)");
         }
 
         if (! isset($options['extension'])) {
@@ -1027,23 +1098,24 @@ class Storage implements StorageInterface
                     $ext = 'png';
                     break;
                 default:
-                    throw new Exception("Unsupported image type `$type`");
+                    throw new Storage\Exception("Unsupported image type `$type`");
             }
             $options['extension'] = $ext;
         }
 
         return $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath) use ($file) {
             if (! copy($file, $filePath)) {
-                throw new Exception("copy error '$file'");
+                throw new Storage\Exception("copy error '$file'");
             }
         });
     }
 
     /**
      * @param array $options
-     * @return Storage
+     * @return StorageInterface
+     * @throws Storage\Exception
      */
-    public function flush(array $options)
+    public function flush(array $options): StorageInterface
     {
         $defaults = [
             'format' => null,
@@ -1129,25 +1201,26 @@ class Storage implements StorageInterface
 
     /**
      * @param int $imageId
-     * @return boolean|string
+     * @return string|null
+     * @throws Storage\Exception
      */
-    public function getImageIPTC(int $imageId)
+    public function getImageIPTC(int $imageId): ?string
     {
         $imageRow = $this->getImageRow($imageId);
 
         if (! $imageRow) {
-            return false;
+            return null;
         }
 
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
         if (! file_exists($filepath)) {
-            throw new Exception("File `$filepath` not found");
+            throw new Storage\Exception("File `$filepath` not found");
         }
 
         $iptcStr = '';
@@ -1175,67 +1248,68 @@ class Storage implements StorageInterface
 
     /**
      * @param int $imageId
-     * @return boolean|array
+     * @return array|null
+     * @throws Storage\Exception
      */
-    public function getImageEXIF(int $imageId)
+    public function getImageEXIF(int $imageId): ?array
     {
         $imageRow = $this->getImageRow($imageId);
 
         if (! $imageRow) {
-            return false;
+            return null;
         }
 
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
         if (! file_exists($filepath)) {
-            throw new Exception("File `$filepath` not found");
+            throw new Storage\Exception("File `$filepath` not found");
         }
 
-        return @exif_read_data($filepath, null, true);
+        $exif = @exif_read_data($filepath, null, true);
+
+        return $exif ? $exif : null;
     }
 
     /**
      * @param int $imageId
-     * @return boolean|array
+     * @return array|null
+     * @throws ImagickException
+     * @throws Storage\Exception
      */
-    public function getImageResolution(int $imageId)
+    public function getImageResolution(int $imageId): ?array
     {
         $imageRow = $this->getImageRow($imageId);
 
         if (! $imageRow) {
-            return false;
+            return null;
         }
 
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
         if (! file_exists($filepath)) {
-            throw new Exception("File `$filepath` not found");
+            throw new Storage\Exception("File `$filepath` not found");
         }
 
         $imagick = new Imagick();
         $imagick->readImage($filepath);
 
-        try {
-            $info = $imagick->identifyImage();
-        } catch (ImagickException $e) {
-            return false;
-        }
+        $info = $imagick->identifyImage();
 
         $x = $info['resolution']['x'];
         $y = $info['resolution']['x'];
 
         if (! $x || ! $y) {
-            return false;
+            return null;
         }
 
         switch ($info['units']) {
@@ -1250,7 +1324,7 @@ class Storage implements StorageInterface
             case 'Unrecognized':
                 return null;
             default:
-                throw new Exception("Unexpected resolution unit `{$info['units']}`");
+                throw new Storage\Exception("Unexpected resolution unit `{$info['units']}`");
         }
 
         return [
@@ -1259,7 +1333,12 @@ class Storage implements StorageInterface
         ];
     }
 
-    private static function detectExtenstion($filepath)
+    /**
+     * @param $filepath
+     * @return string
+     * @throws Storage\Exception
+     */
+    private static function detectExtension($filepath)
     {
         $imageInfo = getimagesize($filepath);
 
@@ -1271,24 +1350,26 @@ class Storage implements StorageInterface
             case IMAGETYPE_PNG:
                 break;
             default:
-                throw new Exception("Unsupported image type");
+                throw new Storage\Exception("Unsupported image type");
         }
         return image_type_to_extension($imageType, false);
     }
 
     /**
-     * @throws Exception
+     * @param int $imageId
+     * @param array $options
+     * @throws Storage\Exception
      */
-    public function changeImageName(int $imageId, array $options = [])
+    public function changeImageName(int $imageId, array $options = []): void
     {
         $imageRow = $this->getImageRow($imageId);
         if (! $imageRow) {
-            throw new Exception("Image `$imageId` not found");
+            throw new Storage\Exception("Image `$imageId` not found");
         }
 
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
-            throw new Exception("Dir '{$imageRow['dir']}' not defined");
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         $dirPath = $dir->getPath();
@@ -1296,10 +1377,13 @@ class Storage implements StorageInterface
         $oldFilePath = $dirPath . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
         if (! isset($options['extension'])) {
-            $options['extension'] = self::detectExtenstion($oldFilePath);
+            $options['extension'] = self::detectExtension($oldFilePath);
         }
 
         $attemptIndex = 0;
+        /**
+         * @var Storage\Exception
+         */
         $insertAttemptException = null;
 
         do {
@@ -1312,7 +1396,7 @@ class Storage implements StorageInterface
 
             try {
                 if ($destFileName == $imageRow['filepath']) {
-                    throw new Exception("Trying to rename to self");
+                    throw new Storage\Exception("Trying to rename to self");
                 }
 
                 $this->imageTable->update([
@@ -1320,7 +1404,7 @@ class Storage implements StorageInterface
                 ], [
                     'id' => $imageRow['id']
                 ]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // duplicate or other error
                 $insertAttemptException = $e;
             }
@@ -1328,7 +1412,7 @@ class Storage implements StorageInterface
             if (! $insertAttemptException) {
                 $success = rename($oldFilePath, $destFilePath);
                 if (! $success) {
-                    throw new Exception("Failed to move file");
+                    throw new Storage\Exception("Failed to move file");
                 }
 
                 $this->chmodFile($destFilePath);
@@ -1342,11 +1426,16 @@ class Storage implements StorageInterface
         }
     }
 
-    public function flop(int $imageId)
+    /**
+     * @param int $imageId
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
+    public function flop(int $imageId): void
     {
         $filePath = $this->getImageFilepath($imageId);
         if (! $filePath) {
-            throw new Exception("Failed to found path for `$imageId`");
+            throw new Storage\Exception("Failed to found path for `$imageId`");
         }
 
         $imagick = new Imagick();
@@ -1364,11 +1453,16 @@ class Storage implements StorageInterface
         ]);
     }
 
-    public function normalize(int $imageId)
+    /**
+     * @param int $imageId
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
+    public function normalize(int $imageId): void
     {
         $filePath = $this->getImageFilepath($imageId);
         if (! $filePath) {
-            throw new Exception("Failed to found path for `$imageId`");
+            throw new Storage\Exception("Failed to found path for `$imageId`");
         }
 
         $imagick = new Imagick();
@@ -1386,7 +1480,7 @@ class Storage implements StorageInterface
         ]);
     }
 
-    public function printBrokenFiles()
+    public function printBrokenFiles(): void
     {
         $select = $this->imageTable->getSql()->select()
             ->columns(['id', 'filepath', 'dir']);
@@ -1407,7 +1501,10 @@ class Storage implements StorageInterface
         }
     }
 
-    public function fixBrokenFiles()
+    /**
+     * @throws Storage\Exception
+     */
+    public function fixBrokenFiles(): void
     {
         $select = $this->imageTable->getSql()->select()
             ->columns(['id', 'filepath', 'dir']);
@@ -1445,11 +1542,15 @@ class Storage implements StorageInterface
         }
     }
 
-    public function deleteBrokenFiles(string $dirname)
+    /**
+     * @param string $dirname
+     * @throws Storage\Exception
+     */
+    public function deleteBrokenFiles(string $dirname): void
     {
         $dir = $this->getDir($dirname);
         if (! $dir) {
-            throw new Exception("Dir '{$dirname}' not defined");
+            throw new Storage\Exception("Dir '{$dirname}' not defined");
         }
 
         $select = $this->imageTable->getSql()->select()
@@ -1477,10 +1578,11 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param integer $imageId
+     * @param int $imageId
      * @return array|null
+     * @throws Storage\Exception
      */
-    public function getImageCrop(int $imageId)
+    public function getImageCrop(int $imageId): ?array
     {
         $row = $this->getImageRow($imageId);
 
@@ -1500,10 +1602,15 @@ class Storage implements StorageInterface
         ];
     }
 
-    public function setImageCrop(int $imageId, $crop)
+    /**
+     * @param int $imageId
+     * @param $crop
+     * @throws Storage\Exception
+     */
+    public function setImageCrop(int $imageId, $crop): void
     {
         if (! $imageId) {
-            throw new Exception("Invalid image id provided `$imageId`");
+            throw new Storage\Exception("Invalid image id provided `$imageId`");
         }
 
         if (! is_array($crop)) {

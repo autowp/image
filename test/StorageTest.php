@@ -2,11 +2,11 @@
 
 namespace AutowpTest\Image;
 
+use Autowp\Image\Storage;
+use PHPUnit\Framework\TestCase;
 use Zend\Mvc\Application;
 
-use Autowp\Image;
-
-class StorageTest extends \PHPUnit\Framework\TestCase
+class StorageTest extends TestCase
 {
     const TEST_IMAGE_FILE = __DIR__ . '/_files/Towers_Schiphol_small.jpg';
     const TEST_IMAGE_FILE2 = __DIR__ . '/_files/mazda3_sedan_us-spec_11.jpg';
@@ -17,7 +17,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Image\Storage::class);
+        $imageStorage = $serviceManager->get(Storage::class);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
 
@@ -44,7 +44,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Image\Storage::class);
+        $imageStorage = $serviceManager->get(Storage::class);
 
         $blob = file_get_contents(self::TEST_IMAGE_FILE);
 
@@ -66,7 +66,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Image\Storage::class);
+        $imageStorage = $serviceManager->get(Storage::class);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'test', [
             'prefferedName' => 'zeliboba'
@@ -85,7 +85,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Image\Storage::class);
+        $imageStorage = $serviceManager->get(Storage::class);
 
         $blob = file_get_contents(self::TEST_IMAGE_FILE2);
 
@@ -109,7 +109,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Image\Storage::class);
+        $imageStorage = $serviceManager->get(Storage::class);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
         $this->assertNotEmpty($imageId);
@@ -147,7 +147,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Image\Storage::class);
+        $imageStorage = $serviceManager->get(Storage::class);
 
         $imageId1 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
 
@@ -180,7 +180,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Image\Storage::class);
+        $imageStorage = $serviceManager->get(Storage::class);
 
         $result = $imageStorage->getImage(999999999);
 
@@ -193,7 +193,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Image\Storage::class);
+        $imageStorage = $serviceManager->get(Storage::class);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
 
@@ -222,7 +222,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Image\Storage::class);
+        $imageStorage = $serviceManager->get(Storage::class);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
 
@@ -236,7 +236,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
         $formatedImageTable->insert([
             'format'            => $formatName,
             'image_id'          => $imageId,
-            'status'            => \Autowp\Image\Storage::STATUS_PROCESSING,
+            'status'            => Storage::STATUS_PROCESSING,
             'formated_image_id' => null
         ]);
 
@@ -251,7 +251,7 @@ class StorageTest extends \PHPUnit\Framework\TestCase
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Image\Storage::class);
+        $imageStorage = $serviceManager->get(Storage::class);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
 

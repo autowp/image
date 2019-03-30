@@ -2,8 +2,6 @@
 
 namespace Autowp\Image\Sampler;
 
-use Autowp\Image\Sampler\Exception;
-
 /**
  * @author dima
  *
@@ -101,7 +99,7 @@ class Format
             $method = 'set' . ucfirst($key);
 
             if (! method_exists($this, $method)) {
-                $this->raise("Unexpected option '$key'");
+                throw new Exception("Unexpected option '$key'");
             }
 
             $this->$method($value);
@@ -142,7 +140,8 @@ class Format
     }
 
     /**
-     * @return string|NULL
+     * @return string|null
+     * @throws Exception
      */
     public function getFormatExtension()
     {
@@ -162,7 +161,7 @@ class Format
                     return 'bmp';
 
                 default:
-                    $this->raise("Unsupported format `{$this->format}`");
+                    throw new Exception("Unsupported format `{$this->format}`");
             }
         }
 
@@ -170,14 +169,15 @@ class Format
     }
 
     /**
-     * @param int $value
-     * @return Format
+     * @param $value
+     * @return $this
+     * @throws Exception
      */
     public function setQuality($value)
     {
         $value = (int)$value;
         if ($value < 0 || $value > 100) {
-            return $this->raise("Compression quality must be >= 0 and <= 100");
+            throw new Exception("Compression quality must be >= 0 and <= 100");
         }
 
         $this->quality = $value;
@@ -267,8 +267,7 @@ class Format
                 break;
 
             default:
-                $message = "Unexpected fit type `$fitType`";
-                $this->raise($message);
+                throw new Exception("Unexpected fit type `$fitType`");
         }
 
         return $this;
@@ -291,8 +290,7 @@ class Format
     {
         $width = (int)$width;
         if ($width < 0) {
-            $message = "Unexpected width `$width`";
-            $this->raise($message);
+            throw new Exception("Unexpected width `$width`");
         }
         $this->width = $width;
 
@@ -316,8 +314,7 @@ class Format
     {
         $height = (int)$height;
         if ($height < 0) {
-            $message = "Unexpected height `$height`";
-            $this->raise($message);
+            throw new Exception("Unexpected height `$height`");
         }
         $this->height = $height;
 
@@ -334,7 +331,6 @@ class Format
 
     /**
      * @param string $color
-     * @throws Exception
      * @return Format
      */
     public function setBackground($color)
@@ -408,15 +404,6 @@ class Format
     public function getProportionalCrop(): bool
     {
         return $this->proportionalCrop;
-    }
-
-    /**
-     * @param string $message
-     * @throws Exception
-     */
-    private function raise(string $message)
-    {
-        throw new Exception($message);
     }
 
     /**

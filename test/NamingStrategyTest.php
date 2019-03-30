@@ -2,12 +2,14 @@
 
 namespace AutowpTest\Image;
 
+use Autowp\Image\Storage\Exception;
 use Autowp\Image\Storage\NamingStrategy\Pattern;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group Autowp_Image
  */
-class NamingStrategyTest extends \PHPUnit\Framework\TestCase
+class NamingStrategyTest extends TestCase
 {
     public static function patternsProvider()
     {
@@ -21,9 +23,14 @@ class NamingStrategyTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param string $pattern
+     * @param string $result
+     * @param string $extension
+     * @throws Exception
+     *
      * @dataProvider patternsProvider
      */
-    public function testPatternStrategy($pattern, $result, $extension)
+    public function testPatternStrategy(string $pattern, string $result, string $extension)
     {
         $strategy = new Pattern([
             'dir' => sys_get_temp_dir()

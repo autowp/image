@@ -2,6 +2,8 @@
 
 namespace Autowp\Image;
 
+use PDO;
+
 $imageDir = __DIR__ . '/../../images/';
 
 if (getenv('PDODRIVER') == 'pgsql') {
@@ -14,7 +16,7 @@ if (getenv('PDODRIVER') == 'pgsql') {
         'username'       => 'postgres',
         'password'       => '',
         'driver_options' => [
-            \PDO::ATTR_PERSISTENT => true
+            PDO::ATTR_PERSISTENT => true
         ],
     ];
 } else {
@@ -27,7 +29,7 @@ if (getenv('PDODRIVER') == 'pgsql') {
         'username'       => 'autowp_test',
         'password'       => 'test',
         'driver_options' => [
-            \PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'"
+            PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'"
         ],
     ];
 }

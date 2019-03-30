@@ -2,7 +2,9 @@
 
 namespace Autowp\Image\Factory;
 
+use Autowp\ZFComponents\Db\TableManager;
 use Interop\Container\ContainerInterface;
+use Zend\Http\Request;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 use Autowp\Image\Storage;
@@ -11,6 +13,12 @@ use Autowp\Image\Processor;
 class ImageStorageFactory implements FactoryInterface
 {
     /**
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array|null $options
+     * @return Storage|object
+     * @throws Storage\Exception
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
@@ -18,7 +26,7 @@ class ImageStorageFactory implements FactoryInterface
         $config = $container->has('Config') ? $container->get('Config') : [];
         $storageConfig = isset($config['imageStorage']) ? $config['imageStorage'] : [];
 
-        $tables = $container->get(\Autowp\ZFComponents\Db\TableManager::class);
+        $tables = $container->get(TableManager::class);
 
         $storage = new Storage(
             $storageConfig,
@@ -29,7 +37,7 @@ class ImageStorageFactory implements FactoryInterface
         );
 
         $request = $container->get('Request');
-        if ($request instanceof \Zend\Http\Request) {
+        if ($request instanceof Request) {
             if ($request->getServer('HTTPS') || $request->getServer('HTTP_X_FORWARDED_PROTO') == 'https') {
                 $storage->setForceHttps(true);
             }

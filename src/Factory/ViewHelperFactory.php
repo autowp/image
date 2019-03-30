@@ -11,6 +11,11 @@ use Autowp\Image\View\Helper\ImageStorage;
 class ViewHelperFactory implements FactoryInterface
 {
     /**
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array|null $options
+     * @return ImageStorage|object
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)

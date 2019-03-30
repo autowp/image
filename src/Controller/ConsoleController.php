@@ -2,11 +2,10 @@
 
 namespace Autowp\Image\Controller;
 
+use InvalidArgumentException;
 use Zend\Console\ColorInterface;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
-
-use Autowp\Image;
 
 class ConsoleController extends AbstractActionController
 {
@@ -35,7 +34,7 @@ class ConsoleController extends AbstractActionController
         $imageId = (int)$this->params('image');
 
         if (! $imageId) {
-            throw new \InvalidArgumentException("image id not provided");
+            throw new InvalidArgumentException("image id not provided");
         }
 
         $this->imageStorage()->flush([
@@ -75,7 +74,7 @@ class ConsoleController extends AbstractActionController
         Console::getInstance()->writeLine("Clear `$dirname`");
         $dir = $this->imageStorage()->getDir($dirname);
         if (! $dir) {
-            throw new \InvalidArgumentException("Dir '$dirname' not found");
+            throw new InvalidArgumentException("Dir '$dirname' not found");
         }
 
         $this->recursiveDirectory(realpath($dir->getPath()));

@@ -2,14 +2,19 @@
 
 namespace AutowpTest\Image;
 
+use Autowp\Image\Controller\ConsoleController;
+use Autowp\Image\Storage;
+use PHPUnit\Framework\TestCase;
+use Zend\Mvc\Application;
+
 /**
  * @group Autowp_Image
  */
-class ZFIntegrationTest extends \PHPUnit\Framework\TestCase
+class ZFIntegrationTest extends TestCase
 {
     public function testViewHelperRegistered()
     {
-        $app = \Zend\Mvc\Application::init(require __DIR__ . '/_files/config/application.config.php');
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
         $serviceManager = $app->getServiceManager();
 
@@ -17,12 +22,12 @@ class ZFIntegrationTest extends \PHPUnit\Framework\TestCase
 
         $imageStorage = $view->imageStorage();
 
-        $this->assertInstanceOf(\Autowp\Image\Storage::class, $imageStorage);
+        $this->assertInstanceOf(Storage::class, $imageStorage);
     }
 
     public function testControllerPluginRegistered()
     {
-        $app = \Zend\Mvc\Application::init(require __DIR__ . '/_files/config/application.config.php');
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
         $serviceManager = $app->getServiceManager();
 
@@ -30,19 +35,19 @@ class ZFIntegrationTest extends \PHPUnit\Framework\TestCase
 
         $imageStorage = $pluginManager->get('imageStorage');
 
-        $this->assertInstanceOf(\Autowp\Image\Storage::class, $imageStorage());
+        $this->assertInstanceOf(Storage::class, $imageStorage());
     }
 
     public function testControllerRegistered()
     {
-        $app = \Zend\Mvc\Application::init(require __DIR__ . '/_files/config/application.config.php');
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
         $serviceManager = $app->getServiceManager();
 
         $controllerManager = $serviceManager->get('ControllerManager');
 
-        $controller = $controllerManager->get(\Autowp\Image\Controller\ConsoleController::class);
+        $controller = $controllerManager->get(ConsoleController::class);
 
-        $this->assertInstanceOf(\Autowp\Image\Controller\ConsoleController::class, $controller);
+        $this->assertInstanceOf(ConsoleController::class, $controller);
     }
 }

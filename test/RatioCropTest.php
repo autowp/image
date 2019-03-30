@@ -5,12 +5,18 @@ namespace AutowpTest\Image;
 use Autowp\Image\Sampler;
 
 use Imagick;
+use ImagickException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group Autowp_Image
  */
-class RatioCropTest extends \PHPUnit\Framework\TestCase
+class RatioCropTest extends TestCase
 {
+    /**
+     * @throws Sampler\Exception
+     * @throws ImagickException
+     */
     public function testWidest()
     {
         $sampler = new Sampler();
@@ -28,6 +34,10 @@ class RatioCropTest extends \PHPUnit\Framework\TestCase
         $imagick->clear();
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
     public function testHighest()
     {
         $sampler = new Sampler();

@@ -3,6 +3,7 @@
 namespace Autowp\Image\Processor;
 
 use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Config;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
@@ -40,10 +41,15 @@ class ProcessorPluginManagerFactory implements FactoryInterface
         return $pluginManager;
     }
 
+
     /**
      * {@inheritDoc}
      *
-     * @return ProcessorPluginManager
+     * @param ServiceLocatorInterface $container
+     * @param null $name
+     * @param null $requestedName
+     * @return ProcessorPluginManager|mixed
+     * @throws ContainerException
      */
     public function createService(ServiceLocatorInterface $container, $name = null, $requestedName = null)
     {
