@@ -93,7 +93,7 @@ class ConsoleController extends AbstractActionController
             if ($dh = opendir($currentDir)) {
                 $count = 0;
                 while (($file = readdir($dh)) !== false) {
-                    if ($file !== '.' and $file !== '..') {
+                    if ($file !== '.' && $file !== '..') {
                         $count++;
                         $currentFile = $currentDir . DIRECTORY_SEPARATOR . $file;
                         if (is_dir($currentFile)) {

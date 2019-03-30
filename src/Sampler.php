@@ -184,9 +184,7 @@ class Sampler
 
         $scaleHeight = round($scaleWidth / $srcRatio);
 
-        $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
-
-        return $imagick;
+        return $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
     }
 
     private function convertByHeight(Imagick $imagick, Format $format): Imagick
@@ -205,9 +203,7 @@ class Sampler
 
         $scaleWidth = round($scaleHeight * $srcRatio);
 
-        $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
-
-        return $imagick;
+        return $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
     }
 
     private function crop(Imagick $imagick, int $width, int $height, int $left, int $top): Imagick
@@ -306,9 +302,7 @@ class Sampler
             }
         }
 
-        $imagick = $this->crop($imagick, $cropWidth, $cropHeight, $cropLeft, $cropTop);
-
-        return $imagick;
+        return $this->crop($imagick, $cropWidth, $cropHeight, $cropLeft, $cropTop);
     }
 
     private function cropToWidest(Imagick $imagick, $widestRatio): Imagick
@@ -503,7 +497,7 @@ class Sampler
         foreach ($values as $val) {
             $diff = ((double) $val) - $mean;
             $carry += $diff * $diff;
-        };
+        }
         if ($sample) {
             --$count;
         }

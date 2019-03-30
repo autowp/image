@@ -815,10 +815,8 @@ class Storage implements StorageInterface
             'id = ?' => $imageRow['id']
         ]);
 
-        if (file_exists($filepath)) {
-            if (! unlink($filepath)) {
-                throw new Exception("Error unlink `$filepath`");
-            }
+        if (file_exists($filepath) && ! unlink($filepath)) {
+            throw new Exception("Error unlink `$filepath`");
         }
 
         return $this;

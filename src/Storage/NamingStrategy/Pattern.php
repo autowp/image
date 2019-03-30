@@ -20,11 +20,9 @@ class Pattern extends AbstractStrategy
         $result = [];
         $patternComponents = preg_split('|[\\/]+|isu', $pattern);
         foreach ($patternComponents as $component) {
-            if (! in_array($component, self::$notAllowedParts)) {
-                if ($component) {
-                    $filtered = $filter->filter($component);
-                    $result[] = $filtered;
-                }
+            if (! in_array($component, self::$notAllowedParts) && $component) {
+                $filtered = $filter->filter($component);
+                $result[] = $filtered;
             }
         }
 
@@ -32,9 +30,10 @@ class Pattern extends AbstractStrategy
     }
 
     /**
-     * @param string $dir
      * @param array $options
      * @see AbstractStrategy::generate()
+     *
+     * @return string
      */
     public function generate(array $options = [])
     {
@@ -53,11 +52,9 @@ class Pattern extends AbstractStrategy
         if ($pattern) {
             $nameComponents[] = $pattern;
         }
-        if ($index or (! $pattern)) {
+        if ($index || (! $pattern)) {
             $nameComponents[] = $index;
         }
-        $filename = implode('_', $nameComponents) . ($ext ? '.' . $ext : '');
-
-        return $filename;
+        return implode('_', $nameComponents) . ($ext ? '.' . $ext : '');
     }
 }
