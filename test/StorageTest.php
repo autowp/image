@@ -2,22 +2,34 @@
 
 namespace AutowpTest\Image;
 
-use Autowp\Image\Storage;
+use ImagickException;
+
 use PHPUnit\Framework\TestCase;
+use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Application;
+
+use Autowp\Image\Storage;
 
 class StorageTest extends TestCase
 {
     const TEST_IMAGE_FILE = __DIR__ . '/_files/Towers_Schiphol_small.jpg';
     const TEST_IMAGE_FILE2 = __DIR__ . '/_files/mazda3_sedan_us-spec_11.jpg';
 
+    private function getImageStorage(Application $app): Storage
+    {
+        $serviceManager = $app->getServiceManager();
+
+        return $serviceManager->get(Storage::class);
+    }
+
+    /**
+     * @throws Storage\Exception
+     */
     public function testAddImageFromFileChangeNameAndDelete()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
-        $serviceManager = $app->getServiceManager();
-
-        $imageStorage = $serviceManager->get(Storage::class);
+        $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
 
@@ -38,13 +50,15 @@ class StorageTest extends TestCase
         $this->assertNull($result);
     }
 
+    /**
+     * @throws Storage\Exception
+     * @throws ImagickException
+     */
     public function testAddImageFromBlobAndFormat()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
-        $serviceManager = $app->getServiceManager();
-
-        $imageStorage = $serviceManager->get(Storage::class);
+        $imageStorage = $this->getImageStorage($app);
 
         $blob = file_get_contents(self::TEST_IMAGE_FILE);
 
@@ -60,13 +74,14 @@ class StorageTest extends TestCase
         $this->assertNotEmpty($formatedImage->getSrc());
     }
 
+    /**
+     * @throws Storage\Exception
+     */
     public function testAddImageWithPrefferedName()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
-        $serviceManager = $app->getServiceManager();
-
-        $imageStorage = $serviceManager->get(Storage::class);
+        $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'test', [
             'prefferedName' => 'zeliboba'
@@ -79,13 +94,15 @@ class StorageTest extends TestCase
         $this->assertContains('zeliboba', $image->getSrc());
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
     public function testIptcAndExif()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
-        $serviceManager = $app->getServiceManager();
-
-        $imageStorage = $serviceManager->get(Storage::class);
+        $imageStorage = $this->getImageStorage($app);
 
         $blob = file_get_contents(self::TEST_IMAGE_FILE2);
 
@@ -103,13 +120,15 @@ class StorageTest extends TestCase
         $this->assertNotEmpty($resolution);
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
     public function testAddImageAndCrop()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
-        $serviceManager = $app->getServiceManager();
-
-        $imageStorage = $serviceManager->get(Storage::class);
+        $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
         $this->assertNotEmpty($imageId);
@@ -141,13 +160,15 @@ class StorageTest extends TestCase
         $this->assertContains('0400030003fc01f4', $formatedImage->getSrc());
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
     public function testFlopNormalizeAndMultipleRequest()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
-        $serviceManager = $app->getServiceManager();
-
-        $imageStorage = $serviceManager->get(Storage::class);
+        $imageStorage = $this->getImageStorage($app);
 
         $imageId1 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
 
@@ -174,26 +195,29 @@ class StorageTest extends TestCase
         $this->assertEquals(2, count($formatedImages));
     }
 
+    /**
+     * @throws Storage\Exception
+     */
     public function testGetImageReturnsNull()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
-        $serviceManager = $app->getServiceManager();
-
-        $imageStorage = $serviceManager->get(Storage::class);
+        $imageStorage = $this->getImageStorage($app);
 
         $result = $imageStorage->getImage(999999999);
 
         $this->assertNull($result);
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
     public function testRequestFormatedImageAgain()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
-        $serviceManager = $app->getServiceManager();
-
-        $imageStorage = $serviceManager->get(Storage::class);
+        $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
 
@@ -216,13 +240,17 @@ class StorageTest extends TestCase
         $this->assertNotEmpty($formatedImage->getSrc());
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
     public function testTimeout()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
         $serviceManager = $app->getServiceManager();
 
-        $imageStorage = $serviceManager->get(Storage::class);
+        $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
 
@@ -231,6 +259,7 @@ class StorageTest extends TestCase
         $formatName = 'picture-gallery';
 
         $tables = $serviceManager->get('TableManager');
+        /** @var TableGateway $formatedImageTable */
         $formatedImageTable = $tables->get('formated_image');
 
         $formatedImageTable->insert([
@@ -245,13 +274,15 @@ class StorageTest extends TestCase
         $this->assertEmpty($formatedImage);
     }
 
+    /**
+     * @throws ImagickException
+     * @throws Storage\Exception
+     */
     public function testNormalizeProcessor()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
-        $serviceManager = $app->getServiceManager();
-
-        $imageStorage = $serviceManager->get(Storage::class);
+        $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
 

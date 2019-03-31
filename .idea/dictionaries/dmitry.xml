@@ -9,7 +9,10 @@
       <w>filesize</w>
       <w>formated</w>
       <w>iptc</w>
+      <w>phpcbf</w>
+      <w>phpcs</w>
       <w>phpmd</w>
+      <w>phtml</w>
       <w>servicemanager</w>
       <w>superglobals</w>
       <w>zendframework</w>

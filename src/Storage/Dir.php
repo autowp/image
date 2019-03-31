@@ -55,12 +55,8 @@ class Dir
      * @return Dir
      * @throws Exception
      */
-    public function setPath($path): Dir
+    public function setPath(string $path): Dir
     {
-        if (! is_string($path)) {
-            throw new Exception("Path must be a string");
-        }
-
         $path = trim($path);
 
         if (! $path) {

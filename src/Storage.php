@@ -285,7 +285,7 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @return array
+     * @return Storage\Dir[]
      */
     public function getDirs(): array
     {
@@ -1230,9 +1230,9 @@ class Storage implements StorageInterface
             if (is_array($iptc)) {
                 foreach ($iptc as $key => $value) {
                     $iptcStr .= "<b>IPTC Key:</b> ".htmlspecialchars($key)." <b>Contents:</b> ";
-                    foreach ($value as $innerkey => $innervalue) {
-                        $iptcStr .= htmlspecialchars($innervalue);
-                        if (($innerkey + 1) != count($value)) {
+                    foreach ($value as $innerKey => $innerValue) {
+                        $iptcStr .= htmlspecialchars($innerValue);
+                        if (($innerKey + 1) != count($value)) {
                             $iptcStr .= ", ";
                         }
                     }

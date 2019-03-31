@@ -3,13 +3,22 @@
 namespace Autowp\Image\Controller;
 
 use InvalidArgumentException;
+
 use Zend\Console\ColorInterface;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
+use Autowp\Image\Storage;
+
+/**
+ * Class ConsoleController
+ * @package Autowp\Image\Controller
+ *
+ * @method Storage imageStorage()
+ */
 class ConsoleController extends AbstractActionController
 {
-    public function listDirsAction()
+    public function listDirsAction(): void
     {
         $console = Console::getInstance();
 
@@ -18,7 +27,10 @@ class ConsoleController extends AbstractActionController
         }
     }
 
-    public function flushFormatAction()
+    /**
+     * @throws Storage\Exception
+     */
+    public function flushFormatAction(): void
     {
         $format = $this->params('format');
 
@@ -29,7 +41,10 @@ class ConsoleController extends AbstractActionController
         Console::getInstance()->writeLine("done", ColorInterface::GREEN);
     }
 
-    public function flushImageAction()
+    /**
+     * @throws Storage\Exception
+     */
+    public function flushImageAction(): void
     {
         $imageId = (int)$this->params('image');
 
@@ -44,21 +59,27 @@ class ConsoleController extends AbstractActionController
         Console::getInstance()->writeLine("done", ColorInterface::GREEN);
     }
 
-    public function listBrokenFilesAction()
+    public function listBrokenFilesAction(): void
     {
         $this->imageStorage()->printBrokenFiles();
 
         Console::getInstance()->writeLine("done", ColorInterface::GREEN);
     }
 
-    public function fixBrokenFilesAction()
+    /**
+     * @throws Storage\Exception
+     */
+    public function fixBrokenFilesAction(): void
     {
         $this->imageStorage()->fixBrokenFiles();
 
         Console::getInstance()->writeLine("done", ColorInterface::GREEN);
     }
 
-    public function deleteBrokenFilesAction()
+    /**
+     * @throws Storage\Exception
+     */
+    public function deleteBrokenFilesAction(): void
     {
         $dirname = $this->params('dirname');
 
@@ -67,7 +88,7 @@ class ConsoleController extends AbstractActionController
         Console::getInstance()->writeLine("done", ColorInterface::GREEN);
     }
 
-    public function clearEmptyDirsAction()
+    public function clearEmptyDirsAction(): void
     {
         $dirname = $this->params('dirname');
 
@@ -82,7 +103,7 @@ class ConsoleController extends AbstractActionController
         Console::getInstance()->writeLine("done", ColorInterface::GREEN);
     }
 
-    private function recursiveDirectory($dir)
+    private function recursiveDirectory(string $dir): void
     {
         $stack[] = $dir;
 
