@@ -530,6 +530,7 @@ class Storage implements StorageInterface
      * @return int
      * @throws ImagickException
      * @throws Storage\Exception
+     * @throws Exception
      */
     private function doFormatImage(int $imageId, string $formatName): int
     {
@@ -961,6 +962,7 @@ class Storage implements StorageInterface
      * @param Closure $callback
      * @return int
      * @throws Storage\Exception
+     * @throws Exception
      */
     private function generateLockWrite(string $dirName, array $options, $width, $height, Closure $callback): int
     {
