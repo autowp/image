@@ -99,6 +99,16 @@ return [
                 ]
             ]
         ],
+        's3' => [
+            'region' => '',
+            'version' => 'latest',
+            'endpoint' => 'http://amd:7480',
+            'credentials' => [
+                'key' => '040JJYSRWKEG8FP4DCQE',
+                'secret' => 'CC2secCLdW49LReoOXmhhXwBeZsbSIL3N0b5kWLp'
+            ],
+            'use_path_style_endpoint' => true
+        ]
     ],
     'db' => $db
 ];
