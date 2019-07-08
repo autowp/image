@@ -37,9 +37,8 @@ class StorageTest extends TestCase
 
         $this->assertNotEmpty($imageId);
 
-        $filePath = $imageStorage->getImageFilepath($imageId);
-        $this->assertTrue(file_exists($filePath));
-        $this->assertEquals(filesize(self::TEST_IMAGE_FILE), filesize($filePath));
+        $imageInfo = $imageStorage->getImage($imageId);
+        $this->assertEquals(filesize(self::TEST_IMAGE_FILE), $imageInfo->toArray()['filesize']);
 
         $imageStorage->changeImageName($imageId, [
             'pattern' => 'new-name/by-pattern'

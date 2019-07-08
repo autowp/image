@@ -1151,7 +1151,7 @@ class Storage implements StorageInterface
             $filesize = strlen($blob);
         } else {
             $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath) use ($imagick, &$filesize) {
-                if (!$imagick->writeImages($filePath, true)) {
+                if (! $imagick->writeImages($filePath, true)) {
                     throw new Storage\Exception("Imagick::writeImage error");
                 }
 
@@ -1443,10 +1443,9 @@ class Storage implements StorageInterface
 
             $imagick->readImageBlob($object['Body']->getContents());
         } else {
-
             $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
-            if (!file_exists($filepath)) {
+            if (! file_exists($filepath)) {
                 throw new Storage\Exception("File `$filepath` not found");
             }
             $imagick->readImage($filepath);
@@ -1508,16 +1507,13 @@ class Storage implements StorageInterface
      * @param int $imageId
      * @param array $options
      * @throws Storage\Exception
+     * @throws Exception
      */
     public function changeImageName(int $imageId, array $options = []): void
     {
         $imageRow = $this->getImageRow($imageId);
         if (! $imageRow) {
             throw new Storage\Exception("Image `$imageId` not found");
-        }
-
-        if ($imageRow['s3']) {
-            throw new Storage\Exception("Not implemented for S3");
         }
 
         $dir = $this->getDir($imageRow['dir']);
@@ -1530,7 +1526,11 @@ class Storage implements StorageInterface
         $oldFilePath = $dirPath . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
         if (! isset($options['extension'])) {
-            $options['extension'] = self::detectExtension($oldFilePath);
+            if ($imageRow['s3']) {
+                $options['extension'] = pathinfo($oldFilePath, PATHINFO_EXTENSION);
+            } else {
+                $options['extension'] = self::detectExtension($oldFilePath);
+            }
         }
 
         $attemptIndex = 0;
@@ -1563,12 +1563,26 @@ class Storage implements StorageInterface
             }
 
             if (! $insertAttemptException) {
-                $success = rename($oldFilePath, $destFilePath);
-                if (! $success) {
-                    throw new Storage\Exception("Failed to move file");
-                }
+                if ($imageRow['s3']) {
+                    $s3 = $this->getS3Client();
+                    $s3->copyObject([
+                        'Bucket'     => $imageRow['dir'],
+                        'CopySource' => $imageRow['dir'] . '/' . $imageRow['filepath'],
+                        'Key'        => $destFileName,
+                        'ACL'        => 'public-read'
+                    ]);
+                    $s3->deleteObject([
+                        'Bucket'     => $imageRow['dir'],
+                        'Key'        => $imageRow['filepath']
+                    ]);
+                } else {
+                    $success = rename($oldFilePath, $destFilePath);
+                    if (! $success) {
+                        throw new Storage\Exception("Failed to move file");
+                    }
 
-                $this->chmodFile($destFilePath);
+                    $this->chmodFile($destFilePath);
+                }
             }
 
             $attemptIndex++;
