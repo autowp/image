@@ -25,19 +25,23 @@ class StorageS3Test extends TestCase
     /**
      * @throws Storage\Exception
      */
-    public function testAddImageFromFileChangeNameAndDelete()
+    public function testS3AddImageFromFileChangeNameAndDelete2()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
         $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming', [
-            's3' => true
+            's3'      => true,
+            'pattern' => 'folder/file'
         ]);
 
         $this->assertNotEmpty($imageId);
 
         $imageInfo = $imageStorage->getImage($imageId);
+
+        $this->assertContains('folder/file', $imageInfo->getSrc());
+
         $blob = file_get_contents($imageInfo->getSrc());
         $this->assertEquals(filesize(self::TEST_IMAGE_FILE), strlen($blob));
 
