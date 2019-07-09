@@ -1600,18 +1600,45 @@ class Storage implements StorageInterface
      */
     public function flop(int $imageId): void
     {
-        $filePath = $this->getImageFilepath($imageId);
-        if (! $filePath) {
+        $imageRow = $this->getImageRow($imageId);
+
+        if (! $imageRow) {
             throw new Storage\Exception("Failed to found path for `$imageId`");
         }
 
         $imagick = new Imagick();
-        $imagick->readImage($filePath);
 
-        // format
-        $imagick->flopImage();
+        if ($imageRow['s3']) {
+            $object = $this->getS3Client()->getObject([
+                'Bucket' => $imageRow['dir'],
+                'Key'    => $imageRow['filepath']
+            ]);
 
-        $imagick->writeImages($filePath, true);
+            $imagick->readImageBlob($object['Body']->getContents());
+
+            // format
+            $imagick->flopImage();
+
+            $this->getS3Client()->putObject([
+                'Key'    => $imageRow['filepath'],
+                'Body'   => $imagick->getImagesBlob(),
+                'Bucket' => $imageRow['dir']
+            ]);
+        } else {
+
+            $dir = $this->getDir($imageRow['dir']);
+            if (!$dir) {
+                throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+            }
+
+            $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
+            $imagick->readImage($filePath);
+
+            // format
+            $imagick->flopImage();
+
+            $imagick->writeImages($filePath, true);
+        }
 
         $imagick->clear();
 
@@ -1627,18 +1654,45 @@ class Storage implements StorageInterface
      */
     public function normalize(int $imageId): void
     {
-        $filePath = $this->getImageFilepath($imageId);
-        if (! $filePath) {
+        $imageRow = $this->getImageRow($imageId);
+
+        if (! $imageRow) {
             throw new Storage\Exception("Failed to found path for `$imageId`");
         }
 
         $imagick = new Imagick();
-        $imagick->readImage($filePath);
 
-        // format
-        $imagick->normalizeImage();
+        if ($imageRow['s3']) {
+            $object = $this->getS3Client()->getObject([
+                'Bucket' => $imageRow['dir'],
+                'Key'    => $imageRow['filepath']
+            ]);
 
-        $imagick->writeImages($filePath, true);
+            $imagick->readImageBlob($object['Body']->getContents());
+
+            // format
+            $imagick->normalizeImage();
+
+            $this->getS3Client()->putObject([
+                'Key'    => $imageRow['filepath'],
+                'Body'   => $imagick->getImagesBlob(),
+                'Bucket' => $imageRow['dir']
+            ]);
+        } else {
+
+            $dir = $this->getDir($imageRow['dir']);
+            if (!$dir) {
+                throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+            }
+
+            $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
+            $imagick->readImage($filePath);
+
+            // format
+            $imagick->normalizeImage();
+
+            $imagick->writeImages($filePath, true);
+        }
 
         $imagick->clear();
 

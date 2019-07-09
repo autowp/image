@@ -82,7 +82,9 @@ class StorageTest extends TestCase
 
         $imageStorage = $this->getImageStorage($app);
 
-        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'test');
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'test', [
+            'prefferedName' => 'zeliboba'
+        ]);
 
         $this->assertNotEmpty($imageId);
 

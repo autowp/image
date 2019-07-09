@@ -23,6 +23,7 @@ class StorageS3Test extends TestCase
     }
 
     /**
+     * @group S3
      * @throws Storage\Exception
      */
     public function testS3AddImageFromFileChangeNameAndDelete2()
@@ -57,6 +58,7 @@ class StorageS3Test extends TestCase
     }
 
     /**
+     * @group S3
      * @throws Storage\Exception
      * @throws ImagickException
      */
@@ -83,9 +85,10 @@ class StorageS3Test extends TestCase
     }
 
     /**
+     * @group S3
      * @throws Storage\Exception
      */
-    public function testAddImageWithPrefferedName()
+    public function testS3AddImageWithPrefferedName()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -104,34 +107,7 @@ class StorageS3Test extends TestCase
     }
 
     /**
-     * @throws ImagickException
-     * @throws Storage\Exception
-     */
-    public function testIptcAndExif()
-    {
-        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
-
-        $imageStorage = $this->getImageStorage($app);
-
-        $blob = file_get_contents(self::TEST_IMAGE_FILE2);
-
-        $imageId = $imageStorage->addImageFromBlob($blob, 'test', [
-            's3' => true
-        ]);
-
-        $this->assertNotEmpty($imageId);
-
-        $iptc = $imageStorage->getImageIPTC($imageId);
-        $this->assertNotEmpty($iptc);
-
-        $exif = $imageStorage->getImageEXIF($imageId);
-        $this->assertNotEmpty($exif);
-
-        $resolution = $imageStorage->getImageResolution($imageId);
-        $this->assertNotEmpty($resolution);
-    }
-
-    /**
+     * @group S3
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -173,6 +149,7 @@ class StorageS3Test extends TestCase
     }
 
     /**
+     * @group S3
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -216,6 +193,7 @@ class StorageS3Test extends TestCase
     }
 
     /**
+     * @group S3
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -249,6 +227,7 @@ class StorageS3Test extends TestCase
     }
 
     /**
+     * @group S3
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -285,6 +264,7 @@ class StorageS3Test extends TestCase
     }
 
     /**
+     * @group S3
      * @throws ImagickException
      * @throws Storage\Exception
      */
