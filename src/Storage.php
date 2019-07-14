@@ -1230,10 +1230,11 @@ class Storage implements StorageInterface
             $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath, $fileName) use ($dir, $file) {
                 $handle = fopen($file, 'r');
                 $this->getS3Client()->putObject([
-                    'Key'    => $fileName,
-                    'Body'   => $handle,
-                    'Bucket' => $dir->getBucket(),
-                    'ACL'    => 'public-read'
+                    'Key'         => $fileName,
+                    'Body'        => $handle,
+                    'Bucket'      => $dir->getBucket(),
+                    'ACL'         => 'public-read',
+                    'ContentType' => mime_content_type($file)
                 ]);
                 fclose($handle);
             });
@@ -1639,9 +1640,10 @@ class Storage implements StorageInterface
             $imagick->flopImage();
 
             $this->getS3Client()->putObject([
-                'Key'    => $imageRow['filepath'],
-                'Body'   => $imagick->getImagesBlob(),
-                'Bucket' => $dir->getBucket()
+                'Key'         => $imageRow['filepath'],
+                'Body'        => $imagick->getImagesBlob(),
+                'Bucket'      => $dir->getBucket(),
+                'ContentType' => $imagick->getImageMimeType()
             ]);
         } else {
 
@@ -1693,9 +1695,10 @@ class Storage implements StorageInterface
             $imagick->normalizeImage();
 
             $this->getS3Client()->putObject([
-                'Key'    => $imageRow['filepath'],
-                'Body'   => $imagick->getImagesBlob(),
-                'Bucket' => $dir->getBucket()
+                'Key'         => $imageRow['filepath'],
+                'Body'        => $imagick->getImagesBlob(),
+                'Bucket'      => $dir->getBucket(),
+                'ContentType' => $imagick->getImageMimeType()
             ]);
         } else {
 
