@@ -99,6 +99,7 @@ return [
                 ]
             ]
         ],
+        'formatToS3' => false,
         's3' => [
             'region' => '',
             'version' => 'latest',

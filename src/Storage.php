@@ -109,6 +109,11 @@ class Storage implements StorageInterface
     private $s3Options = [];
 
     /**
+     * @var bool
+     */
+    private $formatToS3 = false;
+
+    /**
      * Storage constructor.
      * @param array $options
      * @param TableGateway $imageTable
@@ -148,6 +153,13 @@ class Storage implements StorageInterface
 
             $this->$method($value);
         }
+
+        return $this;
+    }
+
+    public function setFormatToS3($value): Storage
+    {
+        $this->formatToS3 = (bool) $value;
 
         return $this;
     }
@@ -720,7 +732,8 @@ class Storage implements StorageInterface
                 $this->formatedImageDirName,
                 [
                     'extension' => $extension,
-                    'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename'] . $cropSuffix
+                    'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename'] . $cropSuffix,
+                    's3'        => $this->formatToS3
                 ]
             );
 
@@ -1139,12 +1152,13 @@ class Storage implements StorageInterface
 
         if (isset($options['s3']) && $options['s3']) {
             $blob = $imagick->getImagesBlob();
-            $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath, $fileName) use ($dirName, $blob) {
+            $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath, $fileName) use ($dirName, $blob, $imagick) {
                 $this->getS3Client()->putObject([
-                    'Key'    => $fileName,
-                    'Body'   => $blob,
-                    'Bucket' => $dirName,
-                    'ACL'    => 'public-read'
+                    'Key'         => $fileName,
+                    'Body'        => $blob,
+                    'Bucket'      => $dirName,
+                    'ACL'         => 'public-read',
+                    'ContentType' => $imagick->getImageMimeType()
                 ]);
             });
 
