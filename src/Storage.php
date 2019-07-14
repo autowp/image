@@ -441,18 +441,18 @@ class Storage implements StorageInterface
      */
     private function buildImageBlobResult($imageRow): string
     {
+        $dir = $this->getDir($imageRow['dir']);
+        if (! $dir) {
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+        }
+
         if ($imageRow['s3']) {
             $object = $this->getS3Client()->getObject([
-                'Bucket' => $imageRow['dir'],
+                'Bucket' => $dir->getBucket(),
                 'Key'    => $imageRow['filepath']
             ]);
 
             return $object['Body']->getContents();
-        }
-
-        $dir = $this->getDir($imageRow['dir']);
-        if (! $dir) {
-            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
         $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
@@ -614,18 +614,18 @@ class Storage implements StorageInterface
 
         $imagick = new Imagick();
         try {
+            $dir = $this->getDir($imageRow['dir']);
+            if (! $dir) {
+                throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+            }
             if ($imageRow['s3']) {
                 $object = $this->getS3Client()->getObject([
-                    'Bucket' => $imageRow['dir'],
+                    'Bucket' => $dir->getBucket(),
                     'Key'    => $imageRow['filepath']
                 ]);
 
                 $imagick->readImageBlob($object['Body']->getContents());
             } else {
-                $dir = $this->getDir($imageRow['dir']);
-                if (! $dir) {
-                    throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
-                }
                 $srcFilePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
 
                 if (! file_exists($srcFilePath)) {
@@ -938,18 +938,18 @@ class Storage implements StorageInterface
             'id = ?' => $imageRow['id']
         ]);
 
+        $dir = $this->getDir($imageRow['dir']);
+        if (! $dir) {
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+        }
+
         if ($imageRow['s3']) {
             $this->getS3Client()->deleteObject([
-                'Bucket' => $imageRow['dir'],
+                'Bucket' => $dir->getBucket(),
                 'Key'    => $imageRow['filepath']
             ]);
         } else {
             // remove file & row
-            $dir = $this->getDir($imageRow['dir']);
-            if (! $dir) {
-                throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
-            }
-
             $filepath = implode(DIRECTORY_SEPARATOR, [
                 rtrim($dir->getPath(), DIRECTORY_SEPARATOR),
                 $imageRow['filepath']
@@ -1152,11 +1152,11 @@ class Storage implements StorageInterface
 
         if (isset($options['s3']) && $options['s3']) {
             $blob = $imagick->getImagesBlob();
-            $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath, $fileName) use ($dirName, $blob, $imagick) {
+            $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath, $fileName) use ($dir, $blob, $imagick) {
                 $this->getS3Client()->putObject([
                     'Key'         => $fileName,
                     'Body'        => $blob,
-                    'Bucket'      => $dirName,
+                    'Bucket'      => $dir->getBucket(),
                     'ACL'         => 'public-read',
                     'ContentType' => $imagick->getImageMimeType()
                 ]);
@@ -1227,12 +1227,12 @@ class Storage implements StorageInterface
         }
 
         if (isset($options['s3']) && $options['s3']) {
-            $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath, $fileName) use ($dirName, $file) {
+            $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath, $fileName) use ($dir, $file) {
                 $handle = fopen($file, 'r');
                 $this->getS3Client()->putObject([
                     'Key'    => $fileName,
                     'Body'   => $handle,
-                    'Bucket' => $dirName,
+                    'Bucket' => $dir->getBucket(),
                     'ACL'    => 'public-read'
                 ]);
                 fclose($handle);
@@ -1451,7 +1451,7 @@ class Storage implements StorageInterface
         $imagick = new Imagick();
         if ($imageRow['s3']) {
             $object = $this->getS3Client()->getObject([
-                'Bucket' => $imageRow['dir'],
+                'Bucket' => $dir->getBucket(),
                 'Key'    => $imageRow['filepath']
             ]);
 
@@ -1580,13 +1580,13 @@ class Storage implements StorageInterface
                 if ($imageRow['s3']) {
                     $s3 = $this->getS3Client();
                     $s3->copyObject([
-                        'Bucket'     => $imageRow['dir'],
+                        'Bucket'     => $dir->getBucket(),
                         'CopySource' => $imageRow['dir'] . '/' . $imageRow['filepath'],
                         'Key'        => $destFileName,
                         'ACL'        => 'public-read'
                     ]);
                     $s3->deleteObject([
-                        'Bucket'     => $imageRow['dir'],
+                        'Bucket'     => $dir->getBucket(),
                         'Key'        => $imageRow['filepath']
                     ]);
                 } else {
@@ -1620,11 +1620,16 @@ class Storage implements StorageInterface
             throw new Storage\Exception("Failed to found path for `$imageId`");
         }
 
+        $dir = $this->getDir($imageRow['dir']);
+        if (!$dir) {
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+        }
+
         $imagick = new Imagick();
 
         if ($imageRow['s3']) {
             $object = $this->getS3Client()->getObject([
-                'Bucket' => $imageRow['dir'],
+                'Bucket' => $dir->getBucket(),
                 'Key'    => $imageRow['filepath']
             ]);
 
@@ -1636,14 +1641,9 @@ class Storage implements StorageInterface
             $this->getS3Client()->putObject([
                 'Key'    => $imageRow['filepath'],
                 'Body'   => $imagick->getImagesBlob(),
-                'Bucket' => $imageRow['dir']
+                'Bucket' => $dir->getBucket()
             ]);
         } else {
-
-            $dir = $this->getDir($imageRow['dir']);
-            if (!$dir) {
-                throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
-            }
 
             $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
             $imagick->readImage($filePath);
@@ -1674,11 +1674,16 @@ class Storage implements StorageInterface
             throw new Storage\Exception("Failed to found path for `$imageId`");
         }
 
+        $dir = $this->getDir($imageRow['dir']);
+        if (!$dir) {
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+        }
+
         $imagick = new Imagick();
 
         if ($imageRow['s3']) {
             $object = $this->getS3Client()->getObject([
-                'Bucket' => $imageRow['dir'],
+                'Bucket' => $dir->getBucket(),
                 'Key'    => $imageRow['filepath']
             ]);
 
@@ -1690,14 +1695,9 @@ class Storage implements StorageInterface
             $this->getS3Client()->putObject([
                 'Key'    => $imageRow['filepath'],
                 'Body'   => $imagick->getImagesBlob(),
-                'Bucket' => $imageRow['dir']
+                'Bucket' => $dir->getBucket()
             ]);
         } else {
-
-            $dir = $this->getDir($imageRow['dir']);
-            if (!$dir) {
-                throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
-            }
 
             $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
             $imagick->readImage($filePath);

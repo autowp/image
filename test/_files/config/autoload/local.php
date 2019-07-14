@@ -48,7 +48,8 @@ return [
                 'url'  => 'http://localhost/image/format/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'
-                ]
+                ],
+                'bucket' => 'dev-format'
             ],
             'test' => [
                 'path' => $imageDir . "test",
@@ -58,14 +59,16 @@ return [
                     'options'  => [
                         'deep' => 2
                     ]
-                ]
+                ],
+                'bucket' => 'dev-test'
             ],
             'naming' => [
                 'path' => $imageDir . "naming",
                 'url'  => 'http://localhost/image/naming/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'
-                ]
+                ],
+                'bucket' => 'dev-naming'
             ],
         ],
 
