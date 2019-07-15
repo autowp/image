@@ -49,7 +49,7 @@ return [
                 'namingStrategy' => [
                     'strategy' => 'pattern'
                 ],
-                'bucket' => 'dev-format'
+                'bucket' => 'test-format'
             ],
             'test' => [
                 'path' => $imageDir . "test",
@@ -60,7 +60,7 @@ return [
                         'deep' => 2
                     ]
                 ],
-                'bucket' => 'dev-test'
+                'bucket' => 'test-test'
             ],
             'naming' => [
                 'path' => $imageDir . "naming",
@@ -68,7 +68,7 @@ return [
                 'namingStrategy' => [
                     'strategy' => 'pattern'
                 ],
-                'bucket' => 'dev-naming'
+                'bucket' => 'test-naming'
             ],
         ],
 
@@ -106,10 +106,10 @@ return [
         's3' => [
             'region' => '',
             'version' => 'latest',
-            'endpoint' => 'http://amd:7480',
+            'endpoint' => getenv('S3_ENDPOINT'),
             'credentials' => [
-                'key' => '040JJYSRWKEG8FP4DCQE',
-                'secret' => 'CC2secCLdW49LReoOXmhhXwBeZsbSIL3N0b5kWLp'
+                'key' => getenv('S3_KEY'),
+                'secret' => getenv('S3_SECRET')
             ],
             'use_path_style_endpoint' => true
         ]

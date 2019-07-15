@@ -1622,7 +1622,7 @@ class Storage implements StorageInterface
         }
 
         $dir = $this->getDir($imageRow['dir']);
-        if (!$dir) {
+        if (! $dir) {
             throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
@@ -1646,7 +1646,6 @@ class Storage implements StorageInterface
                 'ContentType' => $imagick->getImageMimeType()
             ]);
         } else {
-
             $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
             $imagick->readImage($filePath);
 
@@ -1677,7 +1676,7 @@ class Storage implements StorageInterface
         }
 
         $dir = $this->getDir($imageRow['dir']);
-        if (!$dir) {
+        if (! $dir) {
             throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
@@ -1701,7 +1700,6 @@ class Storage implements StorageInterface
                 'ContentType' => $imagick->getImageMimeType()
             ]);
         } else {
-
             $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
             $imagick->readImage($filePath);
 
