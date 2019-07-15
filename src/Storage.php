@@ -1152,27 +1152,39 @@ class Storage implements StorageInterface
 
         if (isset($options['s3']) && $options['s3']) {
             $blob = $imagick->getImagesBlob();
-            $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath, $fileName) use ($dir, $blob, $imagick) {
-                $this->getS3Client()->putObject([
-                    'Key'         => $fileName,
-                    'Body'        => $blob,
-                    'Bucket'      => $dir->getBucket(),
-                    'ACL'         => 'public-read',
-                    'ContentType' => $imagick->getImageMimeType()
-                ]);
-            });
+            $id = $this->generateLockWrite(
+                $dirName,
+                $options,
+                $width,
+                $height,
+                function ($filePath, $fileName) use ($dir, $blob, $imagick) {
+                    $this->getS3Client()->putObject([
+                        'Key'         => $fileName,
+                        'Body'        => $blob,
+                        'Bucket'      => $dir->getBucket(),
+                        'ACL'         => 'public-read',
+                        'ContentType' => $imagick->getImageMimeType()
+                    ]);
+                }
+            );
 
             $filesize = strlen($blob);
         } else {
-            $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath) use ($imagick, &$filesize) {
-                if (! $imagick->writeImages($filePath, true)) {
-                    throw new Storage\Exception("Imagick::writeImage error");
+            $id = $this->generateLockWrite(
+                $dirName,
+                $options,
+                $width,
+                $height,
+                function ($filePath) use ($imagick, &$filesize) {
+                    if (! $imagick->writeImages($filePath, true)) {
+                        throw new Storage\Exception("Imagick::writeImage error");
+                    }
+
+                    $this->chmodFile($filePath);
+
+                    $filesize = filesize($filePath);
                 }
-
-                $this->chmodFile($filePath);
-
-                $filesize = filesize($filePath);
-            });
+            );
         }
 
         $this->imageTable->update([
@@ -1227,17 +1239,23 @@ class Storage implements StorageInterface
         }
 
         if (isset($options['s3']) && $options['s3']) {
-            $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath, $fileName) use ($dir, $file) {
-                $handle = fopen($file, 'r');
-                $this->getS3Client()->putObject([
-                    'Key'         => $fileName,
-                    'Body'        => $handle,
-                    'Bucket'      => $dir->getBucket(),
-                    'ACL'         => 'public-read',
-                    'ContentType' => mime_content_type($file)
-                ]);
-                fclose($handle);
-            });
+            $id = $this->generateLockWrite(
+                $dirName,
+                $options,
+                $width,
+                $height,
+                function ($filePath, $fileName) use ($dir, $file) {
+                    $handle = fopen($file, 'r');
+                    $this->getS3Client()->putObject([
+                        'Key'         => $fileName,
+                        'Body'        => $handle,
+                        'Bucket'      => $dir->getBucket(),
+                        'ACL'         => 'public-read',
+                        'ContentType' => mime_content_type($file)
+                    ]);
+                    fclose($handle);
+                }
+            );
         } else {
             $id = $this->generateLockWrite($dirName, $options, $width, $height, function ($filePath) use ($file) {
                 if (! copy($file, $filePath)) {
