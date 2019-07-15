@@ -179,7 +179,7 @@ class StorageS3Test extends TestCase
 
         $this->assertEquals(2, count($images));
 
-        $formatedImages = $imageStorage->getFormatedImages([$imageId1, $imageId2], 'test',);
+        $formatedImages = $imageStorage->getFormatedImages([$imageId1, $imageId2], 'test');
 
         $this->assertEquals(2, count($formatedImages));
 
