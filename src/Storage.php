@@ -15,6 +15,7 @@ use Zend\Db\TableGateway\TableGateway;
 
 /**
  * @author dima
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Storage implements StorageInterface
 {
@@ -404,13 +405,13 @@ class Storage implements StorageInterface
      */
     private function buildImageResult($imageRow)
     {
+        $dir = $this->getDir($imageRow['dir']);
+        if (! $dir) {
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+        }
         if ($imageRow['s3']) {
-            $src = $this->getS3Client()->getObjectUrl($imageRow['dir'], $imageRow['filepath']);
+            $src = $this->getS3Client()->getObjectUrl($dir->getBucket(), $imageRow['filepath']);
         } else {
-            $dir = $this->getDir($imageRow['dir']);
-            if (! $dir) {
-                throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
-            }
             $dirUrl = $dir->getUrl();
 
             $src = null;
@@ -1600,7 +1601,7 @@ class Storage implements StorageInterface
                     $s3 = $this->getS3Client();
                     $s3->copyObject([
                         'Bucket'     => $dir->getBucket(),
-                        'CopySource' => $imageRow['dir'] . '/' . $imageRow['filepath'],
+                        'CopySource' => $dir->getBucket() . '/' . $imageRow['filepath'],
                         'Key'        => $destFileName,
                         'ACL'        => 'public-read'
                     ]);
