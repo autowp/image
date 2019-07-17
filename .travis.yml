@@ -2,7 +2,6 @@ sudo: required
 dist: trusty
 language: php
 php:
-  - "7.1"
   - "7.2"
   - "7.3"
 services:
@@ -34,8 +33,8 @@ before_script:
 script: 
   - composer cs-check
   - composer phpmd
-  - PDODRIVER=pgsql ./vendor/bin/phpunit
-  - PDODRIVER=mysql ./vendor/bin/phpunit --log-junit test/logs/junit.xml --coverage-clover ./test/logs/clover.xml
+  - PDODRIVER=pgsql ./vendor/bin/phpunit --exclude StorageS3Test
+  - PDODRIVER=mysql ./vendor/bin/phpunit --exclude StorageS3Test --log-junit test/logs/junit.xml --coverage-clover ./test/logs/clover.xml
   - sonar-scanner || travis_terminate 1;
 
 after_script:

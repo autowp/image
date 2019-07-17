@@ -48,7 +48,8 @@ return [
                 'url'  => 'http://localhost/image/format/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'
-                ]
+                ],
+                'bucket' => 'test-format'
             ],
             'test' => [
                 'path' => $imageDir . "test",
@@ -58,14 +59,16 @@ return [
                     'options'  => [
                         'deep' => 2
                     ]
-                ]
+                ],
+                'bucket' => 'test-test'
             ],
             'naming' => [
                 'path' => $imageDir . "naming",
                 'url'  => 'http://localhost/image/naming/',
                 'namingStrategy' => [
                     'strategy' => 'pattern'
-                ]
+                ],
+                'bucket' => 'test-naming'
             ],
         ],
 
@@ -99,6 +102,17 @@ return [
                 ]
             ]
         ],
+        'formatToS3' => false,
+        's3' => [
+            'region' => '',
+            'version' => 'latest',
+            'endpoint' => getenv('S3_ENDPOINT'),
+            'credentials' => [
+                'key' => getenv('S3_KEY'),
+                'secret' => getenv('S3_SECRET')
+            ],
+            'use_path_style_endpoint' => true
+        ]
     ],
     'db' => $db
 ];

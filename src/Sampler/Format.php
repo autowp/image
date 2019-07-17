@@ -5,7 +5,7 @@ namespace Autowp\Image\Sampler;
 /**
  * @author dima
  *
- * @desc Represents a image formating rules
+ * @desc Represents a image formatting rules
  */
 class Format
 {
