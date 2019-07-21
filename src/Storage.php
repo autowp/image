@@ -1735,6 +1735,21 @@ class Storage implements StorageInterface
         ]);
     }
 
+    public function moveDirToS3(string $dir): void
+    {
+        $select = $this->formatedImageTable->getSql()->select()
+            ->where([
+                $this->formatedImageTableName . '.dir = ?' => $dir
+            ])
+            ->limit(10000);
+
+        $rows = $this->formatedImageTable->selectWith($select);
+
+        foreach ($rows as $row) {
+            $this->moveToS3($row['id']);
+        }
+    }
+
     /**
      * @param int $imageID
      * @throws Storage\Exception

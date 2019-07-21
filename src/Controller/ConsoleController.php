@@ -75,6 +75,19 @@ class ConsoleController extends AbstractActionController
         Console::getInstance()->writeLine("done", ColorInterface::GREEN);
     }
 
+    public function moveDirToS3Action(): void
+    {
+        $dir = (string)$this->params('dir');
+
+        if (! $dir) {
+            throw new InvalidArgumentException("dir not provided");
+        }
+
+        $this->imageStorage()->moveDirToS3($dir);
+
+        Console::getInstance()->writeLine("done", ColorInterface::GREEN);
+    }
+
     public function listBrokenFilesAction(): void
     {
         $this->imageStorage()->printBrokenFiles();
