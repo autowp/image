@@ -56,7 +56,7 @@ class ConfigProvider
                     ],
                     'image-storage-image' => [
                         'options' => [
-                            'route'    => 'image-storage (flush-image):action <image>',
+                            'route'    => 'image-storage (flush-image|move-to-s3):action <image>',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class
                             ]

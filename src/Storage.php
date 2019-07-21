@@ -1735,6 +1735,58 @@ class Storage implements StorageInterface
         ]);
     }
 
+    /**
+     * @param int $imageID
+     * @throws Storage\Exception
+     */
+    public function moveToS3(int $imageID): void
+    {
+        $imageRow = $this->getImageRow($imageID);
+
+        if (! $imageRow) {
+            throw new Storage\Exception("Failed to found path for `$imageID`");
+        }
+
+        $dir = $this->getDir($imageRow['dir']);
+        if (! $dir) {
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+        }
+
+        if ($imageRow['s3']) {
+            return;
+        }
+
+        $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
+
+        $mime = mime_content_type($filePath);
+        if (! $mime) {
+            throw new Storage\Exception("Failed to detect mime type of file `$filePath`");
+        }
+
+        $handle = fopen($filePath, 'r');
+
+        if (! $handle) {
+            throw new Storage\Exception("Failed to open file `$filePath`");
+        }
+
+        $this->getS3Client()->putObject([
+            'Key'         => $imageRow['filepath'],
+            'Body'        => $handle,
+            'Bucket'      => $dir->getBucket(),
+            'ContentType' => $mime,
+            'ACL'         => 'public-read',
+        ]);
+        fclose($handle);
+
+        $this->imageTable->update([
+            's3' => 1
+        ], [
+            'id' => $imageID
+        ]);
+
+        unlink($filePath);
+    }
+
     public function printBrokenFiles(): void
     {
         $select = $this->imageTable->getSql()->select()

@@ -285,4 +285,41 @@ class StorageS3Test extends TestCase
         $this->assertTrue($formatedImage->getFileSize() > 0);
         $this->assertNotEmpty($formatedImage->getSrc());
     }
+
+    /**
+     * @group S3
+     * @throws Storage\Exception
+     * @throws ImagickException
+     */
+    public function testMoveToS3()
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+
+        $imageStorage = $this->getImageStorage($app);
+
+        $blob = file_get_contents(self::TEST_IMAGE_FILE);
+
+        $imageID = $imageStorage->addImageFromBlob($blob, 'test');
+
+        $this->assertNotEmpty($imageID);
+
+        $image = $imageStorage->getImage($imageID);
+
+        $this->assertEquals(101, $image->getWidth());
+        $this->assertEquals(149, $image->getHeight());
+        $this->assertTrue($image->getFileSize() > 0);
+        $this->assertNotEmpty($image->getSrc());
+
+        $imageStorage->moveToS3($imageID);
+
+        $s3Image = $imageStorage->getImage($imageID);
+
+        $this->assertEquals(101, $s3Image->getWidth());
+        $this->assertEquals(149, $s3Image->getHeight());
+        $this->assertTrue($s3Image->getFileSize() > 0);
+        $this->assertNotEmpty($s3Image->getSrc());
+
+        $this->assertNotEquals($image->getSrc(), $s3Image->getSrc());
+        var_dump($s3Image->getSrc());
+    }
 }
