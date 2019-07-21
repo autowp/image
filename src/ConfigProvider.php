@@ -64,7 +64,8 @@ class ConfigProvider
                     ],
                     'image-storage-dir' => [
                         'options' => [
-                            'route'    => 'image-storage (delete-broken-files|clear-empty-dirs|move-dir-to-s3):action <dirname>',
+                            'route'    =>
+                                'image-storage (delete-broken-files|clear-empty-dirs|move-dir-to-s3):action <dirname>',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
                             ]
