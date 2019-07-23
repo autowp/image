@@ -77,7 +77,7 @@ class ConsoleController extends AbstractActionController
 
     public function moveDirToS3Action(): void
     {
-        $dir = (string)$this->params('dir');
+        $dir = (string)$this->params('dirname');
 
         if (! $dir) {
             throw new InvalidArgumentException("dir not provided");

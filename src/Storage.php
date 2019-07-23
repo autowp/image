@@ -1737,13 +1737,14 @@ class Storage implements StorageInterface
 
     public function moveDirToS3(string $dir): void
     {
-        $select = $this->formatedImageTable->getSql()->select()
+        $select = $this->imageTable->getSql()->select()
             ->where([
-                $this->formatedImageTableName . '.dir = ?' => $dir
+                'dir' => $dir,
+                'not s3'
             ])
             ->limit(10000);
 
-        $rows = $this->formatedImageTable->selectWith($select);
+        $rows = $this->imageTable->selectWith($select);
 
         foreach ($rows as $row) {
             $this->moveToS3($row['id']);
