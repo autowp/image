@@ -10,9 +10,9 @@ services:
 addons:
   apt:
     packages:
-    - mysql-server-8
-    - mysql-client-core-8
-    - mysql-client-8
+    - mysql-server-5.7
+    - mysql-client-core-5.7
+    - mysql-client-5.7
   sonarcloud:
     organization: "autowp-github"
     token:
