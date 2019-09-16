@@ -484,7 +484,7 @@ class Storage implements StorageInterface
         }
 
         $imageRow = $this->imageTable->select([
-            'id = ?' => $id
+            'id' => $id
         ])->current();
 
         return $imageRow ? $imageRow : null;
@@ -556,6 +556,47 @@ class Storage implements StorageInterface
         }
 
         return $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
+    }
+
+    /**
+     * @param int $imageId
+     * @return resource|null
+     * @throws Storage\Exception
+     */
+    public function getImageBlobStream(int $imageId)
+    {
+        $imageRow = $this->getImageRow($imageId);
+        if (! $imageRow) {
+            return null;
+        }
+
+        $dir = $this->getDir($imageRow['dir']);
+        if (! $dir) {
+            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+        }
+
+        if ($imageRow['s3']) {
+            $object = $this->getS3Client()->getObject([
+                'Bucket' => $dir->getBucket(),
+                'Key'    => $imageRow['filepath']
+            ]);
+
+            return $object['Body']->detach();
+        }
+
+        $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
+
+        if (! file_exists($filepath)) {
+            throw new Storage\Exception("File `$filepath` not found");
+        }
+
+        $result = fopen($filepath, 'r');
+
+        if ($result === false) {
+            throw new Storage\Exception("Failed to read file `$filepath`");
+        }
+
+        return $result;
     }
 
     /**
@@ -1188,8 +1229,17 @@ class Storage implements StorageInterface
             );
         }
 
+        $exif = $this->extractEXIF($id);
+        if ($exif) {
+            $exif = json_encode($exif);
+            if ($exif === false) {
+                throw new Exception("Failed to encode exif");
+            }
+        }
+
         $this->imageTable->update([
-            'filesize' => $filesize
+            'filesize' => $filesize,
+            'exif'     => $exif
         ], [
             'id' => $id
         ]);
@@ -1267,8 +1317,17 @@ class Storage implements StorageInterface
             });
         }
 
+        $exif = $this->extractEXIF($id);
+        if ($exif) {
+            $exif = json_encode($exif);
+            if ($exif === false) {
+                throw new Exception("Failed to encode exif");
+            }
+        }
+
         $this->imageTable->update([
-            'filesize' => filesize($file)
+            'filesize' => filesize($file),
+            'exif'     => $exif
         ], [
             'id' => $id
         ]);
@@ -1425,26 +1484,43 @@ class Storage implements StorageInterface
     {
         $imageRow = $this->getImageRow($imageId);
 
+        if (! $imageRow || ! $imageRow['exif']) {
+            return null;
+        }
+
+        $exif = json_decode($imageRow['exif'], true);
+
+        if ($exif === false) {
+            return null;
+        }
+
+        return $exif;
+    }
+
+    /**
+     * @param int $imageId
+     * @return array|null
+     * @throws Storage\Exception
+     */
+    public function extractEXIF(int $imageId)
+    {
+        $imageRow = $this->getImageRow($imageId);
+
         if (! $imageRow) {
             return null;
         }
 
-        if ($imageRow['s3']) {
+        $stream = $this->getImageBlobStream($imageId);
+
+        if (! $stream) {
             return null;
         }
 
-        $dir = $this->getDir($imageRow['dir']);
-        if (! $dir) {
-            throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
+        if (! is_resource($stream)) {
+            throw new Exception("Resource expected");
         }
 
-        $filepath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
-
-        if (! file_exists($filepath)) {
-            throw new Storage\Exception("File `$filepath` not found");
-        }
-
-        $exif = @exif_read_data($filepath, null, true);
+        $exif = @exif_read_data($stream, null, true);
 
         return $exif ? $exif : null;
     }

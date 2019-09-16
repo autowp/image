@@ -16,6 +16,7 @@ CREATE TABLE `image` (
   `crop_width` smallint unsigned NOT NULL DEFAULT 0,
   `crop_height` smallint unsigned NOT NULL DEFAULT 0,
   `s3` smallint unsigned NOT NULL DEFAULT 0,
+  `exif` JSON DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `filename` (`filepath`,`dir`),
   KEY `image_dir_id` (`dir`)

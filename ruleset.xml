@@ -26,7 +26,7 @@
     <rule ref="rulesets/codesize.xml/ExcessivePublicCount">
         <priority>1</priority>
         <properties>
-            <property name="minimum" value="49" />
+            <property name="minimum" value="51" />
         </properties>
     </rule>
 

@@ -114,6 +114,7 @@ class StorageTest extends TestCase
 
         $exif = $imageStorage->getImageEXIF($imageId);
         $this->assertNotEmpty($exif);
+        $this->assertEquals('Adobe Photoshop CS3 Macintosh', $exif['IFD0']['Software']);
 
         $resolution = $imageStorage->getImageResolution($imageId);
         $this->assertNotEmpty($resolution);

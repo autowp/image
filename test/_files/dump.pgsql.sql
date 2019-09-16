@@ -14,6 +14,7 @@ CREATE TABLE image (
   date_add timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   dir varchar(255) NOT NULL,
   s3 boolean NOT NULL DEFAULT false,
+  exif JSON DEFAULT NULL,
   PRIMARY KEY (id)
 );
 

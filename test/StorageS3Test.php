@@ -320,6 +320,5 @@ class StorageS3Test extends TestCase
         $this->assertNotEmpty($s3Image->getSrc());
 
         $this->assertNotEquals($image->getSrc(), $s3Image->getSrc());
-        var_dump($s3Image->getSrc());
     }
 }
