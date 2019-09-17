@@ -17,6 +17,7 @@ addons:
     organization: "autowp-github"
     token:
       secure: $SONARCLOUD_TOKEN
+  postgresql: '9.6'
 install:
   - pear config-set preferred_state beta
   - pecl channel-update pecl.php.net
