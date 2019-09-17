@@ -71,6 +71,15 @@ class ConfigProvider
                             ]
                         ]
                     ],
+                    'image-storage-extract-exif' => [
+                        'options' => [
+                            'route'    => 'image-storage extract-exif <dirname>',
+                            'defaults' => [
+                                'controller' => Controller\ConsoleController::class,
+                                'action'     => 'extract-exif'
+                            ]
+                        ]
+                    ],
                 ]
             ]
         ];

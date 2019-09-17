@@ -158,4 +158,17 @@ class ConsoleController extends AbstractActionController
             }
         }
     }
+
+    public function extractExifAction()
+    {
+        $dir = (string)$this->params('dirname');
+
+        if (! $dir) {
+            throw new InvalidArgumentException("dir not provided");
+        }
+
+        $this->imageStorage()->extractAllEXIF($dir);
+
+        Console::getInstance()->writeLine("done", ColorInterface::GREEN);
+    }
 }

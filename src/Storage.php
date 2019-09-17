@@ -2062,4 +2062,36 @@ class Storage implements StorageInterface
             }
         }
     }
+
+    /**
+     * @param string $dir
+     * @throws Storage\Exception
+     */
+    public function extractAllEXIF(string $dir): void
+    {
+        $select = $this->imageTable->getSql()->select()
+            ->where([
+                'dir' => $dir,
+                'exif is null'
+            ])
+            ->limit(10000);
+
+        $rows = $this->imageTable->selectWith($select);
+
+        foreach ($rows as $row) {
+            $exif = $this->extractEXIF($row['id']);
+            if ($exif) {
+                $exif = json_encode($exif);
+                if ($exif === false) {
+                    throw new Exception("Failed to encode exif");
+                }
+            }
+
+            $this->imageTable->update([
+                'exif' => $exif
+            ], [
+                'id' => $row['id']
+            ]);
+        }
+    }
 }
