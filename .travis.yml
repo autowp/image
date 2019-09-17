@@ -19,23 +19,23 @@ addons:
       secure: $SONARCLOUD_TOKEN
   postgresql: '9.6'
 install:
-  - pear config-set preferred_state beta
-  - pecl channel-update pecl.php.net
-  - yes | pecl install imagick
+  - pear config-set preferred_state beta || travis_terminate 1;
+  - pecl channel-update pecl.php.net || travis_terminate 1;
+  - yes | pecl install imagick || travis_terminate 1;
   
 before_script: 
-  - composer install --no-progress --no-interaction --no-suggest --ignore-platform-reqs
-  - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
-  - mysql -u root -e 'create database autowp_image_test;'
-  - mysql -u root < test/_files/dump.mysql.sql
-  - mysql -u root -e 'GRANT ALL PRIVILEGES ON autowp_image_test.* TO autowp_test@localhost IDENTIFIED BY "test";'
-  - psql -c 'create database autowp_image_test;' -U postgres
-  - psql --set ON_ERROR_STOP=on -U postgres autowp_image_test < test/_files/dump.pgsql.sql
+  - composer install --no-progress --no-interaction --no-suggest --ignore-platform-reqs || travis_terminate 1;
+  - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql || travis_terminate 1;
+  - mysql -u root -e 'create database autowp_image_test;' || travis_terminate 1;
+  - mysql -u root < test/_files/dump.mysql.sql || travis_terminate 1;
+  - mysql -u root -e 'GRANT ALL PRIVILEGES ON autowp_image_test.* TO autowp_test@localhost IDENTIFIED BY "test";' || travis_terminate 1;
+  - psql -c 'create database autowp_image_test;' -U postgres || travis_terminate 1;
+  - psql --set ON_ERROR_STOP=on -U postgres autowp_image_test < test/_files/dump.pgsql.sql || travis_terminate 1;
 script: 
-  - composer cs-check
-  - composer phpmd
-  - PDODRIVER=pgsql ./vendor/bin/phpunit --exclude StorageS3Test
-  - PDODRIVER=mysql ./vendor/bin/phpunit --exclude StorageS3Test --log-junit test/logs/junit.xml --coverage-clover ./test/logs/clover.xml
+  - composer cs-check || travis_terminate 1;
+  - composer phpmd || travis_terminate 1;
+  - PDODRIVER=pgsql ./vendor/bin/phpunit --exclude StorageS3Test || travis_terminate 1;
+  - PDODRIVER=mysql ./vendor/bin/phpunit --exclude StorageS3Test --log-junit test/logs/junit.xml --coverage-clover ./test/logs/clover.xml || travis_terminate 1;
   - sonar-scanner || travis_terminate 1;
 
 after_script:
