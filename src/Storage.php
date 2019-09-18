@@ -1231,7 +1231,7 @@ class Storage implements StorageInterface
 
         $exif = $this->extractEXIF($id);
         if ($exif) {
-            $exif = json_encode($exif);
+            $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE);
             if ($exif === false) {
                 throw new Exception("Failed to encode exif");
             }
@@ -1319,7 +1319,7 @@ class Storage implements StorageInterface
 
         $exif = $this->extractEXIF($id);
         if ($exif) {
-            $exif = json_encode($exif);
+            $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE);
             if ($exif === false) {
                 throw new Exception("Failed to encode exif");
             }
@@ -2081,7 +2081,7 @@ class Storage implements StorageInterface
         foreach ($rows as $row) {
             $exif = $this->extractEXIF($row['id']);
             if ($exif) {
-                $exif = json_encode($exif);
+                $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE);
                 if ($exif === false) {
                     throw new Exception("Failed to encode exif");
                 }
