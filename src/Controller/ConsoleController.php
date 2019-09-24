@@ -59,6 +59,35 @@ class ConsoleController extends AbstractActionController
         Console::getInstance()->writeLine("done", ColorInterface::GREEN);
     }
 
+    /**
+     * @throws Storage\Exception
+     */
+    public function moveToS3Action(): void
+    {
+        $imageID = (int)$this->params('image');
+
+        if (! $imageID) {
+            throw new InvalidArgumentException("image id not provided");
+        }
+
+        $this->imageStorage()->moveToS3($imageID);
+
+        Console::getInstance()->writeLine("done", ColorInterface::GREEN);
+    }
+
+    public function moveDirToS3Action(): void
+    {
+        $dir = (string)$this->params('dirname');
+
+        if (! $dir) {
+            throw new InvalidArgumentException("dir not provided");
+        }
+
+        $this->imageStorage()->moveDirToS3($dir);
+
+        Console::getInstance()->writeLine("done", ColorInterface::GREEN);
+    }
+
     public function listBrokenFilesAction(): void
     {
         $this->imageStorage()->printBrokenFiles();
@@ -128,5 +157,18 @@ class ConsoleController extends AbstractActionController
                 }
             }
         }
+    }
+
+    public function extractExifAction()
+    {
+        $dir = (string)$this->params('dirname');
+
+        if (! $dir) {
+            throw new InvalidArgumentException("dir not provided");
+        }
+
+        $this->imageStorage()->extractAllEXIF($dir);
+
+        Console::getInstance()->writeLine("done", ColorInterface::GREEN);
     }
 }

@@ -10,7 +10,7 @@ use Zend\Mvc\Application;
 
 use Autowp\Image\Storage;
 
-class StorageTest extends TestCase
+class StorageS3Test extends TestCase
 {
     const TEST_IMAGE_FILE = __DIR__ . '/_files/Towers_Schiphol_small.jpg';
     const TEST_IMAGE_FILE2 = __DIR__ . '/_files/mazda3_sedan_us-spec_11.jpg';
@@ -23,20 +23,28 @@ class StorageTest extends TestCase
     }
 
     /**
+     * @group S3
      * @throws Storage\Exception
      */
-    public function testAddImageFromFileChangeNameAndDelete()
+    public function testS3AddImageFromFileChangeNameAndDelete2()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
         $imageStorage = $this->getImageStorage($app);
 
-        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming', [
+            's3'      => true,
+            'pattern' => 'folder/file'
+        ]);
 
         $this->assertNotEmpty($imageId);
 
         $imageInfo = $imageStorage->getImage($imageId);
-        $this->assertEquals(filesize(self::TEST_IMAGE_FILE), $imageInfo->toArray()['filesize']);
+
+        $this->assertContains('folder/file', $imageInfo->getSrc());
+
+        $blob = file_get_contents($imageInfo->getSrc());
+        $this->assertEquals(filesize(self::TEST_IMAGE_FILE), strlen($blob));
 
         $imageStorage->changeImageName($imageId, [
             'pattern' => 'new-name/by-pattern'
@@ -50,6 +58,7 @@ class StorageTest extends TestCase
     }
 
     /**
+     * @group S3
      * @throws Storage\Exception
      * @throws ImagickException
      */
@@ -61,7 +70,9 @@ class StorageTest extends TestCase
 
         $blob = file_get_contents(self::TEST_IMAGE_FILE);
 
-        $imageId = $imageStorage->addImageFromBlob($blob, 'test');
+        $imageId = $imageStorage->addImageFromBlob($blob, 'test', [
+            's3' => true
+        ]);
 
         $this->assertNotEmpty($imageId);
 
@@ -74,16 +85,18 @@ class StorageTest extends TestCase
     }
 
     /**
+     * @group S3
      * @throws Storage\Exception
      */
-    public function testAddImageWithPrefferedName()
+    public function testS3AddImageWithPrefferedName()
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
         $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'test', [
-            'prefferedName' => 'zeliboba'
+            'prefferedName' => 'zeliboba',
+            's3' => true
         ]);
 
         $this->assertNotEmpty($imageId);
@@ -94,33 +107,7 @@ class StorageTest extends TestCase
     }
 
     /**
-     * @throws ImagickException
-     * @throws Storage\Exception
-     */
-    public function testIptcAndExif()
-    {
-        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
-
-        $imageStorage = $this->getImageStorage($app);
-
-        $blob = file_get_contents(self::TEST_IMAGE_FILE2);
-
-        $imageId = $imageStorage->addImageFromBlob($blob, 'test');
-
-        $this->assertNotEmpty($imageId);
-
-        $iptc = $imageStorage->getImageIPTC($imageId);
-        $this->assertNotEmpty($iptc);
-
-        $exif = $imageStorage->getImageEXIF($imageId);
-        $this->assertNotEmpty($exif);
-        $this->assertEquals('Adobe Photoshop CS3 Macintosh', $exif['IFD0']['Software']);
-
-        $resolution = $imageStorage->getImageResolution($imageId);
-        $this->assertNotEmpty($resolution);
-    }
-
-    /**
+     * @group S3
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -130,7 +117,9 @@ class StorageTest extends TestCase
 
         $imageStorage = $this->getImageStorage($app);
 
-        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
+            's3' => true
+        ]);
         $this->assertNotEmpty($imageId);
 
         $crop = [
@@ -145,10 +134,9 @@ class StorageTest extends TestCase
         $this->assertEquals($crop, $imageStorage->getImageCrop($imageId));
 
 
-
-        $filePath = $imageStorage->getImageFilepath($imageId);
-        $this->assertTrue(file_exists($filePath));
-        $this->assertEquals(filesize(self::TEST_IMAGE_FILE2), filesize($filePath));
+        $imageInfo = $imageStorage->getImage($imageId);
+        $blob = file_get_contents($imageInfo->getSrc());
+        $this->assertEquals(filesize(self::TEST_IMAGE_FILE2), strlen($blob));
 
         $formatedImage = $imageStorage->getFormatedImage($imageId, 'picture-gallery');
 
@@ -161,6 +149,7 @@ class StorageTest extends TestCase
     }
 
     /**
+     * @group S3
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -170,13 +159,17 @@ class StorageTest extends TestCase
 
         $imageStorage = $this->getImageStorage($app);
 
-        $imageId1 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming');
+        $imageId1 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming', [
+            's3' => true
+        ]);
 
         $this->assertNotEmpty($imageId1);
 
         $imageStorage->flop($imageId1);
 
-        $imageId2 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
+        $imageId2 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
+            's3' => true
+        ]);
 
         $this->assertNotEmpty($imageId2);
 
@@ -196,20 +189,7 @@ class StorageTest extends TestCase
     }
 
     /**
-     * @throws Storage\Exception
-     */
-    public function testGetImageReturnsNull()
-    {
-        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
-
-        $imageStorage = $this->getImageStorage($app);
-
-        $result = $imageStorage->getImage(999999999);
-
-        $this->assertNull($result);
-    }
-
-    /**
+     * @group S3
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -219,7 +199,9 @@ class StorageTest extends TestCase
 
         $imageStorage = $this->getImageStorage($app);
 
-        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
+            's3' => true
+        ]);
 
         $this->assertNotEmpty($imageId);
 
@@ -241,6 +223,7 @@ class StorageTest extends TestCase
     }
 
     /**
+     * @group S3
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -252,7 +235,9 @@ class StorageTest extends TestCase
 
         $imageStorage = $this->getImageStorage($app);
 
-        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
+            's3' => true
+        ]);
 
         $this->assertNotEmpty($imageId);
 
@@ -275,6 +260,7 @@ class StorageTest extends TestCase
     }
 
     /**
+     * @group S3
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -284,7 +270,9 @@ class StorageTest extends TestCase
 
         $imageStorage = $this->getImageStorage($app);
 
-        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
+            's3' => true
+        ]);
 
         $this->assertNotEmpty($imageId);
 
@@ -296,5 +284,41 @@ class StorageTest extends TestCase
         $this->assertEquals(120, $formatedImage->getHeight());
         $this->assertTrue($formatedImage->getFileSize() > 0);
         $this->assertNotEmpty($formatedImage->getSrc());
+    }
+
+    /**
+     * @group S3
+     * @throws Storage\Exception
+     * @throws ImagickException
+     */
+    public function testMoveToS3()
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+
+        $imageStorage = $this->getImageStorage($app);
+
+        $blob = file_get_contents(self::TEST_IMAGE_FILE);
+
+        $imageID = $imageStorage->addImageFromBlob($blob, 'test');
+
+        $this->assertNotEmpty($imageID);
+
+        $image = $imageStorage->getImage($imageID);
+
+        $this->assertEquals(101, $image->getWidth());
+        $this->assertEquals(149, $image->getHeight());
+        $this->assertTrue($image->getFileSize() > 0);
+        $this->assertNotEmpty($image->getSrc());
+
+        $imageStorage->moveToS3($imageID);
+
+        $s3Image = $imageStorage->getImage($imageID);
+
+        $this->assertEquals(101, $s3Image->getWidth());
+        $this->assertEquals(149, $s3Image->getHeight());
+        $this->assertTrue($s3Image->getFileSize() > 0);
+        $this->assertNotEmpty($s3Image->getSrc());
+
+        $this->assertNotEquals($image->getSrc(), $s3Image->getSrc());
     }
 }

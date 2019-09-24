@@ -17,6 +17,11 @@ class Dir
     private $url = '';
 
     /**
+     * @var string
+     */
+    private $bucket = '';
+
+    /**
      * @var AbstractStrategy
      */
     private $namingStrategy;
@@ -48,6 +53,25 @@ class Dir
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $bucket
+     * @return Dir
+     */
+    public function setBucket(string $bucket): Dir
+    {
+        $this->bucket = trim($bucket);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBucket(): string
+    {
+        return $this->bucket;
     }
 
     /**

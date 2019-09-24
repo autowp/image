@@ -56,7 +56,7 @@ class ConfigProvider
                     ],
                     'image-storage-image' => [
                         'options' => [
-                            'route'    => 'image-storage (flush-image):action <image>',
+                            'route'    => 'image-storage (flush-image|move-to-s3):action <image>',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class
                             ]
@@ -64,9 +64,19 @@ class ConfigProvider
                     ],
                     'image-storage-dir' => [
                         'options' => [
-                            'route'    => 'image-storage (delete-broken-files|clear-empty-dirs):action <dirname>',
+                            'route'    =>
+                                'image-storage (delete-broken-files|clear-empty-dirs|move-dir-to-s3):action <dirname>',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
+                            ]
+                        ]
+                    ],
+                    'image-storage-extract-exif' => [
+                        'options' => [
+                            'route'    => 'image-storage extract-exif <dirname>',
+                            'defaults' => [
+                                'controller' => Controller\ConsoleController::class,
+                                'action'     => 'extract-exif'
                             ]
                         ]
                     ],

@@ -13,6 +13,8 @@ CREATE TABLE image (
   crop_height smallint NOT NULL DEFAULT 0,
   date_add timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   dir varchar(255) NOT NULL,
+  s3 boolean NOT NULL DEFAULT false,
+  exif JSON DEFAULT NULL,
   PRIMARY KEY (id)
 );
 
