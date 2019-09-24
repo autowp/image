@@ -945,12 +945,17 @@ class Storage implements StorageInterface
         return $imageId;
     }
 
+    /**
+     * @param $attempt
+     * @return int
+     * @throws Exception
+     */
     private function indexByAttempt($attempt)
     {
         $from = pow(10, $attempt - 1);
         $to = pow(10, $attempt) - 1;
 
-        return rand($from, $to);
+        return random_int($from, $to);
     }
 
     /**
@@ -961,6 +966,7 @@ class Storage implements StorageInterface
      * @param Closure $callback
      * @return int
      * @throws Storage\Exception
+     * @throws Exception
      */
     private function generateLockWrite(string $dirName, array $options, $width, $height, Closure $callback): int
     {
@@ -1359,6 +1365,7 @@ class Storage implements StorageInterface
      * @param int $imageId
      * @param array $options
      * @throws Storage\Exception
+     * @throws Exception
      */
     public function changeImageName(int $imageId, array $options = []): void
     {
