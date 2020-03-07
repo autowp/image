@@ -18,7 +18,7 @@
         "zendframework/zend-mvc": "^3.1.1",
         "zendframework/zend-mvc-console": "^1.2",
         "autowp/zf-components": "^2.0.0",
-        "zendframework/zend-db": "^2.9.2",
+        "zendframework/zend-db": "^2.11",
         "aws/aws-sdk-php": "^3.100"
     },
     "autoload": {

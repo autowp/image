@@ -34,7 +34,6 @@ script:
   - ./cc-test-reporter before-build || travis_terminate 1;
   - composer cs-check || travis_terminate 1;
   - composer phpmd || travis_terminate 1;
-  - PDODRIVER=pgsql ./vendor/bin/phpunit --exclude StorageS3Test || travis_terminate 1;
   - PDODRIVER=mysql ./vendor/bin/phpunit --exclude StorageS3Test --log-junit test/logs/junit.xml --coverage-clover ./test/logs/clover.xml || travis_terminate 1;
   - sonar-scanner || travis_terminate 1;
 
