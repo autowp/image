@@ -4,14 +4,13 @@ language: php
 php:
   - "7.2"
   - "7.3"
+  - "7.4"
 services:
   - mysql
   - postgresql
 addons:
   apt:
     packages:
-    - mysql-server-5.7
-    - mysql-client-core-5.7
     - mysql-client-5.7
   sonarcloud:
     organization: "autowp-github"
