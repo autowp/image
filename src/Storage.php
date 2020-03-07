@@ -122,7 +122,7 @@ class Storage implements StorageInterface
     private Processor\ProcessorPluginManager $processors;
 
     /** @var S3Client */
-    private ?S3Client $s3 = null;
+    private ?S3Client $s3;
 
     /** @var array */
     private array $s3Options = [];
@@ -1380,7 +1380,7 @@ class Storage implements StorageInterface
         }
 
         $iptcStr = '';
-        $info = null;
+        $info    = null;
         @getimagesize($filepath, $info);
         if (is_array($info) && array_key_exists('APP13', $info)) {
             $iptc = iptcparse($info['APP13']);
