@@ -61,6 +61,11 @@ class Format
      */
     public function __construct(array $options = [])
     {
+        $this->width      = null;
+        $this->height     = null;
+        $this->background = null;
+        $this->widest     = null;
+        $this->highest    = null;
         $this->setOptions($options);
     }
 
