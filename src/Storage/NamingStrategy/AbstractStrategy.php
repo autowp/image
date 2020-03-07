@@ -14,8 +14,7 @@ use const DIRECTORY_SEPARATOR;
 
 abstract class AbstractStrategy
 {
-    /** @var string */
-    private $dir;
+    private string $dir;
 
     /**
      * @throws Exception
@@ -26,10 +25,9 @@ abstract class AbstractStrategy
     }
 
     /**
-     * @return $this
      * @throws Exception
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): self
     {
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
@@ -44,27 +42,17 @@ abstract class AbstractStrategy
         return $this;
     }
 
-    /**
-     * @param string $dir
-     * @return $this
-     */
-    public function setDir($dir)
+    public function setDir(string $dir): self
     {
         $this->dir = rtrim($dir, DIRECTORY_SEPARATOR);
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getDir()
+    public function getDir(): string
     {
         return $this->dir;
     }
 
-    /**
-     * @return string
-     */
-    abstract public function generate(array $options = []);
+    abstract public function generate(array $options = []): string;
 }

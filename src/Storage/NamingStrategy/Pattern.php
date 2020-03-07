@@ -13,13 +13,9 @@ use function preg_split;
 
 class Pattern extends AbstractStrategy
 {
-    private static $notAllowedParts = ['.', '..'];
+    private static array $notAllowedParts = ['.', '..'];
 
-    /**
-     * @param string $pattern
-     * @return string
-     */
-    private static function normalizePattern($pattern)
+    private static function normalizePattern(string $pattern): string
     {
         $filter = new FilenameSafe();
 
@@ -37,13 +33,11 @@ class Pattern extends AbstractStrategy
 
     /**
      * @see AbstractStrategy::generate()
-     *
-     * @return string
      */
-    public function generate(array $options = [])
+    public function generate(array $options = []): string
     {
         $defaults = [
-            'pattern'   => null,
+            'pattern'   => '',
             'extension' => null,
             'index'     => null,
         ];

@@ -46,7 +46,7 @@ class StorageS3Test extends TestCase
 
         $imageInfo = $imageStorage->getImage($imageId);
 
-        $this->assertContains('folder/file', $imageInfo->getSrc());
+        $this->assertStringContainsString('folder/file', $imageInfo->getSrc());
 
         $blob = file_get_contents($imageInfo->getSrc());
         $this->assertEquals(filesize(self::TEST_IMAGE_FILE), strlen($blob));
@@ -108,7 +108,7 @@ class StorageS3Test extends TestCase
 
         $image = $imageStorage->getImage($imageId);
 
-        $this->assertContains('zeliboba', $image->getSrc());
+        $this->assertStringContainsString('zeliboba', $image->getSrc());
     }
 
     /**
@@ -149,7 +149,7 @@ class StorageS3Test extends TestCase
         $this->assertTrue($formatedImage->getFileSize() > 0);
         $this->assertNotEmpty($formatedImage->getSrc());
 
-        $this->assertContains('0400030003fc01f4', $formatedImage->getSrc());
+        $this->assertStringContainsString('0400030003fc01f4', $formatedImage->getSrc());
     }
 
     /**

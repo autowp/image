@@ -9,19 +9,19 @@ use function array_merge;
 class Image
 {
     /** @var int */
-    private $id;
+    private int $id;
 
     /** @var int */
-    private $width;
+    private int $width;
 
     /** @var int */
-    private $height;
+    private int $height;
 
     /** @var int */
-    private $filesize;
+    private int $filesize;
 
     /** @var string */
-    private $src;
+    private string $src;
 
     public function __construct(array $options)
     {

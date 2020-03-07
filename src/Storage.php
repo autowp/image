@@ -83,52 +83,52 @@ class Storage implements StorageInterface
     private const TIMEOUT = 15;
 
     /** @var TableGateway */
-    private $imageTable;
+    private TableGateway $imageTable;
 
     /** @var string */
-    private $imageTableName = 'image';
+    private string $imageTableName = 'image';
 
     /** @var TableGateway */
-    private $formatedImageTable;
+    private TableGateway $formatedImageTable;
 
     /** @var string */
-    private $formatedImageTableName = 'formated_image';
+    private string $formatedImageTableName = 'formated_image';
 
     /** @var TableGateway */
-    private $dirTable;
+    private TableGateway $dirTable;
 
     /** @var array */
-    private $dirs = [];
+    private array $dirs = [];
 
     /** @var array */
-    private $formats = [];
+    private array $formats = [];
 
     /** @var int */
-    private $fileMode = 0600;
+    private int $fileMode = 0600;
 
     /** @var int */
-    private $dirMode = 0700;
+    private int $dirMode = 0700;
 
     /** @var string */
-    private $formatedImageDirName;
+    private string $formatedImageDirName;
 
     /** @var Sampler */
-    private $imageSampler;
+    private Sampler $imageSampler;
 
     /** @var bool */
-    private $forceHttps = false;
+    private bool $forceHttps = false;
 
     /** @var Processor\ProcessorPluginManager */
-    private $processors;
+    private Processor\ProcessorPluginManager $processors;
 
     /** @var S3Client */
-    private $s3;
+    private S3Client $s3;
 
     /** @var array */
-    private $s3Options = [];
+    private array $s3Options = [];
 
     /** @var bool */
-    private $formatToS3 = false;
+    private bool $formatToS3 = false;
 
     /**
      * @throws Storage\Exception
@@ -1168,7 +1168,7 @@ class Storage implements StorageInterface
         if ($exif) {
             $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE);
             if ($exif === false) {
-                throw new Exception("Failed to encode exif");
+                throw new Storage\Exception("Failed to encode exif");
             }
         }
 
@@ -1441,7 +1441,7 @@ class Storage implements StorageInterface
         }
 
         if (! is_resource($stream)) {
-            throw new Exception("Resource expected");
+            throw new Storage\Exception("Resource expected");
         }
 
         $exif = @exif_read_data($stream, null, true);
@@ -1727,6 +1727,9 @@ class Storage implements StorageInterface
         ]);
     }
 
+    /**
+     * @throws Storage\Exception
+     */
     public function moveDirToS3(string $dir): void
     {
         $select = $this->imageTable->getSql()->select()
@@ -1992,7 +1995,7 @@ class Storage implements StorageInterface
             if ($exif) {
                 $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE);
                 if ($exif === false) {
-                    throw new Exception("Failed to encode exif");
+                    throw new Storage\Exception("Failed to encode exif");
                 }
             }
 

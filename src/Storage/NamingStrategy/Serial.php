@@ -19,7 +19,7 @@ class Serial extends AbstractStrategy
     private const ITEM_PER_DIR = 1000;
 
     /** @var int */
-    private $deep = 0;
+    private int $deep = 0;
 
     /**
      * @param int $deep
@@ -44,12 +44,10 @@ class Serial extends AbstractStrategy
 
     /**
      * Return the complete directory path of a filename (including hashedDirectoryStructure)
-     *
-     * @return string
      */
-    private function path(int $index, int $deep)
+    private function path(int $index, int $deep): string
     {
-        $chars = strlen(self::ITEM_PER_DIR - 1); // use log10, fkn n00b
+        $chars = strlen((string) (self::ITEM_PER_DIR - 1)); // use log10, fkn n00b
         $path  = '';
         if ($deep > 0) {
             $cur = floor($index / self::ITEM_PER_DIR);

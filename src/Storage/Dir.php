@@ -17,16 +17,16 @@ use const DIRECTORY_SEPARATOR;
 class Dir
 {
     /** @var string */
-    private $path = '';
+    private string $path = '';
 
     /** @var string */
-    private $url = '';
+    private string $url = '';
 
     /** @var string */
-    private $bucket = '';
+    private ?string $bucket = '';
 
     /** @var AbstractStrategy */
-    private $namingStrategy;
+    private AbstractStrategy $namingStrategy;
 
     /**
      * @throws Exception

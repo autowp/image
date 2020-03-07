@@ -116,7 +116,7 @@ class ConsoleController extends AbstractActionController
      */
     public function deleteBrokenFilesAction(): void
     {
-        $dirname = $this->params('dirname');
+        $dirname = (string) $this->params('dirname');
 
         $this->imageStorage()->deleteBrokenFiles($dirname);
 
@@ -125,7 +125,7 @@ class ConsoleController extends AbstractActionController
 
     public function clearEmptyDirsAction(): void
     {
-        $dirname = $this->params('dirname');
+        $dirname = (string) $this->params('dirname');
 
         Console::getInstance()->writeLine("Clear `$dirname`");
         $dir = $this->imageStorage()->getDir($dirname);
@@ -165,6 +165,9 @@ class ConsoleController extends AbstractActionController
         }
     }
 
+    /**
+     * @throws Storage\Exception
+     */
     public function extractExifAction()
     {
         $dir = (string) $this->params('dirname');

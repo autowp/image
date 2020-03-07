@@ -18,43 +18,43 @@ class Format
         FIT_TYPE_MAXIMUM = '2';
 
     /** @var int */
-    private $fitType;
+    private int $fitType;
 
     /** @var int */
-    private $width;
+    private ?int $width;
 
     /** @var int */
-    private $height;
+    private ?int $height;
 
     /** @var string */
-    private $background;
+    private ?string $background;
 
     /** @var bool */
-    private $ignoreCrop = false;
+    private bool $ignoreCrop = false;
 
     /** @var bool */
-    private $proportionalCrop = false;
+    private bool $proportionalCrop = false;
 
     /** @bool */
-    private $reduceOnly = false;
+    private bool $reduceOnly = false;
 
     /** @var bool */
-    private $strip = false;
+    private bool $strip = false;
 
     /** @var int */
-    private $quality = 0;
+    private int $quality = 0;
 
     /** @var string */
-    private $format;
+    private string $format;
 
     /** @var float|null */
-    private $widest;
+    private ?float $widest;
 
     /** @var float|null */
-    private $highest;
+    private ?float $highest;
 
     /** @var array */
-    private $processors = [];
+    private array $processors = [];
 
     /**
      * @throws Exception

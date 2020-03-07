@@ -29,13 +29,6 @@ class ProcessorPluginManager extends AbstractPluginManager
     protected $sharedByDefault = false;
 
     /**
-     * Whether or not to share by default (v2)
-     *
-     * @var bool
-     */
-    protected $shareByDefault = false;
-
-    /**
      * {inheritDoc}
      */
     protected $instanceOf = AbstractProcessor::class;

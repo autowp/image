@@ -10,7 +10,7 @@ use Zend\View\Helper\AbstractHelper;
 class ImageStorage extends AbstractHelper
 {
     /** @var Image\Storage */
-    private $imageStorage;
+    private Image\Storage $imageStorage;
 
     public function __construct(Image\Storage $imageStorage)
     {
