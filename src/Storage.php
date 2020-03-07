@@ -1025,8 +1025,8 @@ class Storage implements StorageInterface
      */
     private function indexByAttempt(int $attempt): int
     {
-        $from = pow(10, $attempt - 1);
-        $to   = pow(10, $attempt) - 1;
+        $from = (int) pow(10, $attempt - 1);
+        $to   = (int) pow(10, $attempt) - 1;
 
         return random_int($from, $to);
     }
