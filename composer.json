@@ -30,7 +30,7 @@
         "ext-pdo": "*",
         "phpunit/phpunit": "^9.0",
         "php-coveralls/php-coveralls": "^2.0",
-        "phpmd/phpmd" : "^2.6",
+        "phpmd/phpmd" : "^2.8",
         "laminas/laminas-coding-standard": "^2.0.0rc1"
     },
     "autoload-dev": {

@@ -21,13 +21,13 @@ class Format
     private int $fitType;
 
     /** @var int */
-    private ?int $width;
+    private ?int $width = null;
 
     /** @var int */
-    private ?int $height;
+    private ?int $height = null;
 
     /** @var string */
-    private ?string $background;
+    private ?string $background = null;
 
     /** @var bool */
     private bool $ignoreCrop = false;
@@ -48,10 +48,10 @@ class Format
     private string $format;
 
     /** @var float|null */
-    private ?float $widest;
+    private ?float $widest = null;
 
     /** @var float|null */
-    private ?float $highest;
+    private ?float $highest = null;
 
     /** @var array */
     private array $processors = [];

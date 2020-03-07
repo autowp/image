@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c4685c2ccdf743e3977418aa3ae61439",
+    "content-hash": "0d10e06fdc85c535fc8212d1aa34c94c",
     "packages": [
         {
             "name": "autowp/zf-components",

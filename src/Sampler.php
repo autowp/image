@@ -383,7 +383,8 @@ class Sampler
             $format = new Sampler\Format($format);
         }
 
-        if ($quality = $format->getQuality()) {
+        $quality = $format->getQuality();
+        if ($quality) {
             $imagick->setImageCompressionQuality($quality);
         }
 
@@ -473,7 +474,8 @@ class Sampler
             $imagick->stripImage();
         }
 
-        if ($imageFormat = $format->getFormat()) {
+        $imageFormat = $format->getFormat();
+        if ($imageFormat) {
             $imagick->setImageFormat($imageFormat);
         }
 

@@ -140,12 +140,13 @@ class ConsoleController extends AbstractActionController
 
     private function recursiveDirectory(string $dir): void
     {
-        $stack[] = $dir;
+        $stack = [$dir];
 
         while ($stack) {
             $currentDir = array_pop($stack);
 
-            if ($dh = opendir($currentDir)) {
+            $dh = opendir($currentDir);
+            if ($dh) {
                 $count = 0;
                 while (($file = readdir($dh)) !== false) {
                     if ($file !== '.' && $file !== '..') {
