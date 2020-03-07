@@ -83,14 +83,14 @@ return [
                 'width'      => 160,
                 'height'     => 120,
                 'background' => '#fff',
-                'strip'      => 1,
+                'strip'      => true,
             ],
             'picture-gallery' => [
                 'fitType'    => 2,
                 'width'      => 1024,
                 'height'     => 768,
                 'reduceOnly' => 1,
-                'strip'      => 1,
+                'strip'      => true,
                 'format'     => 'jpeg',
             ],
             'with-processor'  => [
@@ -98,7 +98,7 @@ return [
                 'width'      => 160,
                 'height'     => 120,
                 'background' => '#fff',
-                'strip'      => 1,
+                'strip'      => true,
                 'processors' => [
                     'normalize',
                     'negate',

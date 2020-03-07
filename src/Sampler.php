@@ -133,8 +133,8 @@ class Sampler
         }
 
         // extend by bg-space
-        $borderLeft = floor(($format->getWidth() - $imagick->getImageWidth()) / 2);
-        $borderTop  = floor(($format->getHeight() - $imagick->getImageHeight()) / 2);
+        $borderLeft = (int) floor(($format->getWidth() - $imagick->getImageWidth()) / 2);
+        $borderTop  = (int) floor(($format->getHeight() - $imagick->getImageHeight()) / 2);
 
         $imagick->extentImage(
             $format->getWidth(),
@@ -177,10 +177,10 @@ class Sampler
             // высчитываем размеры обрезания
             if ($ratio < $srcRatio) {
                 $scaleWidth  = $format->getWidth();
-                $scaleHeight = round($format->getWidth() / $srcRatio);
+                $scaleHeight = (int) round($format->getWidth() / $srcRatio);
             } else {
                 // добавляем поля по бокам
-                $scaleWidth  = round($format->getHeight() * $srcRatio);
+                $scaleWidth  = (int) round($format->getHeight() * $srcRatio);
                 $scaleHeight = $format->getHeight();
             }
 
@@ -307,24 +307,24 @@ class Sampler
 
             if ($cRatio > $fRatio) {
                 // crop wider than format, need more height
-                $targetHeight = round($cropWidth / $fRatio);
+                $targetHeight = (int) round($cropWidth / $fRatio);
                 if ($targetHeight > $height) {
                     $targetHeight = $height;
                 }
                 $addedHeight = $targetHeight - $cropHeight;
-                $cropTop    -= round($addedHeight / 2);
+                $cropTop    -= (int) round($addedHeight / 2);
                 if ($cropTop < 0) {
                     $cropTop = 0;
                 }
                 $cropHeight = $targetHeight;
             } else {
                 // crop higher than format, need more width
-                $targetWidth = round($cropHeight * $fRatio);
+                $targetWidth = (int) round($cropHeight * $fRatio);
                 if ($targetWidth > $width) {
                     $targetWidth = $width;
                 }
                 $addedWidth = $targetWidth - $cropWidth;
-                $cropLeft  -= round($addedWidth / 2);
+                $cropLeft  -= (int) round($addedWidth / 2);
                 if ($cropLeft < 0) {
                     $cropLeft = 0;
                 }
@@ -346,7 +346,7 @@ class Sampler
 
         if ($ratioDiff > 0) {
             $dstWidth = (int) round($widestRatio * $srcHeight);
-            $imagick  = $this->crop($imagick, $dstWidth, $srcHeight, ($srcWidth - $dstWidth) / 2, 0);
+            $imagick  = $this->crop($imagick, $dstWidth, $srcHeight, (int) round(($srcWidth - $dstWidth) / 2), 0);
         }
 
         return $imagick;
@@ -629,18 +629,18 @@ class Sampler
 
         if ($topColor || $bottomColor) {
             $targetWidth  = $srcWidth;
-            $targetHeight = round($targetWidth / $fRatio);
+            $targetHeight = (int) round($targetWidth / $fRatio);
 
             $needHeight   = $targetHeight - $srcHeight;
             $topHeight    = 0;
             $bottomHeight = 0;
             if ($topColor && $bottomColor) {
-                $topHeight    = round($needHeight / 2);
+                $topHeight    = (int) round($needHeight / 2);
                 $bottomHeight = $needHeight - $topHeight;
             } elseif ($topColor) {
-                $topHeight = round($needHeight);
+                $topHeight = (int) round($needHeight);
             } elseif ($bottomColor) {
-                $bottomHeight = round($needHeight);
+                $bottomHeight = (int) round($needHeight);
             }
 
             $imagick->extentImage(
@@ -690,18 +690,18 @@ class Sampler
 
         if ($leftColor || $rightColor) {
             $targetHeight = $srcHeight;
-            $targetWidth  = round($targetHeight * $fRatio);
+            $targetWidth  = (int) round($targetHeight * $fRatio);
 
             $needWidth  = $targetWidth - $srcWidth;
             $leftWidth  = 0;
             $rightWidth = 0;
             if ($leftColor && $rightColor) {
-                $leftWidth  = round($needWidth / 2);
+                $leftWidth  = (int) round($needWidth / 2);
                 $rightWidth = $needWidth - $leftWidth;
             } elseif ($leftColor) {
-                $leftWidth = round($needWidth);
+                $leftWidth = (int) round($needWidth);
             } elseif ($rightColor) {
-                $rightWidth = round($needWidth);
+                $rightWidth = (int) round($needWidth);
             }
 
             $imagick->extentImage(
