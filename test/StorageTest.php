@@ -1,19 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AutowpTest\Image;
 
+use Autowp\Image\Storage;
 use ImagickException;
-
 use PHPUnit\Framework\TestCase;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Application;
 
-use Autowp\Image\Storage;
+use function count;
+use function file_exists;
+use function file_get_contents;
+use function filesize;
 
 class StorageTest extends TestCase
 {
-    const TEST_IMAGE_FILE = __DIR__ . '/_files/Towers_Schiphol_small.jpg';
-    const TEST_IMAGE_FILE2 = __DIR__ . '/_files/mazda3_sedan_us-spec_11.jpg';
+    private const TEST_IMAGE_FILE  = __DIR__ . '/_files/Towers_Schiphol_small.jpg';
+    private const TEST_IMAGE_FILE2 = __DIR__ . '/_files/mazda3_sedan_us-spec_11.jpg';
 
     private function getImageStorage(Application $app): Storage
     {
@@ -39,7 +44,7 @@ class StorageTest extends TestCase
         $this->assertEquals(filesize(self::TEST_IMAGE_FILE), $imageInfo->toArray()['filesize']);
 
         $imageStorage->changeImageName($imageId, [
-            'pattern' => 'new-name/by-pattern'
+            'pattern' => 'new-name/by-pattern',
         ]);
 
         $imageStorage->removeImage($imageId);
@@ -83,7 +88,7 @@ class StorageTest extends TestCase
         $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'test', [
-            'prefferedName' => 'zeliboba'
+            'prefferedName' => 'zeliboba',
         ]);
 
         $this->assertNotEmpty($imageId);
@@ -137,14 +142,12 @@ class StorageTest extends TestCase
             'left'   => 1024,
             'top'    => 768,
             'width'  => 1020,
-            'height' => 500
+            'height' => 500,
         ];
 
         $imageStorage->setImageCrop($imageId, $crop);
 
         $this->assertEquals($crop, $imageStorage->getImageCrop($imageId));
-
-
 
         $filePath = $imageStorage->getImageFilepath($imageId);
         $this->assertTrue(file_exists($filePath));
@@ -266,7 +269,7 @@ class StorageTest extends TestCase
             'format'            => $formatName,
             'image_id'          => $imageId,
             'status'            => Storage::STATUS_PROCESSING,
-            'formated_image_id' => null
+            'formated_image_id' => null,
         ]);
 
         $formatedImage = $imageStorage->getFormatedImage($imageId, $formatName);

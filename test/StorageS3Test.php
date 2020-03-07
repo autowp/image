@@ -1,19 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AutowpTest\Image;
 
+use Autowp\Image\Storage;
 use ImagickException;
-
 use PHPUnit\Framework\TestCase;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Mvc\Application;
 
-use Autowp\Image\Storage;
+use function count;
+use function file_get_contents;
+use function filesize;
+use function strlen;
 
 class StorageS3Test extends TestCase
 {
-    const TEST_IMAGE_FILE = __DIR__ . '/_files/Towers_Schiphol_small.jpg';
-    const TEST_IMAGE_FILE2 = __DIR__ . '/_files/mazda3_sedan_us-spec_11.jpg';
+    private const TEST_IMAGE_FILE  = __DIR__ . '/_files/Towers_Schiphol_small.jpg';
+    private const TEST_IMAGE_FILE2 = __DIR__ . '/_files/mazda3_sedan_us-spec_11.jpg';
 
     private function getImageStorage(Application $app): Storage
     {
@@ -34,7 +39,7 @@ class StorageS3Test extends TestCase
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming', [
             's3'      => true,
-            'pattern' => 'folder/file'
+            'pattern' => 'folder/file',
         ]);
 
         $this->assertNotEmpty($imageId);
@@ -47,7 +52,7 @@ class StorageS3Test extends TestCase
         $this->assertEquals(filesize(self::TEST_IMAGE_FILE), strlen($blob));
 
         $imageStorage->changeImageName($imageId, [
-            'pattern' => 'new-name/by-pattern'
+            'pattern' => 'new-name/by-pattern',
         ]);
 
         $imageStorage->removeImage($imageId);
@@ -71,7 +76,7 @@ class StorageS3Test extends TestCase
         $blob = file_get_contents(self::TEST_IMAGE_FILE);
 
         $imageId = $imageStorage->addImageFromBlob($blob, 'test', [
-            's3' => true
+            's3' => true,
         ]);
 
         $this->assertNotEmpty($imageId);
@@ -96,7 +101,7 @@ class StorageS3Test extends TestCase
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'test', [
             'prefferedName' => 'zeliboba',
-            's3' => true
+            's3'            => true,
         ]);
 
         $this->assertNotEmpty($imageId);
@@ -118,7 +123,7 @@ class StorageS3Test extends TestCase
         $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
-            's3' => true
+            's3' => true,
         ]);
         $this->assertNotEmpty($imageId);
 
@@ -126,16 +131,15 @@ class StorageS3Test extends TestCase
             'left'   => 1024,
             'top'    => 768,
             'width'  => 1020,
-            'height' => 500
+            'height' => 500,
         ];
 
         $imageStorage->setImageCrop($imageId, $crop);
 
         $this->assertEquals($crop, $imageStorage->getImageCrop($imageId));
 
-
         $imageInfo = $imageStorage->getImage($imageId);
-        $blob = file_get_contents($imageInfo->getSrc());
+        $blob      = file_get_contents($imageInfo->getSrc());
         $this->assertEquals(filesize(self::TEST_IMAGE_FILE2), strlen($blob));
 
         $formatedImage = $imageStorage->getFormatedImage($imageId, 'picture-gallery');
@@ -160,7 +164,7 @@ class StorageS3Test extends TestCase
         $imageStorage = $this->getImageStorage($app);
 
         $imageId1 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE, 'naming', [
-            's3' => true
+            's3' => true,
         ]);
 
         $this->assertNotEmpty($imageId1);
@@ -168,7 +172,7 @@ class StorageS3Test extends TestCase
         $imageStorage->flop($imageId1);
 
         $imageId2 = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
-            's3' => true
+            's3' => true,
         ]);
 
         $this->assertNotEmpty($imageId2);
@@ -200,7 +204,7 @@ class StorageS3Test extends TestCase
         $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
-            's3' => true
+            's3' => true,
         ]);
 
         $this->assertNotEmpty($imageId);
@@ -236,7 +240,7 @@ class StorageS3Test extends TestCase
         $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
-            's3' => true
+            's3' => true,
         ]);
 
         $this->assertNotEmpty($imageId);
@@ -251,7 +255,7 @@ class StorageS3Test extends TestCase
             'format'            => $formatName,
             'image_id'          => $imageId,
             'status'            => Storage::STATUS_PROCESSING,
-            'formated_image_id' => null
+            'formated_image_id' => null,
         ]);
 
         $formatedImage = $imageStorage->getFormatedImage($imageId, $formatName);
@@ -271,7 +275,7 @@ class StorageS3Test extends TestCase
         $imageStorage = $this->getImageStorage($app);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming', [
-            's3' => true
+            's3' => true,
         ]);
 
         $this->assertNotEmpty($imageId);

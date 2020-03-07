@@ -1,15 +1,19 @@
 <?php
 
-namespace Autowp\Image\Processor;
+declare(strict_types=1);
 
-use RuntimeException;
+namespace Autowp\Image\Processor;
 
 use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\Exception\InvalidServiceException;
 
+use function get_class;
+use function gettype;
+use function is_object;
+use function sprintf;
+
 class ProcessorPluginManager extends AbstractPluginManager
 {
-
     /**
      * Default factory-based adapters
      *
@@ -34,7 +38,7 @@ class ProcessorPluginManager extends AbstractPluginManager
     /**
      * {inheritDoc}
      */
-    protected $instanceOf = Processor::class;
+    protected $instanceOf = AbstractProcessor::class;
 
     /**
      * Validate the plugin is of the expected type (v3).
@@ -54,20 +58,8 @@ class ProcessorPluginManager extends AbstractPluginManager
 
         throw new InvalidServiceException(sprintf(
             'Plugin of type %s is invalid; must implement %s',
-            (is_object($instance) ? get_class($instance) : gettype($instance)),
-            Processor::class
+            is_object($instance) ? get_class($instance) : gettype($instance),
+            AbstractProcessor::class
         ));
-    }
-
-    /**
-     * {@inheritDoc} (v2)
-     */
-    public function validatePlugin($plugin)
-    {
-        try {
-            $this->validate($plugin);
-        } catch (InvalidServiceException $e) {
-            throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-        }
     }
 }

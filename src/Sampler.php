@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image;
 
 use Imagick;
@@ -8,18 +10,25 @@ use ImagickException;
 use ImagickPixel;
 use ImagickPixelIterator;
 
+use function abs;
+use function array_sum;
+use function count;
+use function floor;
+use function is_array;
+use function round;
+use function sqrt;
+use function trigger_error;
+
+use const E_USER_WARNING;
+
 class Sampler
 {
     /**
-     * @param Imagick $imagick
-     * @param int $width
-     * @param int $height
-     * @return Imagick
      * @throws ImagickException
      */
     private function scaleImage(Imagick $imagick, int $width, int $height): Imagick
     {
-        if ($imagick->getImageFormat() == 'GIF') {
+        if ($imagick->getImageFormat() === 'GIF') {
             foreach ($imagick as $i) {
                 $i->scaleImage($width, $height, false);
             }
@@ -31,20 +40,17 @@ class Sampler
     }
 
     /**
-     * @param Imagick $imagick
-     * @param Sampler\Format $format
-     * @return Imagick
      * @throws ImagickException
      */
     private function convertByInnerFit(Imagick $imagick, Sampler\Format $format): Imagick
     {
-        $srcWidth = $imagick->getImageWidth();
+        $srcWidth  = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
-        $srcRatio = $srcWidth / $srcHeight;
+        $srcRatio  = $srcWidth / $srcHeight;
 
-        $widthLess  = $format->getWidth()  && ($srcWidth < $format->getWidth() );
+        $widthLess  = $format->getWidth() && ($srcWidth < $format->getWidth() );
         $heightLess = $format->getHeight() && ($srcHeight < $format->getHeight());
-        $sizeLess = $widthLess || $heightLess;
+        $sizeLess   = $widthLess || $heightLess;
 
         $ratio = $format->getWidth() / $format->getHeight();
 
@@ -53,28 +59,28 @@ class Sampler
             if (! $heightLess) {
                 // resize by height
                 $scaleHeight = $format->getHeight();
-                $scaleWidth = round($scaleHeight * $srcRatio);
-                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
+                $scaleWidth  = (int) round($scaleHeight * $srcRatio);
+                $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             } elseif (! $widthLess) {
                 // resize by width
-                $scaleWidth = $format->getWidth();
-                $scaleHeight = round($scaleWidth / $srcRatio);
-                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
+                $scaleWidth  = $format->getWidth();
+                $scaleHeight = (int) round($scaleWidth / $srcRatio);
+                $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             }
         } else {
             // высчитываем размеры обрезания
             if ($ratio < $srcRatio) {
                 // широкая картинка
-                $cropWidth = (int)round($srcHeight * $ratio);
+                $cropWidth  = (int) round($srcHeight * $ratio);
                 $cropHeight = $srcHeight;
-                $cropLeft = (int)floor(($srcWidth - $cropWidth) / 2);
-                $cropTop = 0;
+                $cropLeft   = (int) floor(($srcWidth - $cropWidth) / 2);
+                $cropTop    = 0;
             } else {
                 // высокая картинка
-                $cropWidth = $srcWidth;
-                $cropHeight = (int)round($srcWidth / $ratio);
-                $cropLeft = 0;
-                $cropTop = (int)floor(($srcHeight - $cropHeight) / 2);
+                $cropWidth  = $srcWidth;
+                $cropHeight = (int) round($srcWidth / $ratio);
+                $cropLeft   = 0;
+                $cropTop    = (int) floor(($srcHeight - $cropHeight) / 2);
             }
 
             $imagick = $this->crop($imagick, $cropWidth, $cropHeight, $cropLeft, $cropTop);
@@ -85,21 +91,17 @@ class Sampler
     }
 
     /**
-     * @param Imagick $imagick
-     * @param Sampler\Format $format
-     * @return Imagick
      * @throws ImagickException
      */
     private function convertByOuterFit(Imagick $imagick, Sampler\Format $format): Imagick
     {
-
-        $srcWidth = $imagick->getImageWidth();
+        $srcWidth  = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
-        $srcRatio = $srcWidth / $srcHeight;
+        $srcRatio  = $srcWidth / $srcHeight;
 
-        $widthLess  = $format->getWidth()  && ($srcWidth < $format->getWidth() );
+        $widthLess  = $format->getWidth() && ($srcWidth < $format->getWidth() );
         $heightLess = $format->getHeight() && ($srcHeight < $format->getHeight());
-        $sizeLess = $widthLess || $heightLess;
+        $sizeLess   = $widthLess || $heightLess;
 
         $ratio = $format->getWidth() / $format->getHeight();
 
@@ -108,13 +110,13 @@ class Sampler
             if (! $heightLess) {
                 // resize by height
                 $scaleHeight = $format->getHeight();
-                $scaleWidth = round($scaleHeight * $srcRatio);
-                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
+                $scaleWidth  = round($scaleHeight * $srcRatio);
+                $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             } elseif (! $widthLess) {
                 // resize by width
-                $scaleWidth = $format->getWidth();
+                $scaleWidth  = $format->getWidth();
                 $scaleHeight = round($scaleWidth / $srcRatio);
-                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
+                $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             }
         } else {
             if ($ratio < $srcRatio) {
@@ -123,7 +125,7 @@ class Sampler
                 $scaleHeight = round($format->getWidth() / $srcRatio);
             } else {
                 // add left and right margins
-                $scaleWidth = round($format->getHeight() * $srcRatio);
+                $scaleWidth  = round($format->getHeight() * $srcRatio);
                 $scaleHeight = $format->getHeight();
             }
 
@@ -145,20 +147,17 @@ class Sampler
     }
 
     /**
-     * @param Imagick $imagick
-     * @param Sampler\Format $format
-     * @return Imagick
      * @throws ImagickException
      */
     private function convertByMaximumFit(Imagick $imagick, Sampler\Format $format): Imagick
     {
-        $srcWidth = $imagick->getImageWidth();
+        $srcWidth  = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
-        $srcRatio = $srcWidth / $srcHeight;
+        $srcRatio  = $srcWidth / $srcHeight;
 
-        $widthLess  = $format->getWidth()  && ($srcWidth < $format->getWidth() );
+        $widthLess  = $format->getWidth() && ($srcWidth < $format->getWidth() );
         $heightLess = $format->getHeight() && ($srcHeight < $format->getHeight());
-        $sizeLess = $widthLess || $heightLess;
+        $sizeLess   = $widthLess || $heightLess;
 
         $ratio = $format->getWidth() / $format->getHeight();
 
@@ -166,22 +165,22 @@ class Sampler
             if (! $heightLess) {
                 // resize by height
                 $scaleHeight = $format->getHeight();
-                $scaleWidth = round($scaleHeight * $srcRatio);
-                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
+                $scaleWidth  = (int) round($scaleHeight * $srcRatio);
+                $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             } elseif (! $widthLess) {
                 // resize by width
-                $scaleWidth = $format->getWidth();
-                $scaleHeight = round($scaleWidth / $srcRatio);
-                $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
+                $scaleWidth  = $format->getWidth();
+                $scaleHeight = (int) round($scaleWidth / $srcRatio);
+                $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             }
         } else {
             // высчитываем размеры обрезания
             if ($ratio < $srcRatio) {
-                $scaleWidth = $format->getWidth();
+                $scaleWidth  = $format->getWidth();
                 $scaleHeight = round($format->getWidth() / $srcRatio);
             } else {
                 // добавляем поля по бокам
-                $scaleWidth = round($format->getHeight() * $srcRatio);
+                $scaleWidth  = round($format->getHeight() * $srcRatio);
                 $scaleHeight = $format->getHeight();
             }
 
@@ -192,14 +191,10 @@ class Sampler
     }
 
     /**
-     * @param Imagick $imagick
-     * @param Sampler\Format $format
-     * @return Imagick
      * @throws ImagickException
      */
     private function convertByWidth(Imagick $imagick, Sampler\Format $format): Imagick
     {
-
         $srcWidth = $imagick->getImageWidth();
         $srcRatio = $srcWidth / $imagick->getImageHeight();
 
@@ -217,16 +212,12 @@ class Sampler
     }
 
     /**
-     * @param Imagick $imagick
-     * @param Sampler\Format $format
-     * @return Imagick
      * @throws ImagickException
      */
     private function convertByHeight(Imagick $imagick, Sampler\Format $format): Imagick
     {
-
         $srcHeight = $imagick->getImageHeight();
-        $srcRatio = $imagick->getImageWidth() / $srcHeight;
+        $srcRatio  = $imagick->getImageWidth() / $srcHeight;
 
         $heightLess = $format->getHeight() && ($srcHeight < $format->getHeight());
 
@@ -236,22 +227,14 @@ class Sampler
             $scaleHeight = $format->getHeight();
         }
 
-        $scaleWidth = round($scaleHeight * $srcRatio);
+        $scaleWidth = (int) round($scaleHeight * $srcRatio);
 
         return $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
     }
 
-    /**
-     * @param Imagick $imagick
-     * @param int $width
-     * @param int $height
-     * @param int $left
-     * @param int $top
-     * @return Imagick
-     */
     private function crop(Imagick $imagick, int $width, int $height, int $left, int $top): Imagick
     {
-        if ($imagick->getImageFormat() == 'GIF') {
+        if ($imagick->getImageFormat() === 'GIF') {
             foreach ($imagick as $i) {
                 $i->cropImage($width, $height, $left, $top);
                 $i->setImagePage($width, $height, 0, 0);
@@ -265,10 +248,6 @@ class Sampler
     }
 
     /**
-     * @param Imagick $imagick
-     * @param array $crop
-     * @param Sampler\Format $format
-     * @return Imagick
      * @throws Sampler\Exception
      */
     private function cropImage(Imagick $imagick, array $crop, Sampler\Format $format): Imagick
@@ -278,12 +257,12 @@ class Sampler
             throw new Sampler\Exception('Crop parameters not properly set');
         }
 
-        $cropWidth  = (int)$crop['width'];
-        $cropHeight = (int)$crop['height'];
-        $cropLeft   = (int)$crop['left'];
-        $cropTop    = (int)$crop['top'];
+        $cropWidth  = (int) $crop['width'];
+        $cropHeight = (int) $crop['height'];
+        $cropLeft   = (int) $crop['left'];
+        $cropTop    = (int) $crop['top'];
 
-        $width = $imagick->getImageWidth();
+        $width  = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
 
         $leftValid = ($cropLeft >= 0) && ($cropLeft < $width );
@@ -296,8 +275,8 @@ class Sampler
             throw new Sampler\Exception("Crop top out of bounds ('$cropTop')");
         }
 
-        $right = $cropLeft + $cropWidth;
-        $widthValid  = ($cropWidth > 0) && ($right <= $width );
+        $right      = $cropLeft + $cropWidth;
+        $widthValid = ($cropWidth > 0) && ($right <= $width );
         if (! $widthValid) {
             throw new Sampler\Exception(
                 "Crop width out of bounds ('$cropLeft + $cropWidth' ~ '$width x $height')"
@@ -305,13 +284,13 @@ class Sampler
         }
 
         // try to fix height overflow
-        $bottom = $cropTop + $cropHeight;
+        $bottom   = $cropTop + $cropHeight;
         $overflow = $bottom - $height;
         if ($overflow > 0 && $overflow <= 1) {
             $cropHeight -= $overflow;
         }
 
-        $bottom = $cropTop + $cropHeight;
+        $bottom      = $cropTop + $cropHeight;
         $heightValid = ($cropHeight > 0) && ($bottom <= $height);
         if (! $heightValid) {
             throw new Sampler\Exception(
@@ -319,7 +298,7 @@ class Sampler
             );
         }
 
-        $fWidth = $format->getWidth();
+        $fWidth  = $format->getWidth();
         $fHeight = $format->getHeight();
         if ($format->isProportionalCrop() && $fWidth && $fHeight) {
             // extend crop to format proportions
@@ -333,7 +312,7 @@ class Sampler
                     $targetHeight = $height;
                 }
                 $addedHeight = $targetHeight - $cropHeight;
-                $cropTop -= round($addedHeight / 2);
+                $cropTop    -= round($addedHeight / 2);
                 if ($cropTop < 0) {
                     $cropTop = 0;
                 }
@@ -345,7 +324,7 @@ class Sampler
                     $targetWidth = $width;
                 }
                 $addedWidth = $targetWidth - $cropWidth;
-                $cropLeft -= round($addedWidth / 2);
+                $cropLeft  -= round($addedWidth / 2);
                 if ($cropLeft < 0) {
                     $cropLeft = 0;
                 }
@@ -356,14 +335,9 @@ class Sampler
         return $this->crop($imagick, $cropWidth, $cropHeight, $cropLeft, $cropTop);
     }
 
-    /**
-     * @param Imagick $imagick
-     * @param $widestRatio
-     * @return Imagick
-     */
-    private function cropToWidest(Imagick $imagick, $widestRatio): Imagick
+    private function cropToWidest(Imagick $imagick, float $widestRatio): Imagick
     {
-        $srcWidth = $imagick->getImageWidth();
+        $srcWidth  = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
 
         $srcRatio = $srcWidth / $srcHeight;
@@ -371,21 +345,16 @@ class Sampler
         $ratioDiff = $srcRatio - $widestRatio;
 
         if ($ratioDiff > 0) {
-            $dstWidth = round($widestRatio * $srcHeight);
-            $imagick = $this->crop($imagick, $dstWidth, $srcHeight, ($srcWidth - $dstWidth) / 2, 0);
+            $dstWidth = (int) round($widestRatio * $srcHeight);
+            $imagick  = $this->crop($imagick, $dstWidth, $srcHeight, ($srcWidth - $dstWidth) / 2, 0);
         }
 
         return $imagick;
     }
 
-    /**
-     * @param Imagick $imagick
-     * @param $highestRatio
-     * @return Imagick
-     */
-    private function cropToHighest(Imagick $imagick, $highestRatio): Imagick
+    private function cropToHighest(Imagick $imagick, float $highestRatio): Imagick
     {
-        $srcWidth = $imagick->getImageWidth();
+        $srcWidth  = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
 
         $srcRatio = $srcWidth / $srcHeight;
@@ -393,22 +362,19 @@ class Sampler
         $ratioDiff = $srcRatio - $highestRatio;
 
         if ($ratioDiff < 0) {
-            $dstHeight = round($srcWidth / $highestRatio);
-            $imagick = $this->crop($imagick, $srcWidth, $dstHeight, 0, ($srcHeight - $dstHeight) / 2);
+            $dstHeight = (int) round($srcWidth / $highestRatio);
+            $imagick   = $this->crop($imagick, $srcWidth, $dstHeight, 0, ($srcHeight - $dstHeight) / 2);
         }
 
         return $imagick;
     }
 
     /**
-     * @param Imagick $imagick
-     * @param $crop
-     * @param $format
-     * @return Imagick
+     * @param Sampler\Format|array $format
      * @throws ImagickException
      * @throws Sampler\Exception
      */
-    public function convertImagick(Imagick $imagick, $crop, $format): Imagick
+    public function convertImagick(Imagick $imagick, ?array $crop, $format): Imagick
     {
         if (! $format instanceof Sampler\Format) {
             if (! is_array($format)) {
@@ -425,7 +391,7 @@ class Sampler
             $this->cropImage($imagick, $crop, $format);
         }
 
-        if ($imagick->getImageFormat() == 'GIF') {
+        if ($imagick->getImageFormat() === 'GIF') {
             $decomposited = $imagick->coalesceImages();
             $imagick->clear();
             unset($imagick);
@@ -446,7 +412,7 @@ class Sampler
         }
 
         // check for monotone background extend posibility
-        $fWidth = $format->getWidth();
+        $fWidth  = $format->getWidth();
         $fHeight = $format->getHeight();
         if ($format->isProportionalCrop() && $fWidth && $fHeight) {
             $fRatio = $format->getWidth() / $format->getHeight();
@@ -494,7 +460,7 @@ class Sampler
             }
         }
 
-        if ($decomposited->getImageFormat() == 'GIF') {
+        if ($decomposited->getImageFormat() === 'GIF') {
             $decomposited->optimizeImageLayers();
             $imagick = $decomposited->deconstructImages();
             $decomposited->clear();
@@ -515,13 +481,12 @@ class Sampler
     }
 
     /**
-     * @param Imagick|string $source
-     * @param $destFile
+     * @param Imagick|string       $source
      * @param array|Sampler\Format $format
      * @throws Sampler\Exception
      * @throws ImagickException
      */
-    public function convertToFile($source, $destFile, $format): void
+    public function convertToFile($source, string $destFile, $format): void
     {
         if ($source instanceof Imagick) {
             $imagick = clone $source; // to prevent modifying source
@@ -546,7 +511,6 @@ class Sampler
     }
 
     /**
-     * @param array $values
      * @param bool $sample
      * @return bool|float
      */
@@ -561,10 +525,10 @@ class Sampler
             trigger_error("The array has only 1 element", E_USER_WARNING);
             return false;
         }
-        $mean = array_sum($values) / $count;
+        $mean  = array_sum($values) / $count;
         $carry = 0.0;
         foreach ($values as $val) {
-            $diff = ((double) $val) - $mean;
+            $diff   = ((double) $val) - $mean;
             $carry += $diff * $diff;
         }
         if ($sample) {
@@ -573,21 +537,17 @@ class Sampler
         return sqrt($carry / $count);
     }
 
-    /**
-     * @param ImagickPixelIterator $iterator
-     * @return ImagickPixel
-     */
     private function extendEdgeColor(ImagickPixelIterator $iterator): ?ImagickPixel
     {
         $sum = [
             'r' => [],
             'g' => [],
-            'b' => []
+            'b' => [],
         ];
 
         foreach ($iterator as $row) {
             foreach ($row as $pixel) {
-                $color = $pixel->getColor(true);
+                $color      = $pixel->getColor(true);
                 $sum['r'][] = $color['r'];
                 $sum['g'][] = $color['g'];
                 $sum['b'][] = $color['b'];
@@ -596,9 +556,9 @@ class Sampler
 
         $count = count($sum['r']);
 
-        $red = $this->standardDeviation($sum['r']);
+        $red   = $this->standardDeviation($sum['r']);
         $green = $this->standardDeviation($sum['g']);
-        $blue = $this->standardDeviation($sum['b']);
+        $blue  = $this->standardDeviation($sum['b']);
 
         $limit = 0.01;
         if ($red > $limit || $green > $limit || $blue > $limit) {
@@ -618,7 +578,6 @@ class Sampler
     }
 
     /**
-     * @param Imagick $imagick
      * @return ImagickPixel
      */
     private function extendTopColor(Imagick $imagick)
@@ -629,7 +588,6 @@ class Sampler
     }
 
     /**
-     * @param Imagick $imagick
      * @return ImagickPixel
      */
     private function extendBottomColor(Imagick $imagick)
@@ -640,7 +598,6 @@ class Sampler
     }
 
     /**
-     * @param Imagick $imagick
      * @return ImagickPixel
      */
     private function extendLeftColor(Imagick $imagick)
@@ -651,7 +608,6 @@ class Sampler
     }
 
     /**
-     * @param Imagick $imagick
      * @return ImagickPixel
      */
     private function extendRightColor(Imagick $imagick)
@@ -661,29 +617,25 @@ class Sampler
         return $this->extendEdgeColor($iterator);
     }
 
-    /**
-     * @param Imagick $imagick
-     * @param Sampler\Format $format
-     */
     private function extendVertical(Imagick $imagick, Sampler\Format $format)
     {
         $fRatio = $format->getWidth() / $format->getHeight();
 
-        $srcWidth = $imagick->getImageWidth();
+        $srcWidth  = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
 
-        $topColor = $this->extendTopColor($imagick);
+        $topColor    = $this->extendTopColor($imagick);
         $bottomColor = $this->extendBottomColor($imagick);
 
         if ($topColor || $bottomColor) {
-            $targetWidth = $srcWidth;
+            $targetWidth  = $srcWidth;
             $targetHeight = round($targetWidth / $fRatio);
 
-            $needHeight = $targetHeight - $srcHeight;
-            $topHeight = 0;
+            $needHeight   = $targetHeight - $srcHeight;
+            $topHeight    = 0;
             $bottomHeight = 0;
             if ($topColor && $bottomColor) {
-                $topHeight = round($needHeight / 2);
+                $topHeight    = round($needHeight / 2);
                 $bottomHeight = $needHeight - $topHeight;
             } elseif ($topColor) {
                 $topHeight = round($needHeight);
@@ -726,29 +678,25 @@ class Sampler
         }
     }
 
-    /**
-     * @param Imagick $imagick
-     * @param Sampler\Format $format
-     */
     private function extendHorizontal(Imagick $imagick, Sampler\Format $format)
     {
         $fRatio = $format->getWidth() / $format->getHeight();
 
-        $srcWidth = $imagick->getImageWidth();
+        $srcWidth  = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
 
-        $leftColor = $this->extendLeftColor($imagick);
+        $leftColor  = $this->extendLeftColor($imagick);
         $rightColor = $this->extendRightColor($imagick);
 
         if ($leftColor || $rightColor) {
             $targetHeight = $srcHeight;
-            $targetWidth = round($targetHeight * $fRatio);
+            $targetWidth  = round($targetHeight * $fRatio);
 
-            $needWidth = $targetWidth - $srcWidth;
-            $leftWidth = 0;
+            $needWidth  = $targetWidth - $srcWidth;
+            $leftWidth  = 0;
             $rightWidth = 0;
             if ($leftColor && $rightColor) {
-                $leftWidth = round($needWidth / 2);
+                $leftWidth  = round($needWidth / 2);
                 $rightWidth = $needWidth - $leftWidth;
             } elseif ($leftColor) {
                 $leftWidth = round($needWidth);

@@ -1,19 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Controller;
 
+use Autowp\Image\Storage;
 use InvalidArgumentException;
-
 use Zend\Console\ColorInterface;
 use Zend\Console\Console;
 use Zend\Mvc\Controller\AbstractActionController;
 
-use Autowp\Image\Storage;
+use function array_pop;
+use function is_dir;
+use function opendir;
+use function readdir;
+use function realpath;
+use function rmdir;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
- * Class ConsoleController
- * @package Autowp\Image\Controller
- *
  * @method Storage imageStorage()
  */
 class ConsoleController extends AbstractActionController
@@ -35,7 +41,7 @@ class ConsoleController extends AbstractActionController
         $format = $this->params('format');
 
         $this->imageStorage()->flush([
-            'format' => $format
+            'format' => $format,
         ]);
 
         Console::getInstance()->writeLine("done", ColorInterface::GREEN);
@@ -46,14 +52,14 @@ class ConsoleController extends AbstractActionController
      */
     public function flushImageAction(): void
     {
-        $imageId = (int)$this->params('image');
+        $imageId = (int) $this->params('image');
 
         if (! $imageId) {
             throw new InvalidArgumentException("image id not provided");
         }
 
         $this->imageStorage()->flush([
-            'image' => $imageId
+            'image' => $imageId,
         ]);
 
         Console::getInstance()->writeLine("done", ColorInterface::GREEN);
@@ -64,7 +70,7 @@ class ConsoleController extends AbstractActionController
      */
     public function moveToS3Action(): void
     {
-        $imageID = (int)$this->params('image');
+        $imageID = (int) $this->params('image');
 
         if (! $imageID) {
             throw new InvalidArgumentException("image id not provided");
@@ -77,7 +83,7 @@ class ConsoleController extends AbstractActionController
 
     public function moveDirToS3Action(): void
     {
-        $dir = (string)$this->params('dirname');
+        $dir = (string) $this->params('dirname');
 
         if (! $dir) {
             throw new InvalidArgumentException("dir not provided");
@@ -161,7 +167,7 @@ class ConsoleController extends AbstractActionController
 
     public function extractExifAction()
     {
-        $dir = (string)$this->params('dirname');
+        $dir = (string) $this->params('dirname');
 
         if (! $dir) {
             throw new InvalidArgumentException("dir not provided");

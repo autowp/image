@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AutowpTest\Image;
 
 use Autowp\Image\Controller\ConsoleController;

@@ -1,33 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Storage;
 
 use Autowp\Image\Storage\NamingStrategy\AbstractStrategy;
 
+use function is_array;
+use function method_exists;
+use function rtrim;
+use function trim;
+use function ucfirst;
+
+use const DIRECTORY_SEPARATOR;
+
 class Dir
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $path = '';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $url = '';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $bucket = '';
 
-    /**
-     * @var AbstractStrategy
-     */
+    /** @var AbstractStrategy */
     private $namingStrategy;
 
     /**
-     * @param array $options
      * @throws Exception
      */
     public function __construct(array $options = [])
@@ -36,11 +37,10 @@ class Dir
     }
 
     /**
-     * @param array $options
-     * @return Dir
+     * @return $this
      * @throws Exception
      */
-    public function setOptions(array $options): Dir
+    public function setOptions(array $options): self
     {
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
@@ -56,30 +56,25 @@ class Dir
     }
 
     /**
-     * @param string $bucket
-     * @return Dir
+     * @return $this
      */
-    public function setBucket(string $bucket): Dir
+    public function setBucket(string $bucket): self
     {
         $this->bucket = trim($bucket);
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getBucket(): string
     {
         return $this->bucket;
     }
 
     /**
-     * @param string $path
-     * @return Dir
+     * @return $this
      * @throws Exception
      */
-    public function setPath(string $path): Dir
+    public function setPath(string $path): self
     {
         $path = trim($path);
 
@@ -92,28 +87,21 @@ class Dir
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getPath(): string
     {
         return $this->path;
     }
 
     /**
-     * @param string $url
-     * @return Dir
+     * @return $this
      */
-    public function setUrl(string $url): Dir
+    public function setUrl(string $url): self
     {
-        $this->url = isset($url) ? (string)$url : null;
+        $this->url = isset($url) ? (string) $url : null;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getUrl(): string
     {
         return $this->url;
@@ -122,20 +110,20 @@ class Dir
     /**
      * @param string|array|AbstractStrategy $strategy
      * @throws Exception
-     * @return Dir
+     * @return $this
      */
-    public function setNamingStrategy($strategy): Dir
+    public function setNamingStrategy($strategy): self
     {
         if (! $strategy instanceof AbstractStrategy) {
             $strategyName = $strategy;
-            $options = [];
+            $options      = [];
             if (is_array($strategy)) {
                 $strategyName = $strategy['strategy'];
-                $options = isset($strategy['options']) ? $strategy['options'] : [];
+                $options      = $strategy['options'] ?? [];
             }
 
             $className = 'Autowp\\Image\\Storage\\NamingStrategy\\' . ucfirst($strategyName);
-            $strategy = new $className($options);
+            $strategy  = new $className($options);
             if (! $strategy instanceof AbstractStrategy) {
                 throw new Exception("$className is not naming strategy");
             }
@@ -148,9 +136,6 @@ class Dir
         return $this;
     }
 
-    /**
-     * @return AbstractStrategy
-     */
     public function getNamingStrategy(): AbstractStrategy
     {
         return $this->namingStrategy;

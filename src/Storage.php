@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image;
 
 use ArrayObject;
@@ -8,119 +10,127 @@ use Closure;
 use Exception;
 use Imagick;
 use ImagickException;
-
 use Zend\Db\Exception\ExceptionInterface;
+use Zend\Db\ResultSet\ResultSetInterface;
 use Zend\Db\Sql;
 use Zend\Db\TableGateway\TableGateway;
 
+use function array_key_exists;
+use function array_merge;
+use function array_replace;
+use function chmod;
+use function copy;
+use function count;
+use function dirname;
+use function exif_read_data;
+use function fclose;
+use function file_exists;
+use function file_get_contents;
+use function filesize;
+use function fopen;
+use function getimagesize;
+use function htmlspecialchars;
+use function image_type_to_extension;
+use function implode;
+use function iptcparse;
+use function is_array;
+use function is_dir;
+use function is_resource;
+use function is_string;
+use function json_decode;
+use function json_encode;
+use function method_exists;
+use function mime_content_type;
+use function mkdir;
+use function octdec;
+use function pathinfo;
+use function pow;
+use function preg_replace;
+use function random_int;
+use function rename;
+use function round;
+use function rtrim;
+use function sleep;
+use function sprintf;
+use function str_replace;
+use function strlen;
+use function strpos;
+use function strtolower;
+use function ucfirst;
+use function umask;
+use function unlink;
+
+use const DIRECTORY_SEPARATOR;
+use const IMAGETYPE_GIF;
+use const IMAGETYPE_JPEG;
+use const IMAGETYPE_PNG;
+use const JSON_INVALID_UTF8_SUBSTITUTE;
+use const PATHINFO_EXTENSION;
+
 /**
- * @author dima
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Storage implements StorageInterface
 {
-    const EXTENSION_DEFAULT = 'jpg';
+    private const EXTENSION_DEFAULT = 'jpg';
 
-    const INSERT_MAX_ATTEMPTS = 15;
+    private const INSERT_MAX_ATTEMPTS = 15;
 
-    const STATUS_DEFAULT = 0,
-          STATUS_PROCESSING = 1,
-          STATUS_FAILED = 2;
+    private const STATUS_DEFAULT    = 0,
+                  STATUS_PROCESSING = 1,
+                  STATUS_FAILED     = 2;
 
-    const TIMEOUT = 15;
+    private const TIMEOUT = 15;
 
-    /**
-     * @var TableGateway
-     */
-    private $imageTable = null;
+    /** @var TableGateway */
+    private $imageTable;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $imageTableName = 'image';
 
-    /**
-     * @var TableGateway
-     */
-    private $formatedImageTable = null;
+    /** @var TableGateway */
+    private $formatedImageTable;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $formatedImageTableName = 'formated_image';
 
-    /**
-     * @var TableGateway
-     */
-    private $dirTable = null;
+    /** @var TableGateway */
+    private $dirTable;
 
-    /**
-     * @var string
-     */
-    private $dirTableName = 'image_dir';
-
-    /**
-     * @var array
-     */
+    /** @var array */
     private $dirs = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $formats = [];
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $fileMode = 0600;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $dirMode = 0700;
 
-    /**
-     * @var string
-     */
-    private $formatedImageDirName = null;
+    /** @var string */
+    private $formatedImageDirName;
 
-    /**
-     * @var Sampler
-     */
-    private $imageSampler = null;
+    /** @var Sampler */
+    private $imageSampler;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $forceHttps = false;
 
-    /**
-     * @var Processor\ProcessorPluginManager
-     */
+    /** @var Processor\ProcessorPluginManager */
     private $processors;
 
-    /**
-     * @var S3Client
-     */
+    /** @var S3Client */
     private $s3;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $s3Options = [];
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $formatToS3 = false;
 
     /**
-     * Storage constructor.
-     * @param array $options
-     * @param TableGateway $imageTable
-     * @param TableGateway $formatedImageTable
-     * @param TableGateway $dirTable
-     * @param Processor\ProcessorPluginManager $processors
      * @throws Storage\Exception
      */
     public function __construct(
@@ -132,15 +142,14 @@ class Storage implements StorageInterface
     ) {
         $this->setOptions($options);
 
-        $this->imageTable = $imageTable;
+        $this->imageTable         = $imageTable;
         $this->formatedImageTable = $formatedImageTable;
-        $this->dirTable = $dirTable;
-        $this->processors = $processors;
+        $this->dirTable           = $dirTable;
+        $this->processors         = $processors;
     }
 
     /**
-     * @param array $options
-     * @return Storage
+     * @return $this
      * @throws Storage\Exception
      */
     public function setOptions(array $options)
@@ -158,18 +167,17 @@ class Storage implements StorageInterface
         return $this;
     }
 
-    public function setFormatToS3($value): Storage
+    public function setFormatToS3(bool $value): self
     {
-        $this->formatToS3 = (bool) $value;
+        $this->formatToS3 = $value;
 
         return $this;
     }
 
     /**
-     * @param array $options
-     * @return Storage
+     * @return $this
      */
-    public function setS3(array $options): Storage
+    public function setS3(array $options): self
     {
         $this->s3 = null;
 
@@ -178,9 +186,6 @@ class Storage implements StorageInterface
         return $this;
     }
 
-    /**
-     * @return S3Client
-     */
     private function getS3Client(): S3Client
     {
         if (! $this->s3) {
@@ -192,20 +197,20 @@ class Storage implements StorageInterface
 
     /**
      * @param bool $value
-     * @return Storage
+     * @return $this
      */
-    public function setForceHttps($value): Storage
+    public function setForceHttps($value): self
     {
-        $this->forceHttps = (bool)$value;
+        $this->forceHttps = (bool) $value;
 
         return $this;
     }
 
     /**
      * @param string $tableName
-     * @return Storage
+     * @return $this
      */
-    public function setImageTableName($tableName): Storage
+    public function setImageTableName($tableName): self
     {
         $this->imageTableName = $tableName;
 
@@ -214,10 +219,10 @@ class Storage implements StorageInterface
 
     /**
      * @param array|Sampler $options
-     * @return Storage
+     * @return $this
      * @throws Storage\Exception
      */
-    public function setImageSampler($options): Storage
+    public function setImageSampler($options): self
     {
         if (is_array($options)) {
             $options = new Sampler();
@@ -247,7 +252,7 @@ class Storage implements StorageInterface
 
     /**
      * @param string $tableName
-     * @return Storage
+     * @return $this
      */
     public function setFormatedImageTableName($tableName)
     {
@@ -257,44 +262,31 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param string $tableName
-     * @return Storage
+     * @param string|int $mode
+     * @return $this
      */
-    public function setDirTableName($tableName): Storage
+    public function setFileMode($mode): self
     {
-        $this->dirTableName = $tableName;
+        $this->fileMode = is_string($mode) ? octdec($mode) : (int) $mode;
 
         return $this;
     }
 
     /**
      * @param string|int $mode
-     * @return Storage
+     * @return $this
      */
-    public function setFileMode($mode): Storage
+    public function setDirMode($mode): self
     {
-        $this->fileMode = is_string($mode) ? octdec($mode) : (int)$mode;
+        $this->dirMode = is_string($mode) ? octdec($mode) : (int) $mode;
 
         return $this;
     }
 
     /**
-     * @param string|int $mode
-     * @return Storage
-     */
-    public function setDirMode($mode): Storage
-    {
-        $this->dirMode = is_string($mode) ? octdec($mode) : (int)$mode;
-
-        return $this;
-    }
-
-    /**
-     * @param $dirs
-     * @return StorageInterface
      * @throws Storage\Exception
      */
-    public function setDirs($dirs): StorageInterface
+    public function setDirs(array $dirs): StorageInterface
     {
         $this->dirs = [];
 
@@ -306,12 +298,11 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param string $dirName
-     * @param Storage\Dir|mixed $dir
-     * @return Storage
+     * @param Storage\Dir|array $dir
+     * @return $this
      * @throws Storage\Exception
      */
-    public function addDir($dirName, $dir)
+    public function addDir(string $dirName, $dir): StorageInterface
     {
         if (isset($this->dirs[$dirName])) {
             throw new Storage\Exception("Dir '$dirName' already registered");
@@ -324,13 +315,9 @@ class Storage implements StorageInterface
         return $this;
     }
 
-    /**
-     * @param string $dirName
-     * @return Storage\Dir|null
-     */
     public function getDir(string $dirName): ?Storage\Dir
     {
-        return isset($this->dirs[$dirName]) ? $this->dirs[$dirName] : null;
+        return $this->dirs[$dirName] ?? null;
     }
 
     /**
@@ -342,12 +329,10 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param $formats
-     * @return StorageInterface
      * @throws Sampler\Exception
      * @throws Storage\Exception
      */
-    public function setFormats($formats): StorageInterface
+    public function setFormats(array $formats): StorageInterface
     {
         $this->formats = [];
 
@@ -359,13 +344,11 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param $formatName
-     * @param $format
-     * @return StorageInterface
+     * @param Sampler\Format|array $format
      * @throws Sampler\Exception
      * @throws Storage\Exception
      */
-    public function addFormat($formatName, $format): StorageInterface
+    public function addFormat(string $formatName, $format): StorageInterface
     {
         if (isset($this->formats[$formatName])) {
             throw new Storage\Exception("Format '$formatName' already registered");
@@ -384,12 +367,12 @@ class Storage implements StorageInterface
      */
     public function getFormat($formatName)
     {
-        return isset($this->formats[$formatName]) ? $this->formats[$formatName] : null;
+        return $this->formats[$formatName] ?? null;
     }
 
     /**
      * @param string $dirName
-     * @return Storage
+     * @return $this
      */
     public function setFormatedImageDirName($dirName)
     {
@@ -437,7 +420,6 @@ class Storage implements StorageInterface
 
     /**
      * @param array|ArrayObject $imageRow
-     * @return string
      * @throws Storage\Exception
      */
     private function buildImageBlobResult($imageRow): string
@@ -450,7 +432,7 @@ class Storage implements StorageInterface
         if ($imageRow['s3']) {
             $object = $this->getS3Client()->getObject([
                 'Bucket' => $dir->getBucket(),
-                'Key'    => $imageRow['filepath']
+                'Key'    => $imageRow['filepath'],
             ]);
 
             return $object['Body']->getContents();
@@ -478,20 +460,19 @@ class Storage implements StorageInterface
      */
     private function getImageRow($imageId)
     {
-        $id = (int)$imageId;
-        if (strlen($id) != strlen($imageId)) {
+        $id = (int) $imageId;
+        if (strlen($id) !== strlen($imageId)) {
             throw new Storage\Exception("Image id mus be int. `$imageId` given");
         }
 
         $imageRow = $this->imageTable->select([
-            'id' => $id
+            'id' => $id,
         ])->current();
 
         return $imageRow ? $imageRow : null;
     }
 
     /**
-     * @param array $imageIds
      * @return array|ArrayObject
      */
     private function getImageRows(array $imageIds)
@@ -499,7 +480,7 @@ class Storage implements StorageInterface
         $result = [];
         if (count($imageIds)) {
             $result = $this->imageTable->select([
-                new Sql\Predicate\In('id', $imageIds)
+                new Sql\Predicate\In('id', $imageIds),
             ]);
         }
 
@@ -507,9 +488,7 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
      * @throws Storage\Exception
-     * @return Storage\Image|null
      */
     public function getImage(int $imageId): ?Storage\Image
     {
@@ -519,8 +498,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param array $imageIds
-     * @return array
      * @throws Storage\Exception
      */
     public function getImages(array $imageIds): array
@@ -534,11 +511,9 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @return string
      * @throws Storage\Exception
      */
-    public function getImageFilepath($imageId)
+    public function getImageFilepath(int $imageId): ?string
     {
         $imageRow = $this->getImageRow($imageId);
 
@@ -559,7 +534,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
      * @return resource|null
      * @throws Storage\Exception
      */
@@ -578,7 +552,7 @@ class Storage implements StorageInterface
         if ($imageRow['s3']) {
             $object = $this->getS3Client()->getObject([
                 'Bucket' => $dir->getBucket(),
-                'Key'    => $imageRow['filepath']
+                'Key'    => $imageRow['filepath'],
             ]);
 
             return $object['Body']->detach();
@@ -600,8 +574,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @return string|null
      * @throws Storage\Exception
      */
     public function getImageBlob(int $imageId): ?string
@@ -611,16 +583,14 @@ class Storage implements StorageInterface
         return $imageRow ? $this->buildImageBlobResult($imageRow) : null;
     }
 
-    private function isDuplicateKeyException(Exception $e)
+    private function isDuplicateKeyException(Exception $e): bool
     {
-        return
-            strpos($e->getMessage(), 'Duplicate entry') !== false ||
+        return strpos($e->getMessage(), 'Duplicate entry') !== false ||
             strpos($e->getMessage(), 'duplicate key') !== false;
     }
 
     /**
-     * @param $row
-     * @return array|null
+     * @param ResultSetInterface|array $row
      */
     private function getRowCrop($row): ?array
     {
@@ -637,9 +607,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @param string $formatName
-     * @return int
      * @throws ImagickException
      * @throws Storage\Exception
      * @throws Exception
@@ -648,10 +615,10 @@ class Storage implements StorageInterface
     {
         // find source image
         $imageRow = $this->imageTable->select([
-            'id = ?' => $imageId
+            'id = ?' => $imageId,
         ])->current();
         if (! $imageRow) {
-            return null;
+            throw new Storage\Exception("Image '$imageId' not defined");
         }
 
         $imagick = new Imagick();
@@ -663,7 +630,7 @@ class Storage implements StorageInterface
             if ($imageRow['s3']) {
                 $object = $this->getS3Client()->getObject([
                     'Bucket' => $dir->getBucket(),
-                    'Key'    => $imageRow['filepath']
+                    'Key'    => $imageRow['filepath'],
                 ]);
 
                 $imagick->readImageBlob($object['Body']->getContents());
@@ -698,7 +665,7 @@ class Storage implements StorageInterface
                 'format'            => $formatName,
                 'image_id'          => $imageId,
                 'status'            => self::STATUS_PROCESSING,
-                'formated_image_id' => null
+                'formated_image_id' => null,
             ]);
         } catch (ExceptionInterface $e) {
             if (! $this->isDuplicateKeyException($e)) {
@@ -706,7 +673,7 @@ class Storage implements StorageInterface
             }
 
             // wait until done
-            $done = false;
+            $done             = false;
             $formatedImageRow = null;
             for ($i = 0; $i < self::TIMEOUT && ! $done; $i++) {
                 $formatedImageRow = $this->formatedImageTable->select([
@@ -714,7 +681,7 @@ class Storage implements StorageInterface
                     'image_id = ?' => $imageId,
                 ])->current();
 
-                $done = $formatedImageRow['status'] != self::STATUS_PROCESSING;
+                $done = $formatedImageRow['status'] !== self::STATUS_PROCESSING;
 
                 if (! $done) {
                     sleep(1);
@@ -724,11 +691,11 @@ class Storage implements StorageInterface
             if (! $done) {
                 // mark as failed
                 $this->formatedImageTable->update([
-                    'status' => self::STATUS_FAILED
+                    'status' => self::STATUS_FAILED,
                 ], [
                     'format = ?'   => $formatName,
                     'image_id = ?' => $imageId,
-                    'status = ?'   => self::STATUS_PROCESSING
+                    'status = ?'   => self::STATUS_PROCESSING,
                 ]);
             }
 
@@ -736,7 +703,7 @@ class Storage implements StorageInterface
                 throw new Storage\Exception("Failed to format image");
             }
 
-            return (int)$formatedImageRow['formated_image_id'];
+            return (int) $formatedImageRow['formated_image_id'];
         }
 
         try {
@@ -761,21 +728,21 @@ class Storage implements StorageInterface
             }
 
             // store result
-            $newPath = implode(DIRECTORY_SEPARATOR, [
+            $newPath         = implode(DIRECTORY_SEPARATOR, [
                 $imageRow['dir'],
                 $formatName,
-                $imageRow['filepath']
+                $imageRow['filepath'],
             ]);
-            $pi = pathinfo($newPath);
-            $formatExt = $cFormat->getFormatExtension();
-            $extension = $formatExt ? $formatExt : $pi['extension'];
+            $pi              = pathinfo($newPath);
+            $formatExt       = $cFormat->getFormatExtension();
+            $extension       = $formatExt ? $formatExt : $pi['extension'];
             $formatedImageId = $this->addImageFromImagick(
                 $imagick,
                 $this->formatedImageDirName,
                 [
                     'extension' => $extension,
                     'pattern'   => $pi['dirname'] . DIRECTORY_SEPARATOR . $pi['filename'] . $cropSuffix,
-                    's3'        => $this->formatToS3
+                    's3'        => $this->formatToS3,
                 ]
             );
 
@@ -783,14 +750,14 @@ class Storage implements StorageInterface
 
             $this->formatedImageTable->update([
                 'formated_image_id' => $formatedImageId,
-                'status'            => self::STATUS_DEFAULT
+                'status'            => self::STATUS_DEFAULT,
             ], [
                 'format = ?'   => $formatName,
                 'image_id = ?' => $imageId,
             ]);
         } catch (Exception $e) {
             $this->formatedImageTable->update([
-                'status' => self::STATUS_FAILED
+                'status' => self::STATUS_FAILED,
             ], [
                 'format = ?'   => $formatName,
                 'image_id = ?' => $imageId,
@@ -803,8 +770,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param array $imagesId
-     * @param string $formatName
      * @return array
      * @throws ImagickException
      * @throws Storage\Exception
@@ -821,7 +786,7 @@ class Storage implements StorageInterface
                 )
                 ->where([
                     new Sql\Predicate\In('f.image_id', $imagesId),
-                    'f.format = ?' => (string)$formatName
+                    'f.format = ?' => (string) $formatName,
                 ]);
             foreach ($this->imageTable->selectWith($select) as $row) {
                 $destImageRows[] = $row;
@@ -833,7 +798,7 @@ class Storage implements StorageInterface
         foreach ($imagesId as $key => $imageId) {
             $destImageRow = null;
             foreach ($destImageRows as $row) {
-                if ($row['image_id'] == $imageId) {
+                if ($row['image_id'] === $imageId) {
                     $destImageRow = $row;
                     break;
                 }
@@ -843,7 +808,7 @@ class Storage implements StorageInterface
                 $formatedImageId = $this->doFormatImage($imageId, $formatName);
                 // result
                 $destImageRow = $this->imageTable->select([
-                    'id = ?' => $formatedImageId
+                    'id = ?' => $formatedImageId,
                 ])->current();
             }
 
@@ -854,8 +819,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @param string $formatName
      * @return mixed|null
      * @throws ImagickException
      * @throws Storage\Exception
@@ -873,9 +836,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @param string $formatName
-     * @return string|null
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -887,9 +847,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @param string $formatName
-     * @return Storage\Image|null
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -900,13 +857,10 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @param $formatName
-     * @return string|null
      * @throws ImagickException
      * @throws Storage\Exception
      */
-    public function getFormatedImagePath(int $imageId, $formatName)
+    public function getFormatedImagePath(int $imageId, string $formatName): ?string
     {
         $imageRow = $this->getFormatedImageRow($imageId, $formatName);
 
@@ -928,16 +882,13 @@ class Storage implements StorageInterface
         $path = null;
         if ($dirPath) {
             $dirPath = rtrim($dirPath, '/\\') . DIRECTORY_SEPARATOR;
-            $path = $dirPath . $imageRow['filepath'];
+            $path    = $dirPath . $imageRow['filepath'];
         }
 
         return $path;
     }
 
     /**
-     * @param array $imagesId
-     * @param string $formatName
-     * @return array
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -952,14 +903,12 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @return StorageInterface
      * @throws Storage\Exception
      */
     public function removeImage(int $imageId): StorageInterface
     {
         $imageRow = $this->imageTable->select([
-            'id = ?' => $imageId
+            'id = ?' => $imageId,
         ])->current();
 
         if (! $imageRow) {
@@ -967,17 +916,17 @@ class Storage implements StorageInterface
         }
 
         $this->flush([
-            'image' => $imageRow['id']
+            'image' => $imageRow['id'],
         ]);
 
         // to save remove formated image
         $this->formatedImageTable->delete([
-            'formated_image_id = ?' => $imageRow['id']
+            'formated_image_id = ?' => $imageRow['id'],
         ]);
 
         // important to delete row first
         $this->imageTable->delete([
-            'id = ?' => $imageRow['id']
+            'id = ?' => $imageRow['id'],
         ]);
 
         $dir = $this->getDir($imageRow['dir']);
@@ -988,13 +937,13 @@ class Storage implements StorageInterface
         if ($imageRow['s3']) {
             $this->getS3Client()->deleteObject([
                 'Bucket' => $dir->getBucket(),
-                'Key'    => $imageRow['filepath']
+                'Key'    => $imageRow['filepath'],
             ]);
         } else {
             // remove file & row
             $filepath = implode(DIRECTORY_SEPARATOR, [
                 rtrim($dir->getPath(), DIRECTORY_SEPARATOR),
-                $imageRow['filepath']
+                $imageRow['filepath'],
             ]);
 
             if (file_exists($filepath) && ! unlink($filepath)) {
@@ -1006,12 +955,9 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param $dirName
-     * @param array $options
-     * @return string
      * @throws Storage\Exception
      */
-    private function createImagePath($dirName, array $options = [])
+    private function createImagePath(string $dirName, array $options = []): string
     {
         $dir = $this->getDir($dirName);
         if (! $dir) {
@@ -1061,10 +1007,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param string $blob
-     * @param string $dirName
-     * @param array $options
-     * @return int
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -1079,29 +1021,21 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param $attempt
-     * @return int
      * @throws Exception
      */
-    private function indexByAttempt($attempt)
+    private function indexByAttempt(int $attempt): int
     {
         $from = pow(10, $attempt - 1);
-        $to = pow(10, $attempt) - 1;
+        $to   = pow(10, $attempt) - 1;
 
         return random_int($from, $to);
     }
 
     /**
-     * @param string $dirName
-     * @param array $options
-     * @param $width
-     * @param $height
-     * @param Closure $callback
-     * @return int
      * @throws Storage\Exception
      * @throws Exception
      */
-    private function generateLockWrite(string $dirName, array $options, $width, $height, Closure $callback): int
+    private function generateLockWrite(string $dirName, array $options, int $width, int $height, Closure $callback): int
     {
         $dir = $this->getDir($dirName);
         if (! $dir) {
@@ -1111,13 +1045,13 @@ class Storage implements StorageInterface
         $dirPath = $dir->getPath();
 
         $insertAttemptException = null;
-        $imageId = 0;
-        $attemptIndex = 0;
+        $imageId                = 0;
+        $attemptIndex           = 0;
         do {
             $this->incDirCounter($dirName);
 
             $destFileName = $this->createImagePath($dirName, array_replace($options, [
-                'index' => $this->indexByAttempt($attemptIndex)
+                'index' => $this->indexByAttempt($attemptIndex),
             ]));
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
 
@@ -1136,7 +1070,7 @@ class Storage implements StorageInterface
                     'crop_top'    => 0,
                     'crop_width'  => 0,
                     'crop_height' => 0,
-                    's3'          => isset($options['s3']) && $options['s3'] ? 1 : 0
+                    's3'          => isset($options['s3']) && $options['s3'] ? 1 : 0,
                 ]);
 
                 $id = $this->imageTable->getLastInsertValue();
@@ -1160,16 +1094,12 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param Imagick $imagick
-     * @param string $dirName
-     * @param array $options
-     * @return int
      * @throws Storage\Exception
      * @throws ImagickException
      */
     public function addImageFromImagick(Imagick $imagick, string $dirName, array $options = []): int
     {
-        $width = $imagick->getImageWidth();
+        $width  = $imagick->getImageWidth();
         $height = $imagick->getImageHeight();
 
         if (! $width || ! $height) {
@@ -1199,7 +1129,7 @@ class Storage implements StorageInterface
 
         if (isset($options['s3']) && $options['s3']) {
             $blob = $imagick->getImagesBlob();
-            $id = $this->generateLockWrite(
+            $id   = $this->generateLockWrite(
                 $dirName,
                 $options,
                 $width,
@@ -1210,7 +1140,7 @@ class Storage implements StorageInterface
                         'Body'        => $blob,
                         'Bucket'      => $dir->getBucket(),
                         'ACL'         => 'public-read',
-                        'ContentType' => $imagick->getImageMimeType()
+                        'ContentType' => $imagick->getImageMimeType(),
                     ]);
                 }
             );
@@ -1244,28 +1174,24 @@ class Storage implements StorageInterface
 
         $this->imageTable->update([
             'filesize' => $filesize,
-            'exif'     => $exif
+            'exif'     => $exif,
         ], [
-            'id' => $id
+            'id' => $id,
         ]);
 
         return $id;
     }
 
     /**
-     * @param string $file
-     * @param string $dirName
-     * @param array $options
-     * @return int
      * @throws Storage\Exception
      */
     public function addImageFromFile(string $file, string $dirName, array $options = []): int
     {
         $imageInfo = getimagesize($file);
 
-        $width = (int)$imageInfo[0];
-        $height = (int)$imageInfo[1];
-        $type = $imageInfo[2];
+        $width  = (int) $imageInfo[0];
+        $height = (int) $imageInfo[1];
+        $type   = $imageInfo[2];
 
         if (! $width || ! $height) {
             throw new Storage\Exception("Failed to get image size of '$file' ($width x $height)");
@@ -1307,7 +1233,7 @@ class Storage implements StorageInterface
                         'Body'        => $handle,
                         'Bucket'      => $dir->getBucket(),
                         'ACL'         => 'public-read',
-                        'ContentType' => mime_content_type($file)
+                        'ContentType' => mime_content_type($file),
                     ]);
                     fclose($handle);
                 }
@@ -1332,17 +1258,15 @@ class Storage implements StorageInterface
 
         $this->imageTable->update([
             'filesize' => filesize($file),
-            'exif'     => $exif
+            'exif'     => $exif,
         ], [
-            'id' => $id
+            'id' => $id,
         ]);
 
         return $id;
     }
 
     /**
-     * @param array $options
-     * @return StorageInterface
      * @throws Storage\Exception
      */
     public function flush(array $options): StorageInterface
@@ -1358,13 +1282,13 @@ class Storage implements StorageInterface
 
         if ($options['format']) {
             $select->where([
-                $this->formatedImageTableName . '.format = ?' => (string)$options['format']
+                $this->formatedImageTableName . '.format = ?' => (string) $options['format'],
             ]);
         }
 
         if ($options['image']) {
             $select->where([
-                $this->formatedImageTableName . '.image_id = ?' => (int)$options['image']
+                $this->formatedImageTableName . '.image_id = ?' => (int) $options['image'],
             ]);
         }
 
@@ -1377,7 +1301,7 @@ class Storage implements StorageInterface
 
             $this->formatedImageTable->delete([
                 'image_id' => $row['image_id'],
-                'format'   => $row['format']
+                'format'   => $row['format'],
             ]);
         }
 
@@ -1400,29 +1324,29 @@ class Storage implements StorageInterface
             return 0;
         }
 
-        return (int)$row['count'];
+        return (int) $row['count'];
     }
 
     /**
      * @param string $dirName
-     * @return Storage
+     * @return $this
      */
     private function incDirCounter($dirName)
     {
         $row = $this->dirTable->select([
-            'dir = ?' => $dirName
+            'dir = ?' => $dirName,
         ])->current();
 
         if ($row) {
             $this->dirTable->update([
-                'count' => new Sql\Expression('count + 1')
+                'count' => new Sql\Expression('count + 1'),
             ], [
-                'dir' => $dirName
+                'dir' => $dirName,
             ]);
         } else {
             $this->dirTable->insert([
                 'dir'   => $dirName,
-                'count' => 1
+                'count' => 1,
             ]);
         }
 
@@ -1430,8 +1354,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @return string|null
      * @throws Storage\Exception
      */
     public function getImageIPTC(int $imageId): ?string
@@ -1463,10 +1385,10 @@ class Storage implements StorageInterface
             $iptc = iptcparse($info['APP13']);
             if (is_array($iptc)) {
                 foreach ($iptc as $key => $value) {
-                    $iptcStr .= "<b>IPTC Key:</b> ".htmlspecialchars($key)." <b>Contents:</b> ";
+                    $iptcStr .= "<b>IPTC Key:</b> " . htmlspecialchars($key) . " <b>Contents:</b> ";
                     foreach ($value as $innerKey => $innerValue) {
                         $iptcStr .= htmlspecialchars($innerValue);
-                        if (($innerKey + 1) != count($value)) {
+                        if (($innerKey + 1) !== count($value)) {
                             $iptcStr .= ", ";
                         }
                     }
@@ -1481,8 +1403,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @return array|null
      * @throws Storage\Exception
      */
     public function getImageEXIF(int $imageId): ?array
@@ -1503,7 +1423,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
      * @return array|null
      * @throws Storage\Exception
      */
@@ -1531,8 +1450,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @return array|null
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -1553,7 +1470,7 @@ class Storage implements StorageInterface
         if ($imageRow['s3']) {
             $object = $this->getS3Client()->getObject([
                 'Bucket' => $dir->getBucket(),
-                'Key'    => $imageRow['filepath']
+                'Key'    => $imageRow['filepath'],
             ]);
 
             $imagick->readImageBlob($object['Body']->getContents());
@@ -1592,16 +1509,14 @@ class Storage implements StorageInterface
 
         return [
             'x' => $x,
-            'y' => $y
+            'y' => $y,
         ];
     }
 
     /**
-     * @param $filepath
-     * @return string
      * @throws Storage\Exception
      */
-    private static function detectExtension($filepath)
+    private static function detectExtension(string $filepath): string
     {
         $imageInfo = getimagesize($filepath);
 
@@ -1619,8 +1534,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @param array $options
      * @throws Storage\Exception
      * @throws Exception
      */
@@ -1650,27 +1563,27 @@ class Storage implements StorageInterface
 
         $attemptIndex = 0;
         /**
-         * @var Storage\Exception
+         * @var Storage\Exception $insertAttemptException
          */
         $insertAttemptException = null;
 
         do {
             $destFileName = $this->createImagePath($imageRow['dir'], array_replace($options, [
-                'index' => $this->indexByAttempt($attemptIndex)
+                'index' => $this->indexByAttempt($attemptIndex),
             ]));
             $destFilePath = $dirPath . DIRECTORY_SEPARATOR . $destFileName;
 
             $insertAttemptException = null;
 
             try {
-                if ($destFileName == $imageRow['filepath']) {
+                if ($destFileName === $imageRow['filepath']) {
                     throw new Storage\Exception("Trying to rename to self");
                 }
 
                 $this->imageTable->update([
-                    'filepath' => $destFileName
+                    'filepath' => $destFileName,
                 ], [
-                    'id' => $imageRow['id']
+                    'id' => $imageRow['id'],
                 ]);
             } catch (Exception $e) {
                 // duplicate or other error
@@ -1684,11 +1597,11 @@ class Storage implements StorageInterface
                         'Bucket'     => $dir->getBucket(),
                         'CopySource' => $dir->getBucket() . '/' . $imageRow['filepath'],
                         'Key'        => $destFileName,
-                        'ACL'        => 'public-read'
+                        'ACL'        => 'public-read',
                     ]);
                     $s3->deleteObject([
-                        'Bucket'     => $dir->getBucket(),
-                        'Key'        => $imageRow['filepath']
+                        'Bucket' => $dir->getBucket(),
+                        'Key'    => $imageRow['filepath'],
                     ]);
                 } else {
                     $success = rename($oldFilePath, $destFilePath);
@@ -1709,7 +1622,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -1731,7 +1643,7 @@ class Storage implements StorageInterface
         if ($imageRow['s3']) {
             $object = $this->getS3Client()->getObject([
                 'Bucket' => $dir->getBucket(),
-                'Key'    => $imageRow['filepath']
+                'Key'    => $imageRow['filepath'],
             ]);
 
             $imagick->readImageBlob($object['Body']->getContents());
@@ -1743,7 +1655,7 @@ class Storage implements StorageInterface
                 'Key'         => $imageRow['filepath'],
                 'Body'        => $imagick->getImagesBlob(),
                 'Bucket'      => $dir->getBucket(),
-                'ContentType' => $imagick->getImageMimeType()
+                'ContentType' => $imagick->getImageMimeType(),
             ]);
         } else {
             $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
@@ -1758,12 +1670,11 @@ class Storage implements StorageInterface
         $imagick->clear();
 
         $this->flush([
-            'image' => $imageId
+            'image' => $imageId,
         ]);
     }
 
     /**
-     * @param int $imageId
      * @throws ImagickException
      * @throws Storage\Exception
      */
@@ -1785,7 +1696,7 @@ class Storage implements StorageInterface
         if ($imageRow['s3']) {
             $object = $this->getS3Client()->getObject([
                 'Bucket' => $dir->getBucket(),
-                'Key'    => $imageRow['filepath']
+                'Key'    => $imageRow['filepath'],
             ]);
 
             $imagick->readImageBlob($object['Body']->getContents());
@@ -1797,7 +1708,7 @@ class Storage implements StorageInterface
                 'Key'         => $imageRow['filepath'],
                 'Body'        => $imagick->getImagesBlob(),
                 'Bucket'      => $dir->getBucket(),
-                'ContentType' => $imagick->getImageMimeType()
+                'ContentType' => $imagick->getImageMimeType(),
             ]);
         } else {
             $filePath = $dir->getPath() . DIRECTORY_SEPARATOR . $imageRow['filepath'];
@@ -1812,7 +1723,7 @@ class Storage implements StorageInterface
         $imagick->clear();
 
         $this->flush([
-            'image' => $imageId
+            'image' => $imageId,
         ]);
     }
 
@@ -1821,7 +1732,7 @@ class Storage implements StorageInterface
         $select = $this->imageTable->getSql()->select()
             ->where([
                 'dir' => $dir,
-                'not s3'
+                'not s3',
             ])
             ->limit(10000);
 
@@ -1833,7 +1744,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageID
      * @throws Storage\Exception
      */
     public function moveToS3(int $imageID): void
@@ -1876,9 +1786,9 @@ class Storage implements StorageInterface
         fclose($handle);
 
         $this->imageTable->update([
-            's3' => 1
+            's3' => 1,
         ], [
-            'id' => $imageID
+            'id' => $imageID,
         ]);
 
         unlink($filePath);
@@ -1926,7 +1836,7 @@ class Storage implements StorageInterface
                     print $row['id'] . ' ' . $filepath . ' - file not found. ';
 
                     $fRows = $this->formatedImageTable->select([
-                        'formated_image_id = ?' => $row['id']
+                        'formated_image_id = ?' => $row['id'],
                     ]);
 
                     if (count($fRows)) {
@@ -1947,7 +1857,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param string $dirname
      * @throws Storage\Exception
      */
     public function deleteBrokenFiles(string $dirname): void
@@ -1982,8 +1891,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
-     * @return array|null
      * @throws Storage\Exception
      */
     public function getImageCrop(int $imageId): ?array
@@ -1999,19 +1906,17 @@ class Storage implements StorageInterface
         }
 
         return [
-            'left'   => (int)$row['crop_left'],
-            'top'    => (int)$row['crop_top'],
-            'width'  => (int)$row['crop_width'],
-            'height' => (int)$row['crop_height'],
+            'left'   => (int) $row['crop_left'],
+            'top'    => (int) $row['crop_top'],
+            'width'  => (int) $row['crop_width'],
+            'height' => (int) $row['crop_height'],
         ];
     }
 
     /**
-     * @param int $imageId
-     * @param $crop
      * @throws Storage\Exception
      */
-    public function setImageCrop(int $imageId, $crop): void
+    public function setImageCrop(int $imageId, array $crop): void
     {
         if (! $imageId) {
             throw new Storage\Exception("Invalid image id provided `$imageId`");
@@ -2037,15 +1942,15 @@ class Storage implements StorageInterface
             $crop['height'] = 0;
         }
 
-        $left = (int)$crop['left'];
-        $top = (int)$crop['top'];
-        $width = (int)$crop['width'];
-        $height = (int)$crop['height'];
+        $left   = (int) $crop['left'];
+        $top    = (int) $crop['top'];
+        $width  = (int) $crop['width'];
+        $height = (int) $crop['height'];
 
         if ($left < 0 || $top < 0 || $width <= 0 || $height <= 0) {
-            $left = 0;
-            $top = 0;
-            $width = 0;
+            $left   = 0;
+            $top    = 0;
+            $width  = 0;
             $height = 0;
         }
 
@@ -2055,21 +1960,20 @@ class Storage implements StorageInterface
             'crop_width'  => $width,
             'crop_height' => $height,
         ], [
-            'id' => $imageId
+            'id' => $imageId,
         ]);
 
         foreach ($this->formats as $formatName => $format) {
             if (! $format->getIgnoreCrop()) {
                 $this->flush([
                     'format' => $formatName,
-                    'image'  => $imageId
+                    'image'  => $imageId,
                 ]);
             }
         }
     }
 
     /**
-     * @param string $dir
      * @throws Storage\Exception
      */
     public function extractAllEXIF(string $dir): void
@@ -2077,7 +1981,7 @@ class Storage implements StorageInterface
         $select = $this->imageTable->getSql()->select()
             ->where([
                 'dir' => $dir,
-                'exif is null'
+                'exif is null',
             ])
             ->limit(10000);
 
@@ -2093,9 +1997,9 @@ class Storage implements StorageInterface
             }
 
             $this->imageTable->update([
-                'exif' => $exif
+                'exif' => $exif,
             ], [
-                'id' => $row['id']
+                'id' => $row['id'],
             ]);
         }
     }

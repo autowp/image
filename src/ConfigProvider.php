@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image;
 
 use Zend\ServiceManager\Factory\InvokableFactory;
@@ -22,14 +24,14 @@ class ConfigProvider
     public function getImageProcessorsConfig(): array
     {
         return [
-            'aliases' => [
+            'aliases'   => [
                 'normalize' => Processor\Normalize::class,
-                'negate' => Processor\Negate::class,
+                'negate'    => Processor\Negate::class,
             ],
             'factories' => [
                 Processor\Normalize::class => InvokableFactory::class,
-                Processor\Negate::class => InvokableFactory::class,
-            ]
+                Processor\Negate::class    => InvokableFactory::class,
+            ],
         ];
     }
 
@@ -38,57 +40,57 @@ class ConfigProvider
         return [
             'router' => [
                 'routes' => [
-                    'image-storage' => [
+                    'image-storage'              => [
                         'options' => [
                             'route'    => 'image-storage (list-broken-files|fix-broken-files|list-dirs):action',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
-                    'image-storage-format' => [
+                    'image-storage-format'       => [
                         'options' => [
                             'route'    => 'image-storage (flush-format):action <format>',
                             'defaults' => [
-                                'controller' => Controller\ConsoleController::class
-                            ]
-                        ]
+                                'controller' => Controller\ConsoleController::class,
+                            ],
+                        ],
                     ],
-                    'image-storage-image' => [
+                    'image-storage-image'        => [
                         'options' => [
                             'route'    => 'image-storage (flush-image|move-to-s3):action <image>',
                             'defaults' => [
-                                'controller' => Controller\ConsoleController::class
-                            ]
-                        ]
+                                'controller' => Controller\ConsoleController::class,
+                            ],
+                        ],
                     ],
-                    'image-storage-dir' => [
+                    'image-storage-dir'          => [
                         'options' => [
-                            'route'    =>
-                                'image-storage (delete-broken-files|clear-empty-dirs|move-dir-to-s3):action <dirname>',
+                            'route'    => 'image-storage (delete-broken-files|clear-empty-dirs|move-dir-to-s3):action '
+                                . '<dirname>',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     'image-storage-extract-exif' => [
                         'options' => [
                             'route'    => 'image-storage extract-exif <dirname>',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
-                                'action'     => 'extract-exif'
-                            ]
-                        ]
+                                'action'     => 'extract-exif',
+                            ],
+                        ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
     public function getControllerPluginConfig(): array
     {
         return [
-            'aliases' => [
+            'aliases'   => [
                 'imagestorage' => Controller\Plugin\ImageStorage::class,
                 'imageStorage' => Controller\Plugin\ImageStorage::class,
                 'ImageStorage' => Controller\Plugin\ImageStorage::class,
@@ -104,7 +106,7 @@ class ConfigProvider
         return [
             'factories' => [
                 Controller\ConsoleController::class => InvokableFactory::class,
-            ]
+            ],
         ];
     }
 
@@ -114,35 +116,35 @@ class ConfigProvider
     public function getDependencyConfig(): array
     {
         return [
-            'aliases' => [
-                Storage::class => StorageInterface::class
+            'aliases'   => [
+                Storage::class => StorageInterface::class,
             ],
             'factories' => [
                 StorageInterface::class                 => Factory\ImageStorageFactory::class,
                 Processor\ProcessorPluginManager::class => Processor\ProcessorPluginManagerFactory::class,
-            ]
+            ],
         ];
     }
 
     public function getTablesConfig(): array
     {
         return [
-            'image' => [
+            'image'          => [
                 'sequences' => [
-                    'id' => 'image_id_seq'
-                ]
+                    'id' => 'image_id_seq',
+                ],
             ],
             'formated_image' => [
-                'sequences' => []
+                'sequences' => [],
             ],
-            'image_dir' => []
+            'image_dir'      => [],
         ];
     }
 
     public function getViewHelperConfig(): array
     {
         return [
-            'aliases' => [
+            'aliases'   => [
                 'imagestorage' => View\Helper\ImageStorage::class,
                 'imageStorage' => View\Helper\ImageStorage::class,
                 'ImageStorage' => View\Helper\ImageStorage::class,

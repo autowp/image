@@ -1,30 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Factory;
 
+use Autowp\Image\Processor;
+use Autowp\Image\Storage;
 use Autowp\ZFComponents\Db\TableManager;
 use Interop\Container\ContainerInterface;
 use Zend\Http\Request;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-use Autowp\Image\Storage;
-use Autowp\Image\Processor;
-
 class ImageStorageFactory implements FactoryInterface
 {
     /**
-     * @param ContainerInterface $container
      * @param string $requestedName
-     * @param array|null $options
      * @return Storage|object
      * @throws Storage\Exception
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null)
     {
-        $config = $container->has('Config') ? $container->get('Config') : [];
-        $storageConfig = isset($config['imageStorage']) ? $config['imageStorage'] : [];
+        $config        = $container->has('Config') ? $container->get('Config') : [];
+        $storageConfig = $config['imageStorage'] ?? [];
 
         $tables = $container->get(TableManager::class);
 
@@ -38,7 +36,7 @@ class ImageStorageFactory implements FactoryInterface
 
         $request = $container->get('Request');
         if ($request instanceof Request) {
-            if ($request->getServer('HTTPS') || $request->getServer('HTTP_X_FORWARDED_PROTO') == 'https') {
+            if ($request->getServer('HTTPS') || $request->getServer('HTTP_X_FORWARDED_PROTO') === 'https') {
                 $storage->setForceHttps(true);
             }
         }

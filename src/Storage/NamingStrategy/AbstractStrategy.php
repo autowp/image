@@ -1,18 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Storage\NamingStrategy;
 
 use Autowp\Image\Storage\Exception;
 
+use function method_exists;
+use function rtrim;
+use function ucfirst;
+
+use const DIRECTORY_SEPARATOR;
+
 abstract class AbstractStrategy
 {
-    /**
-     * @var string
-     */
-    private $dir = null;
+    /** @var string */
+    private $dir;
 
     /**
-     * @param array $options
      * @throws Exception
      */
     public function __construct(array $options = [])
@@ -21,8 +26,7 @@ abstract class AbstractStrategy
     }
 
     /**
-     * @param array $options
-     * @return AbstractStrategy
+     * @return $this
      * @throws Exception
      */
     public function setOptions(array $options)
@@ -42,7 +46,7 @@ abstract class AbstractStrategy
 
     /**
      * @param string $dir
-     * @return AbstractStrategy
+     * @return $this
      */
     public function setDir($dir)
     {
@@ -60,7 +64,6 @@ abstract class AbstractStrategy
     }
 
     /**
-     * @param array $options
      * @return string
      */
     abstract public function generate(array $options = []);

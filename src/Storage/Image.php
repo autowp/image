@@ -1,37 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Storage;
+
+use function array_merge;
 
 class Image
 {
-    /**
-     * @var int
-     */
+    /** @var int */
     private $id;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $width;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $height;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $filesize;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $src;
 
-    /**
-     * @param array $options
-     */
     public function __construct(array $options)
     {
         $defaults = [
@@ -39,16 +30,16 @@ class Image
             'width'    => null,
             'height'   => null,
             'filesize' => null,
-            'src'      => null
+            'src'      => null,
         ];
 
         $options = array_merge($defaults, $options);
 
-        $this->id       = (int)$options['id'];
-        $this->width    = (int)$options['width'];
-        $this->height   = (int)$options['height'];
-        $this->filesize = (int)$options['filesize'];
-        $this->src      = (string)$options['src'];
+        $this->id       = (int) $options['id'];
+        $this->width    = (int) $options['width'];
+        $this->height   = (int) $options['height'];
+        $this->filesize = (int) $options['filesize'];
+        $this->src      = (string) $options['src'];
     }
 
     /**
@@ -61,7 +52,7 @@ class Image
             'width'    => $this->width,
             'height'   => $this->height,
             'filesize' => $this->filesize,
-            'src'      => $this->src
+            'src'      => $this->src,
         ];
     }
 

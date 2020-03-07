@@ -1,27 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Storage\NamingStrategy;
 
 use Autowp\Image\Storage\Exception;
 use Autowp\ZFComponents\Filter\FilenameSafe;
 
+use function array_merge;
+use function floor;
+use function sprintf;
+use function strlen;
+
+use const DIRECTORY_SEPARATOR;
+
 class Serial extends AbstractStrategy
 {
-    const ITEM_PER_DIR = 1000;
+    private const ITEM_PER_DIR = 1000;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $deep = 0;
 
     /**
      * @param int $deep
      * @throws Exception
-     * @return Serial
+     * @return $this
      */
-    public function setDeep($deep): Serial
+    public function setDeep($deep): self
     {
-        $deep = (int)$deep;
+        $deep = (int) $deep;
         if ($deep < 0) {
             throw new Exception("Deep cannot be < 0");
         }
@@ -30,9 +37,6 @@ class Serial extends AbstractStrategy
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getDeep(): int
     {
         return $this->deep;
@@ -41,29 +45,25 @@ class Serial extends AbstractStrategy
     /**
      * Return the complete directory path of a filename (including hashedDirectoryStructure)
      *
-     * @param int $index
-     * @param int $deep
      * @return string
      */
     private function path(int $index, int $deep)
     {
         $chars = strlen(self::ITEM_PER_DIR - 1); // use log10, fkn n00b
-        $path = '';
+        $path  = '';
         if ($deep > 0) {
             $cur = floor($index / self::ITEM_PER_DIR);
             for ($i = 0; $i < $deep; $i++) {
-                $div = floor($cur / self::ITEM_PER_DIR);
-                $mod = $cur - $div * self::ITEM_PER_DIR;
-                $path = sprintf('%0'.$chars.'d', $mod) . DIRECTORY_SEPARATOR . $path;
-                $cur = $div;
+                $div  = floor($cur / self::ITEM_PER_DIR);
+                $mod  = $cur - $div * self::ITEM_PER_DIR;
+                $path = sprintf('%0' . $chars . 'd', $mod) . DIRECTORY_SEPARATOR . $path;
+                $cur  = $div;
             }
         }
         return $path;
     }
 
     /**
-     * @param array $options
-     * @return string
      * @see AbstractStrategy::generate()
      */
     public function generate(array $options = []): string
@@ -72,13 +72,13 @@ class Serial extends AbstractStrategy
             'extension'     => null,
             'count'         => null,
             'prefferedName' => null,
-            'index'         => null
+            'index'         => null,
         ];
-        $options = array_merge($defaults, $options);
+        $options  = array_merge($defaults, $options);
 
-        $count = (int)$options['count'];
-        $ext = (string)$options['extension'];
-        $index = (int)$options['index'];
+        $count = (int) $options['count'];
+        $ext   = (string) $options['extension'];
+        $index = (int) $options['index'];
 
         $fileIndex = $count + 1;
 
@@ -91,7 +91,7 @@ class Serial extends AbstractStrategy
             $fileBasename = $filter->filter($options['prefferedName']);
         }
 
-        $suffix = $index ? '_' . $index : '';
+        $suffix   = $index ? '_' . $index : '';
         $filename = $fileBasename . $suffix . ($ext ? '.' . $ext : '');
 
         return $dirPath . $filename;

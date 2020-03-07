@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Processor;
 
 use Interop\Container\ContainerInterface;
@@ -8,21 +10,24 @@ use Zend\ServiceManager\Config;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
+use function is_array;
+
 class ProcessorPluginManagerFactory implements FactoryInterface
 {
     /**
      * zend-servicemanager v2 support for invocation options.
      *
-     * @param array
+     * @var array
      */
     protected $creationOptions;
 
     /**
      * {@inheritDoc}
      *
+     * @param string $name
      * @return ProcessorPluginManager
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = null)
+    public function __invoke(ContainerInterface $container, $name, ?array $options = null)
     {
         $pluginManager = new ProcessorPluginManager($container, $options ?: []);
 
@@ -41,26 +46,19 @@ class ProcessorPluginManagerFactory implements FactoryInterface
         return $pluginManager;
     }
 
-
     /**
      * {@inheritDoc}
      *
-     * @param ServiceLocatorInterface $container
-     * @param null $name
-     * @param null $requestedName
-     * @return ProcessorPluginManager|mixed
+     * @return mixed
      * @throws ContainerException
      */
-    public function createService(ServiceLocatorInterface $container, $name = null, $requestedName = null)
+    public function createService(ServiceLocatorInterface $container)
     {
-        return $this($container, $requestedName ?: ProcessorPluginManager::class, $this->creationOptions);
+        return $this($container, ProcessorPluginManager::class, $this->creationOptions);
     }
 
     /**
      * zend-servicemanager v2 support for invocation options.
-     *
-     * @param array $options
-     * @return void
      */
     public function setCreationOptions(array $options)
     {

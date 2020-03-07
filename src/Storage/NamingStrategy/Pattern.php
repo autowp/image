@@ -1,8 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Storage\NamingStrategy;
 
 use Autowp\ZFComponents\Filter\FilenameSafe;
+
+use function array_merge;
+use function implode;
+use function in_array;
+use function preg_split;
 
 class Pattern extends AbstractStrategy
 {
@@ -16,7 +23,7 @@ class Pattern extends AbstractStrategy
     {
         $filter = new FilenameSafe();
 
-        $result = [];
+        $result            = [];
         $patternComponents = preg_split('|[\\/]+|isu', $pattern);
         foreach ($patternComponents as $component) {
             if (! in_array($component, self::$notAllowedParts) && $component) {
@@ -29,7 +36,6 @@ class Pattern extends AbstractStrategy
     }
 
     /**
-     * @param array $options
      * @see AbstractStrategy::generate()
      *
      * @return string
@@ -39,13 +45,13 @@ class Pattern extends AbstractStrategy
         $defaults = [
             'pattern'   => null,
             'extension' => null,
-            'index'     => null
+            'index'     => null,
         ];
-        $options = array_merge($defaults, $options);
+        $options  = array_merge($defaults, $options);
 
-        $ext = (string)$options['extension'];
+        $ext     = (string) $options['extension'];
         $pattern = self::normalizePattern($options['pattern']);
-        $index = (int)$options['index'];
+        $index   = (int) $options['index'];
 
         $nameComponents = [];
         if ($pattern) {

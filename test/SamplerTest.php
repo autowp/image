@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AutowpTest\Image;
 
 use Autowp\Image\Sampler;
 use Autowp\Image\Sampler\Format;
-
 use Imagick;
 use ImagickException;
 use PHPUnit\Framework\TestCase;
+
+use function dirname;
 
 /**
  * @group Autowp_Image
@@ -21,14 +24,14 @@ class SamplerTest extends TestCase
     public function testShouldResizeOddWidthPictureStrictlyToTargetWidthByOuterFitType()
     {
         $sampler = new Sampler();
-        $file = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
+        $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
         $imagick = new Imagick();
         $imagick->readImage($file); //101x149
         $sampler->convertImagick($imagick, null, [
-            'fitType'     => Format::FIT_TYPE_OUTER,
+            'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 102,
             'height'     => 149,
-            'background' => 'red'
+            'background' => 'red',
         ]);
         $this->assertSame($imagick->getImageWidth(), 102);
         $imagick->clear();
@@ -41,14 +44,14 @@ class SamplerTest extends TestCase
     public function testShouldResizeOddHeightPictureStrictlyToTargetHeightByOuterFitType()
     {
         $sampler = new Sampler();
-        $file = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
+        $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
         $imagick = new Imagick();
         $imagick->readImage($file); //101x149
         $sampler->convertImagick($imagick, null, [
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 101,
             'height'     => 150,
-            'background' => 'red'
+            'background' => 'red',
         ]);
         $this->assertSame($imagick->getImageHeight(), 150);
         $imagick->clear();
@@ -61,7 +64,7 @@ class SamplerTest extends TestCase
     public function testReduceOnlyWithInnerFitWorks()
     {
         $sampler = new Sampler();
-        $file = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
+        $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
         $imagick = new Imagick();
         // both size less
         $imagick->readImage($file); //101x149
@@ -69,7 +72,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 150,
             'height'     => 200,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 101);
         $this->assertSame($imagick->getImageHeight(), 149);
@@ -80,7 +83,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 150,
             'height'     => 100,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 68);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -91,7 +94,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 50,
             'height'     => 200,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 74);
@@ -102,7 +105,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 50,
             'height'     => 100,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -113,7 +116,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 150,
             'height'     => 200,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 150);
         $this->assertSame($imagick->getImageHeight(), 200);
@@ -124,7 +127,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 150,
             'height'     => 100,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 150);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -135,7 +138,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 50,
             'height'     => 200,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 200);
@@ -146,7 +149,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_INNER,
             'width'      => 50,
             'height'     => 100,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -160,7 +163,7 @@ class SamplerTest extends TestCase
     public function testReduceOnlyWithOuterFitWorks()
     {
         $sampler = new Sampler();
-        $file = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
+        $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
         $imagick = new Imagick();
         // both size less
         $imagick->readImage($file); //101x149
@@ -168,7 +171,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 150,
             'height'     => 200,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 150);
         $this->assertSame($imagick->getImageHeight(), 200);
@@ -179,7 +182,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 150,
             'height'     => 100,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 150);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -190,7 +193,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 50,
             'height'     => 200,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 200);
@@ -201,7 +204,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 50,
             'height'     => 100,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -212,7 +215,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 150,
             'height'     => 200,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 150);
         $this->assertSame($imagick->getImageHeight(), 200);
@@ -223,7 +226,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 150,
             'height'     => 100,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 150);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -234,7 +237,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 50,
             'height'     => 200,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 200);
@@ -245,7 +248,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_OUTER,
             'width'      => 50,
             'height'     => 100,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -259,7 +262,7 @@ class SamplerTest extends TestCase
     public function testReduceOnlyWithMaximumFitWorks()
     {
         $sampler = new Sampler();
-        $file = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
+        $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
         $imagick = new Imagick();
         // both size less
         $imagick->readImage($file); //101x149
@@ -267,7 +270,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 150,
             'height'     => 200,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 101);
         $this->assertSame($imagick->getImageHeight(), 149);
@@ -278,7 +281,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 150,
             'height'     => 100,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 68);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -289,7 +292,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 50,
             'height'     => 200,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 74);
@@ -300,7 +303,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 50,
             'height'     => 100,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 74);
@@ -311,7 +314,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 150,
             'height'     => 200,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 136);
         $this->assertSame($imagick->getImageHeight(), 200);
@@ -322,7 +325,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 150,
             'height'     => 100,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 68);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -333,7 +336,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 50,
             'height'     => 200,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 74);
@@ -344,7 +347,7 @@ class SamplerTest extends TestCase
             'fitType'    => Format::FIT_TYPE_MAXIMUM,
             'width'      => 50,
             'height'     => 100,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 74);
@@ -358,13 +361,13 @@ class SamplerTest extends TestCase
     public function testReduceOnlyByWidthWorks()
     {
         $sampler = new Sampler();
-        $file = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
+        $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
         $imagick = new Imagick();
         // width less
         $imagick->readImage($file); //101x149
         $sampler->convertImagick($imagick, null, [
             'width'      => 150,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 101);
         $this->assertSame($imagick->getImageHeight(), 149);
@@ -373,7 +376,7 @@ class SamplerTest extends TestCase
         $imagick->readImage($file); //101x149
         $sampler->convertImagick($imagick, null, [
             'width'      => 50,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 74);
@@ -382,7 +385,7 @@ class SamplerTest extends TestCase
         $imagick->readImage($file); //101x149
         $sampler->convertImagick($imagick, null, [
             'width'      => 150,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 150);
         $this->assertSame($imagick->getImageHeight(), 221);
@@ -391,7 +394,7 @@ class SamplerTest extends TestCase
         $imagick->readImage($file); //101x149
         $sampler->convertImagick($imagick, null, [
             'width'      => 50,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 50);
         $this->assertSame($imagick->getImageHeight(), 74);
@@ -405,13 +408,13 @@ class SamplerTest extends TestCase
     public function testReduceOnlyByHeightWorks()
     {
         $sampler = new Sampler();
-        $file = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
+        $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
         $imagick = new Imagick();
         // height less
         $imagick->readImage($file); //101x149
         $sampler->convertImagick($imagick, null, [
             'height'     => 200,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 101);
         $this->assertSame($imagick->getImageHeight(), 149);
@@ -420,7 +423,7 @@ class SamplerTest extends TestCase
         $imagick->readImage($file); //101x149
         $sampler->convertImagick($imagick, null, [
             'height'     => 100,
-            'reduceOnly' => true
+            'reduceOnly' => true,
         ]);
         $this->assertSame($imagick->getImageWidth(), 68);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -429,7 +432,7 @@ class SamplerTest extends TestCase
         $imagick->readImage($file); //101x149
         $sampler->convertImagick($imagick, null, [
             'height'     => 200,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 136);
         $this->assertSame($imagick->getImageHeight(), 200);
@@ -438,7 +441,7 @@ class SamplerTest extends TestCase
         $imagick->readImage($file); //101x149
         $sampler->convertImagick($imagick, null, [
             'height'     => 100,
-            'reduceOnly' => false
+            'reduceOnly' => false,
         ]);
         $this->assertSame($imagick->getImageWidth(), 68);
         $this->assertSame($imagick->getImageHeight(), 100);
@@ -460,8 +463,8 @@ class SamplerTest extends TestCase
 
         $imagick = $sampler->convertImagick($imagick, null, [
             'fitType' => '0',
-            'width'  => 200,
-            'height' => 200,
+            'width'   => 200,
+            'height'  => 200,
         ]);
 
         $this->assertGreaterThan(1, $imagick->getNumberImages());
@@ -489,7 +492,7 @@ class SamplerTest extends TestCase
             'fitType'    => '0',
             'width'      => 80,
             'height'     => 80,
-            'background' => 'transparent'
+            'background' => 'transparent',
         ]);
 
         $this->assertGreaterThan(1, $imagick->getNumberImages());

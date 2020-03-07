@@ -1,86 +1,62 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Sampler;
 
+use function method_exists;
+use function ucfirst;
+
 /**
- * @author dima
- *
  * @desc Represents a image formatting rules
  */
 class Format
 {
-    const
-        FIT_TYPE_INNER = '0', // вписать
-        FIT_TYPE_OUTER = '1', // описать
+    public const
+        FIT_TYPE_INNER   = '0', // вписать
+        FIT_TYPE_OUTER   = '1', // описать
         FIT_TYPE_MAXIMUM = '2';
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $fitType;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $width;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $height;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $background;
 
-    /**
-     * @var boolean
-     */
+    /** @var bool */
     private $ignoreCrop = false;
 
-    /**
-     * @var boolean
-     */
+    /** @var bool */
     private $proportionalCrop = false;
 
-    /**
-     * @bool
-     */
+    /** @bool */
     private $reduceOnly = false;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $strip = false;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $quality = 0;
 
-    /**
-     * @var string
-     */
-    private $format = null;
+    /** @var string */
+    private $format;
 
-    /**
-     * @var float|null
-     */
-    private $widest = null;
+    /** @var float|null */
+    private $widest;
 
-    /**
-     * @var float|null
-     */
-    private $highest = null;
+    /** @var float|null */
+    private $highest;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $processors = [];
 
     /**
-     * @param array $options
      * @throws Exception
      */
     public function __construct(array $options = [])
@@ -89,8 +65,7 @@ class Format
     }
 
     /**
-     * @param array $options
-     * @return Format
+     * @return $this
      * @throws Exception
      */
     public function setOptions(array $options)
@@ -108,9 +83,9 @@ class Format
         return $this;
     }
 
-    public function setProcessors(array $value): Format
+    public function setProcessors(array $value): self
     {
-        $this->processors = (array)$value;
+        $this->processors = (array) $value;
 
         return $this;
     }
@@ -122,17 +97,17 @@ class Format
 
     /**
      * @param string $value
-     * @return Format
+     * @return $this
      */
     public function setFormat($value)
     {
-        $this->format = $value ? (string)$value : null;
+        $this->format = $value ? (string) $value : null;
 
         return $this;
     }
 
     /**
-     * @return string|NULL
+     * @return string|null
      */
     public function getFormat()
     {
@@ -169,13 +144,12 @@ class Format
     }
 
     /**
-     * @param $value
      * @return $this
      * @throws Exception
      */
-    public function setQuality($value)
+    public function setQuality(int $value): self
     {
-        $value = (int)$value;
+        $value = (int) $value;
         if ($value < 0 || $value > 100) {
             throw new Exception("Compression quality must be >= 0 and <= 100");
         }
@@ -185,36 +159,29 @@ class Format
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getQuality()
+    public function getQuality(): int
     {
         return $this->quality;
     }
 
     /**
-     * @param bool $value
-     * @return Format
+     * @return $this
      */
-    public function setStrip(bool $value)
+    public function setStrip(bool $value): self
     {
-        $this->strip = (bool)$value;
+        $this->strip = (bool) $value;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isStrip(): bool
     {
         return $this->strip;
     }
 
     /**
-     * @return bool
      * @deprecated
+     *
      * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     public function getStrip(): bool
@@ -223,27 +190,23 @@ class Format
     }
 
     /**
-     * @param bool $reduceOnly
-     * @return Format
+     * @return $this
      */
-    public function setReduceOnly(bool $reduceOnly)
+    public function setReduceOnly(bool $reduceOnly): self
     {
-        $this->reduceOnly = (bool)$reduceOnly;
+        $this->reduceOnly = (bool) $reduceOnly;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isReduceOnly(): bool
     {
         return $this->reduceOnly;
     }
 
     /**
-     * @return bool
      * @deprecated
+     *
      * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     public function getReduceOnly(): bool
@@ -254,11 +217,11 @@ class Format
     /**
      * @param int $fitType
      * @throws Exception
-     * @return Format
+     * @return $this
      */
-    public function setFitType($fitType)
+    public function setFitType($fitType): self
     {
-        $fitType = (int)$fitType;
+        $fitType = (int) $fitType;
         switch ($fitType) {
             case self::FIT_TYPE_INNER:
             case self::FIT_TYPE_OUTER:
@@ -273,10 +236,7 @@ class Format
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getFitType()
+    public function getFitType(): int
     {
         return $this->fitType;
     }
@@ -284,11 +244,11 @@ class Format
     /**
      * @param int $width
      * @throws Exception
-     * @return Format
+     * @return $this
      */
-    public function setWidth($width)
+    public function setWidth($width): self
     {
-        $width = (int)$width;
+        $width = (int) $width;
         if ($width < 0) {
             throw new Exception("Unexpected width `$width`");
         }
@@ -297,10 +257,7 @@ class Format
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getWidth()
+    public function getWidth(): int
     {
         return $this->width;
     }
@@ -308,11 +265,11 @@ class Format
     /**
      * @param int $height
      * @throws Exception
-     * @return Format
+     * @return $this
      */
-    public function setHeight($height)
+    public function setHeight($height): self
     {
-        $height = (int)$height;
+        $height = (int) $height;
         if ($height < 0) {
             throw new Exception("Unexpected height `$height`");
         }
@@ -321,47 +278,40 @@ class Format
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getHeight()
+    public function getHeight(): int
     {
         return $this->height;
     }
 
     /**
      * @param string $color
-     * @return Format
+     * @return $this
      */
-    public function setBackground($color)
+    public function setBackground($color): self
     {
         $this->background = $color;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getBackground()
+    public function getBackground(): ?string
     {
         return $this->background;
     }
 
     /**
-     * @param boolean $value
-     * @return Format
+     * @return $this
      */
-    public function setIgnoreCrop(bool $value)
+    public function setIgnoreCrop(bool $value): self
     {
-        $this->ignoreCrop = (bool)$value;
+        $this->ignoreCrop = (bool) $value;
 
         return $this;
     }
 
     /**
-     * @return boolean
      * @deprecated
+     *
      * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     public function getIgnoreCrop(): bool
@@ -369,36 +319,29 @@ class Format
         return $this->ignoreCrop;
     }
 
-    /**
-     * @return boolean
-     */
     public function isIgnoreCrop(): bool
     {
         return $this->ignoreCrop;
     }
 
     /**
-     * @param boolean $value
-     * @return Format
+     * @return $this
      */
-    public function setProportionalCrop(bool $value)
+    public function setProportionalCrop(bool $value): self
     {
-        $this->proportionalCrop = (bool)$value;
+        $this->proportionalCrop = (bool) $value;
 
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isProportionalCrop(): bool
     {
         return $this->proportionalCrop;
     }
 
     /**
-     * @return bool
      * @deprecated
+     *
      * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     public function getProportionalCrop(): bool
@@ -409,16 +352,16 @@ class Format
     /**
      * @param float|null $value
      * @throws Exception
-     * @return Format
+     * @return $this
      */
-    public function setWidest($value)
+    public function setWidest($value): self
     {
         if ($value === null) {
             $this->widest = null;
             return $this;
         }
 
-        $widest = (float)$value;
+        $widest = (float) $value;
         if ($widest <= 0) {
             throw new Exception("widest value must be > 0");
         }
@@ -431,16 +374,16 @@ class Format
     /**
      * @param float|null $value
      * @throws Exception
-     * @return Format
+     * @return $this
      */
-    public function setHighest($value)
+    public function setHighest($value): self
     {
         if ($value === null) {
             $this->highest = null;
             return $this;
         }
 
-        $highest = (float)$value;
+        $highest = (float) $value;
         if ($highest <= 0) {
             throw new Exception("highest value must be > 0");
         }
@@ -449,18 +392,12 @@ class Format
         return $this;
     }
 
-    /**
-     * @return float|null
-     */
-    public function getWidest()
+    public function getWidest(): ?float
     {
         return $this->widest;
     }
 
-    /**
-     * @return float|null
-     */
-    public function getHighest()
+    public function getHighest(): ?float
     {
         return $this->highest;
     }

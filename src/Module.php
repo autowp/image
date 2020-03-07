@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image;
 
 use Zend\Console\Adapter\AdapterInterface as Console;
@@ -30,9 +32,7 @@ class Module implements
     }
 
     /**
-     * @param Console $console
      * @return string
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getConsoleBanner(Console $console)
@@ -41,9 +41,7 @@ class Module implements
     }
 
     /**
-     * @param Console $console
      * @return array
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getConsoleUsage(Console $console)

@@ -1,24 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Factory;
 
+use Autowp\Image\Controller\Plugin\ImageStorage;
+use Autowp\Image\Storage;
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
-
-use Autowp\Image\Storage;
-use Autowp\Image\Controller\Plugin\ImageStorage;
 
 class ControllerPluginFactory implements FactoryInterface
 {
     /**
-     * @param ContainerInterface $container
      * @param string $requestedName
-     * @param array|null $options
-     * @return ImageStorage|object
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null): ImageStorage
     {
         return new ImageStorage($container->get(Storage::class));
     }

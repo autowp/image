@@ -1,21 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Controller\Plugin;
 
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-
 use Autowp\Image;
+use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 class ImageStorage extends AbstractPlugin
 {
-    /**
-     * @var Image\StorageInterface
-     */
+    /** @var Image\StorageInterface */
     private $imageStorage;
 
-    /**
-     * @param Image\StorageInterface $imageStorage
-     */
     public function __construct(Image\StorageInterface $imageStorage)
     {
         $this->imageStorage = $imageStorage;

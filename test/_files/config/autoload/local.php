@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image;
 
 use PDO;
 
+use function getenv;
+
 $imageDir = __DIR__ . '/../../images/';
 
-if (getenv('PDODRIVER') == 'pgsql') {
+if (getenv('PDODRIVER') === 'pgsql') {
     $db = [
         'driver'         => 'Pdo',
         'pdodriver'      => 'pgsql',
@@ -16,7 +20,7 @@ if (getenv('PDODRIVER') == 'pgsql') {
         'username'       => 'postgres',
         'password'       => '',
         'driver_options' => [
-            PDO::ATTR_PERSISTENT => true
+            PDO::ATTR_PERSISTENT => true,
         ],
     ];
 } else {
@@ -29,58 +33,58 @@ if (getenv('PDODRIVER') == 'pgsql') {
         'username'       => 'autowp_test',
         'password'       => 'test',
         'driver_options' => [
-            PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'"
+            PDO::MYSQL_ATTR_INIT_COMMAND => "set time_zone = 'UTC'",
         ],
     ];
 }
 
 return [
     'imageStorage' => [
-        'imageTableName' => 'image',
-        'dirTableName' => 'image_dir',
+        'imageTableName'         => 'image',
+        'dirTableName'           => 'image_dir',
         'formatedImageTableName' => 'formated_image',
-        'fileMode' => 0644,
-        'dirMode' => 0755,
+        'fileMode'               => 0644,
+        'dirMode'                => 0755,
 
         'dirs' => [
             'format' => [
-                'path' => $imageDir . "format",
-                'url'  => 'http://localhost/image/format/',
+                'path'           => $imageDir . "format",
+                'url'            => 'http://localhost/image/format/',
                 'namingStrategy' => [
-                    'strategy' => 'pattern'
+                    'strategy' => 'pattern',
                 ],
-                'bucket' => 'test-format'
+                'bucket'         => 'test-format',
             ],
-            'test' => [
-                'path' => $imageDir . "test",
-                'url'  => 'http://localhost/image/museum/',
+            'test'   => [
+                'path'           => $imageDir . "test",
+                'url'            => 'http://localhost/image/museum/',
                 'namingStrategy' => [
                     'strategy' => 'serial',
                     'options'  => [
-                        'deep' => 2
-                    ]
+                        'deep' => 2,
+                    ],
                 ],
-                'bucket' => 'test-test'
+                'bucket'         => 'test-test',
             ],
             'naming' => [
-                'path' => $imageDir . "naming",
-                'url'  => 'http://localhost/image/naming/',
+                'path'           => $imageDir . "naming",
+                'url'            => 'http://localhost/image/naming/',
                 'namingStrategy' => [
-                    'strategy' => 'pattern'
+                    'strategy' => 'pattern',
                 ],
-                'bucket' => 'test-naming'
+                'bucket'         => 'test-naming',
             ],
         ],
 
         'formatedImageDirName' => 'format',
 
-        'formats' => [
-            'test'    => [
+        'formats'    => [
+            'test'            => [
                 'fitType'    => 0,
                 'width'      => 160,
                 'height'     => 120,
                 'background' => '#fff',
-                'strip'      => 1
+                'strip'      => 1,
             ],
             'picture-gallery' => [
                 'fitType'    => 2,
@@ -88,9 +92,9 @@ return [
                 'height'     => 768,
                 'reduceOnly' => 1,
                 'strip'      => 1,
-                'format'     => 'jpeg'
+                'format'     => 'jpeg',
             ],
-            'with-processor' => [
+            'with-processor'  => [
                 'fitType'    => 0,
                 'width'      => 160,
                 'height'     => 120,
@@ -98,21 +102,21 @@ return [
                 'strip'      => 1,
                 'processors' => [
                     'normalize',
-                    'negate'
-                ]
-            ]
+                    'negate',
+                ],
+            ],
         ],
         'formatToS3' => false,
-        's3' => [
-            'region' => '',
-            'version' => 'latest',
-            'endpoint' => getenv('S3_ENDPOINT'),
-            'credentials' => [
-                'key' => getenv('S3_KEY'),
-                'secret' => getenv('S3_SECRET')
+        's3'         => [
+            'region'                  => '',
+            'version'                 => 'latest',
+            'endpoint'                => getenv('S3_ENDPOINT'),
+            'credentials'             => [
+                'key'    => getenv('S3_KEY'),
+                'secret' => getenv('S3_SECRET'),
             ],
-            'use_path_style_endpoint' => true
-        ]
+            'use_path_style_endpoint' => true,
+        ],
     ],
-    'db' => $db
+    'db'           => $db,
 ];

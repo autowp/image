@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\Image\Processor;
 
 use Imagick;
 
-class Normalize extends Processor
+class Normalize extends AbstractProcessor
 {
     public function process(Imagick $imagick)
     {
