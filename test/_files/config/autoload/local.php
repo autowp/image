@@ -89,7 +89,7 @@ return [
                 'fitType'    => 2,
                 'width'      => 1024,
                 'height'     => 768,
-                'reduceOnly' => 1,
+                'reduceOnly' => true,
                 'strip'      => true,
                 'format'     => 'jpeg',
             ],
