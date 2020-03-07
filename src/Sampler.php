@@ -110,22 +110,22 @@ class Sampler
             if (! $heightLess) {
                 // resize by height
                 $scaleHeight = $format->getHeight();
-                $scaleWidth  = round($scaleHeight * $srcRatio);
+                $scaleWidth  = (int) round($scaleHeight * $srcRatio);
                 $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             } elseif (! $widthLess) {
                 // resize by width
                 $scaleWidth  = $format->getWidth();
-                $scaleHeight = round($scaleWidth / $srcRatio);
+                $scaleHeight = (int) round($scaleWidth / $srcRatio);
                 $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             }
         } else {
             if ($ratio < $srcRatio) {
                 $scaleWidth = $format->getWidth();
                 // add top and bottom margins
-                $scaleHeight = round($format->getWidth() / $srcRatio);
+                $scaleHeight = (int) round($format->getWidth() / $srcRatio);
             } else {
                 // add left and right margins
-                $scaleWidth  = round($format->getHeight() * $srcRatio);
+                $scaleWidth  = (int) round($format->getHeight() * $srcRatio);
                 $scaleHeight = $format->getHeight();
             }
 
@@ -206,7 +206,7 @@ class Sampler
             $scaleWidth = $format->getWidth();
         }
 
-        $scaleHeight = round($scaleWidth / $srcRatio);
+        $scaleHeight = (int) round($scaleWidth / $srcRatio);
 
         return $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
     }

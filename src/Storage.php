@@ -76,9 +76,9 @@ class Storage implements StorageInterface
 
     private const INSERT_MAX_ATTEMPTS = 15;
 
-    private const STATUS_DEFAULT    = 0,
-                  STATUS_PROCESSING = 1,
-                  STATUS_FAILED     = 2;
+    public const STATUS_DEFAULT    = 0,
+                 STATUS_PROCESSING = 1,
+                 STATUS_FAILED     = 2;
 
     private const TIMEOUT = 15;
 
