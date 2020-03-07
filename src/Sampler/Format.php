@@ -45,7 +45,7 @@ class Format
     private int $quality = 0;
 
     /** @var string */
-    private string $format;
+    private string $format = '';
 
     /** @var float|null */
     private ?float $widest;
