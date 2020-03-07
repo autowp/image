@@ -1252,7 +1252,7 @@ class Storage implements StorageInterface
         if ($exif) {
             $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE);
             if ($exif === false) {
-                throw new Exception("Failed to encode exif");
+                throw new Storage\Exception("Failed to encode exif");
             }
         }
 
