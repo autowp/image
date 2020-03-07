@@ -30,7 +30,10 @@ before_script:
   - mysql -u root -e 'GRANT ALL PRIVILEGES ON autowp_image_test.* TO autowp_test@localhost IDENTIFIED BY "test";' || travis_terminate 1;
   - psql -c 'create database autowp_image_test;' -U postgres || travis_terminate 1;
   - psql --set ON_ERROR_STOP=on -U postgres autowp_image_test < test/_files/dump.pgsql.sql || travis_terminate 1;
-script: 
+  - curl -Ls https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+script:
+  - ./cc-test-reporter before-build || travis_terminate 1;
   - composer cs-check || travis_terminate 1;
   - composer phpmd || travis_terminate 1;
   - PDODRIVER=pgsql ./vendor/bin/phpunit --exclude StorageS3Test || travis_terminate 1;
@@ -39,4 +42,4 @@ script:
 
 after_script:
   - ./vendor/bin/coveralls -v
-  - ./vendor/bin/test-reporter -v --coverage-report=./logs/clover.xml
+  - ./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./test/logs/clover.xml
