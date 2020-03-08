@@ -34,9 +34,9 @@ script:
   - ./cc-test-reporter before-build || travis_terminate 1;
   - composer cs-check || travis_terminate 1;
   - composer phpmd || travis_terminate 1;
-  - PDODRIVER=mysql ./vendor/bin/phpunit --exclude StorageS3Test --log-junit test/logs/junit.xml --coverage-clover ./test/logs/clover.xml || travis_terminate 1;
+  - PDODRIVER=mysql ./vendor/bin/phpunit --exclude StorageS3Test --log-junit test/logs/junit.xml --coverage-clover ./clover.xml || travis_terminate 1;
   - sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true;
 
 after_script:
-  - ./vendor/bin/php-coveralls -v -x ./test/logs/clover.xml
-  - ./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./test/logs/clover.xml
+  - ./vendor/bin/php-coveralls -v -x ./clover.xml
+  - ./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml
