@@ -1837,7 +1837,7 @@ class Storage implements StorageInterface
             if (! file_exists($filepath)) {
                 print $row['id'] . ' ' . $row['filepath'] . " - file not found. ";
 
-                $this->removeImage($row['id']);
+                $this->removeImage((int) $row['id']);
 
                 print "Deleted\n";
             }
