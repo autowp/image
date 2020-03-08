@@ -455,18 +455,13 @@ class Storage implements StorageInterface
 
     /**
      * @param int $imageId
-     * @return array|ArrayObject
+     * @return array|ArrayObject|null
      * @throws Storage\Exception
      */
-    private function getImageRow($imageId)
+    private function getImageRow(int $imageId)
     {
-        $id = (int) $imageId;
-        if (strlen($id) !== strlen($imageId)) {
-            throw new Storage\Exception("Image id mus be int. `$imageId` given");
-        }
-
         $imageRow = $this->imageTable->select([
-            'id' => $id,
+            'id' => $imageId,
         ])->current();
 
         return $imageRow ? $imageRow : null;
