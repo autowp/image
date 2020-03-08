@@ -581,7 +581,7 @@ class Storage implements StorageInterface
     {
         // find source image
         $imageRow = $this->imageTable->select([
-            'id = ?' => $imageId,
+            'id' => $imageId,
         ])->current();
         if (! $imageRow) {
             throw new Storage\Exception("Image '$imageId' not defined");
@@ -643,8 +643,8 @@ class Storage implements StorageInterface
             $formatedImageRow = null;
             for ($i = 0; $i < self::TIMEOUT && ! $done; $i++) {
                 $formatedImageRow = $this->formatedImageTable->select([
-                    'format = ?'   => $formatName,
-                    'image_id = ?' => $imageId,
+                    'format'   => $formatName,
+                    'image_id' => $imageId,
                 ])->current();
 
                 $done = $formatedImageRow['status'] !== self::STATUS_PROCESSING;
@@ -659,9 +659,9 @@ class Storage implements StorageInterface
                 $this->formatedImageTable->update([
                     'status' => self::STATUS_FAILED,
                 ], [
-                    'format = ?'   => $formatName,
-                    'image_id = ?' => $imageId,
-                    'status = ?'   => self::STATUS_PROCESSING,
+                    'format'   => $formatName,
+                    'image_id' => $imageId,
+                    'status'   => self::STATUS_PROCESSING,
                 ]);
             }
 
@@ -718,15 +718,15 @@ class Storage implements StorageInterface
                 'formated_image_id' => $formatedImageId,
                 'status'            => self::STATUS_DEFAULT,
             ], [
-                'format = ?'   => $formatName,
-                'image_id = ?' => $imageId,
+                'format'   => $formatName,
+                'image_id' => $imageId,
             ]);
         } catch (Exception $e) {
             $this->formatedImageTable->update([
                 'status' => self::STATUS_FAILED,
             ], [
-                'format = ?'   => $formatName,
-                'image_id = ?' => $imageId,
+                'format'   => $formatName,
+                'image_id' => $imageId,
             ]);
 
             throw $e;
@@ -751,7 +751,7 @@ class Storage implements StorageInterface
                 )
                 ->where([
                     new Sql\Predicate\In('f.image_id', $imagesId),
-                    'f.format = ?' => (string) $formatName,
+                    'f.format' => (string) $formatName,
                 ]);
             foreach ($this->imageTable->selectWith($select) as $row) {
                 $destImageRows[] = $row;
@@ -773,7 +773,7 @@ class Storage implements StorageInterface
                 $formatedImageId = $this->doFormatImage($imageId, $formatName);
                 // result
                 $destImageRow = $this->imageTable->select([
-                    'id = ?' => $formatedImageId,
+                    'id' => $formatedImageId,
                 ])->current();
             }
 
@@ -873,7 +873,7 @@ class Storage implements StorageInterface
     public function removeImage(int $imageId): StorageInterface
     {
         $imageRow = $this->imageTable->select([
-            'id = ?' => $imageId,
+            'id' => $imageId,
         ])->current();
 
         if (! $imageRow) {
@@ -886,12 +886,12 @@ class Storage implements StorageInterface
 
         // to save remove formated image
         $this->formatedImageTable->delete([
-            'formated_image_id = ?' => $imageRow['id'],
+            'formated_image_id' => $imageRow['id'],
         ]);
 
         // important to delete row first
         $this->imageTable->delete([
-            'id = ?' => $imageRow['id'],
+            'id' => $imageRow['id'],
         ]);
 
         $dir = $this->getDir($imageRow['dir']);
@@ -1246,13 +1246,13 @@ class Storage implements StorageInterface
 
         if ($options['format']) {
             $select->where([
-                $this->formatedImageTableName . '.format = ?' => (string) $options['format'],
+                $this->formatedImageTableName . '.format' => (string) $options['format'],
             ]);
         }
 
         if ($options['image']) {
             $select->where([
-                $this->formatedImageTableName . '.image_id = ?' => (int) $options['image'],
+                $this->formatedImageTableName . '.image_id' => (int) $options['image'],
             ]);
         }
 
@@ -1276,7 +1276,7 @@ class Storage implements StorageInterface
     {
         $select = $this->dirTable->getSql()->select()
             ->columns(['count'])
-            ->where(['dir = ?' => $dirName]);
+            ->where(['dir' => $dirName]);
 
         $row = $this->dirTable->selectWith($select)->current();
 
@@ -1290,7 +1290,7 @@ class Storage implements StorageInterface
     private function incDirCounter(string $dirName): self
     {
         $row = $this->dirTable->select([
-            'dir = ?' => $dirName,
+            'dir' => $dirName,
         ])->current();
 
         if ($row) {
@@ -1370,7 +1370,7 @@ class Storage implements StorageInterface
             return null;
         }
 
-        $exif = json_decode($imageRow['exif'], true);
+        $exif = json_decode($imageRow['exif'], true, 512, JSON_THROW_ON_ERROR);
 
         if ($exif === false) {
             return null;
@@ -1442,7 +1442,7 @@ class Storage implements StorageInterface
         $info = $imagick->identifyImage();
 
         $x = $info['resolution']['x'];
-        $y = $info['resolution']['x'];
+        $y = $info['resolution']['y'];
 
         if (! $x || ! $y) {
             return null;
@@ -1795,7 +1795,7 @@ class Storage implements StorageInterface
                     print $row['id'] . ' ' . $filepath . ' - file not found. ';
 
                     $fRows = $this->formatedImageTable->select([
-                        'formated_image_id = ?' => $row['id'],
+                        'formated_image_id' => $row['id'],
                     ]);
 
                     if (count($fRows)) {
@@ -1827,7 +1827,7 @@ class Storage implements StorageInterface
 
         $select = $this->imageTable->getSql()->select()
             ->columns(['id', 'filepath'])
-            ->where(['dir = ?' => $dirname]);
+            ->where(['dir' => $dirname]);
 
         $rows = $this->imageTable->selectWith($select);
 
