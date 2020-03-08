@@ -8,8 +8,8 @@ use Autowp\Image\Processor;
 use Autowp\Image\Storage;
 use Autowp\ZFComponents\Db\TableManager;
 use Interop\Container\ContainerInterface;
-use Zend\Http\Request;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\Http\Request;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ImageStorageFactory implements FactoryInterface
 {

@@ -6,9 +6,9 @@ namespace Autowp\Image\Controller;
 
 use Autowp\Image\Storage;
 use InvalidArgumentException;
-use Zend\Console\ColorInterface;
-use Zend\Console\Console;
-use Zend\Mvc\Controller\AbstractActionController;
+use Laminas\Console\ColorInterface;
+use Laminas\Console\Console;
+use Laminas\Mvc\Controller\AbstractActionController;
 
 use function array_pop;
 use function is_dir;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Autowp\Image\View\Helper;
 
 use Autowp\Image;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
 
 class ImageStorage extends AbstractHelper
 {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Autowp\Image\Processor;
 
-use Zend\ServiceManager\AbstractPluginManager;
-use Zend\ServiceManager\Exception\InvalidServiceException;
+use Laminas\ServiceManager\AbstractPluginManager;
+use Laminas\ServiceManager\Exception\InvalidServiceException;
 
 use function get_class;
 use function gettype;

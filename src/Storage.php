@@ -10,10 +10,10 @@ use Closure;
 use Exception;
 use Imagick;
 use ImagickException;
-use Zend\Db\Exception\ExceptionInterface;
-use Zend\Db\ResultSet\ResultSetInterface;
-use Zend\Db\Sql;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\Exception\ExceptionInterface;
+use Laminas\Db\ResultSet\ResultSetInterface;
+use Laminas\Db\Sql;
+use Laminas\Db\TableGateway\TableGateway;
 
 use function array_key_exists;
 use function array_merge;

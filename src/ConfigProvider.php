@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Autowp\Image;
 
-use Zend\ServiceManager\Factory\InvokableFactory;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 class ConfigProvider
 {

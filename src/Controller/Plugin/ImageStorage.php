@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Autowp\Image\Controller\Plugin;
 
 use Autowp\Image;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class ImageStorage extends AbstractPlugin
 {

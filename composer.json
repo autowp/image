@@ -15,11 +15,11 @@
         "ext-exif": "*",
         "ext-fileinfo": "*",
         "ext-json": "*",
-        "zendframework/zend-mvc": "^3.1.1",
-        "zendframework/zend-mvc-console": "^1.2",
-        "autowp/zf-components": "^2.0.0",
-        "zendframework/zend-db": "^2.11",
-        "aws/aws-sdk-php": "^3.100"
+        "autowp/zf-components": "^3.0.0",
+        "aws/aws-sdk-php": "^3.100",
+        "laminas/laminas-mvc": "^3.1",
+        "laminas/laminas-mvc-console": "^1.2",
+        "laminas/laminas-db": "^2.11"
     },
     "autoload": {
         "psr-4": {
@@ -31,7 +31,8 @@
         "phpunit/phpunit": "^9.0",
         "php-coveralls/php-coveralls": "^2.0",
         "phpmd/phpmd" : "^2.8",
-        "laminas/laminas-coding-standard": "^2.0.0rc1"
+        "laminas/laminas-coding-standard": "^2.0.0rc1",
+        "laminas/laminas-test": "^3.4"
     },
     "autoload-dev": {
         "psr-4": {

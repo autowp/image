@@ -7,7 +7,7 @@ namespace Autowp\Image\Factory;
 use Autowp\Image\Storage;
 use Autowp\Image\View\Helper\ImageStorage;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ViewHelperFactory implements FactoryInterface
 {
