@@ -540,7 +540,7 @@ class Sampler
 
         foreach ($iterator as $row) {
             foreach ($row as $pixel) {
-                $color      = $pixel->getColor(true);
+                $color      = $pixel->getColor(1);
                 $sum['r'][] = $color['r'];
                 $sum['g'][] = $color['g'];
                 $sum['b'][] = $color['b'];

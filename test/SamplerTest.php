@@ -21,7 +21,7 @@ class SamplerTest extends TestCase
      * @throws Sampler\Exception
      * @throws ImagickException
      */
-    public function testShouldResizeOddWidthPictureStrictlyToTargetWidthByOuterFitType()
+    public function testShouldResizeOddWidthPictureStrictlyToTargetWidthByOuterFitType(): void
     {
         $sampler = new Sampler();
         $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
@@ -41,7 +41,7 @@ class SamplerTest extends TestCase
      * @throws ImagickException
      * @throws Sampler\Exception
      */
-    public function testShouldResizeOddHeightPictureStrictlyToTargetHeightByOuterFitType()
+    public function testShouldResizeOddHeightPictureStrictlyToTargetHeightByOuterFitType(): void
     {
         $sampler = new Sampler();
         $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
@@ -61,7 +61,7 @@ class SamplerTest extends TestCase
      * @throws ImagickException
      * @throws Sampler\Exception
      */
-    public function testReduceOnlyWithInnerFitWorks()
+    public function testReduceOnlyWithInnerFitWorks(): void
     {
         $sampler = new Sampler();
         $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
@@ -160,7 +160,7 @@ class SamplerTest extends TestCase
      * @throws ImagickException
      * @throws Sampler\Exception
      */
-    public function testReduceOnlyWithOuterFitWorks()
+    public function testReduceOnlyWithOuterFitWorks(): void
     {
         $sampler = new Sampler();
         $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
@@ -259,7 +259,7 @@ class SamplerTest extends TestCase
      * @throws ImagickException
      * @throws Sampler\Exception
      */
-    public function testReduceOnlyWithMaximumFitWorks()
+    public function testReduceOnlyWithMaximumFitWorks(): void
     {
         $sampler = new Sampler();
         $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
@@ -358,7 +358,7 @@ class SamplerTest extends TestCase
      * @throws ImagickException
      * @throws Sampler\Exception
      */
-    public function testReduceOnlyByWidthWorks()
+    public function testReduceOnlyByWidthWorks(): void
     {
         $sampler = new Sampler();
         $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
@@ -405,7 +405,7 @@ class SamplerTest extends TestCase
      * @throws ImagickException
      * @throws Sampler\Exception
      */
-    public function testReduceOnlyByHeightWorks()
+    public function testReduceOnlyByHeightWorks(): void
     {
         $sampler = new Sampler();
         $file    = dirname(__FILE__) . '/_files/Towers_Schiphol_small.jpg';
@@ -452,7 +452,7 @@ class SamplerTest extends TestCase
      * @throws ImagickException
      * @throws Sampler\Exception
      */
-    public function testAnimationPreservedDueResample()
+    public function testAnimationPreservedDueResample(): void
     {
         $file = dirname(__FILE__) . '/_files/icon-animation.gif';
 
@@ -479,7 +479,7 @@ class SamplerTest extends TestCase
      * @throws ImagickException
      * @throws Sampler\Exception
      */
-    public function testResizeGif()
+    public function testResizeGif(): void
     {
         $file = dirname(__FILE__) . '/_files/rudolp-jumping-rope.gif';
 
@@ -507,7 +507,7 @@ class SamplerTest extends TestCase
      * @throws ImagickException
      * @throws Sampler\Exception
      */
-    public function testResizeGifWithProportionsConstraints()
+    public function testResizeGifWithProportionsConstraints(): void
     {
         $file = dirname(__FILE__) . '/_files/rudolp-jumping-rope.gif';
 
@@ -530,6 +530,52 @@ class SamplerTest extends TestCase
         $this->assertSame($imagick->getImageWidth(), 456);
         $this->assertSame($imagick->getImageHeight(), 342);
 
+        $imagick->clear();
+    }
+
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
+    public function testVerticalProportional(): void
+    {
+        $sampler = new Sampler();
+        $file    = dirname(__FILE__) . '/_files/mazda3_sedan_us-spec_11.jpg';
+        $imagick = new Imagick();
+        // both size less
+        $imagick->readImage($file); //101x149
+        $sampler->convertImagick($imagick, null, [
+            'fitType'          => Format::FIT_TYPE_INNER,
+            'width'            => 200,
+            'height'           => 200,
+            'reduceOnly'       => true,
+            'proportionalCrop' => true,
+        ]);
+        $this->assertSame($imagick->getImageWidth(), 200);
+        $this->assertSame($imagick->getImageHeight(), 200);
+        $imagick->clear();
+    }
+
+    /**
+     * @throws ImagickException
+     * @throws Sampler\Exception
+     */
+    public function testHorizonalProportional(): void
+    {
+        $sampler = new Sampler();
+        $file    = dirname(__FILE__) . '/_files/mazda3_sedan_us-spec_11.jpg';
+        $imagick = new Imagick();
+        // both size less
+        $imagick->readImage($file); //101x149
+        $sampler->convertImagick($imagick, null, [
+            'fitType'          => Format::FIT_TYPE_INNER,
+            'width'            => 400,
+            'height'           => 200,
+            'reduceOnly'       => true,
+            'proportionalCrop' => true,
+        ]);
+        $this->assertSame($imagick->getImageWidth(), 400);
+        $this->assertSame($imagick->getImageHeight(), 200);
         $imagick->clear();
     }
 }
