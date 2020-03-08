@@ -319,4 +319,43 @@ class StorageTest extends TestCase
 
         $this->assertTrue(true);
     }
+
+    public function testPrintBrokenFiles(): void
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+
+        $imageStorage = $this->getImageStorage($app);
+
+        $imageStorage->printBrokenFiles();
+
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @throws Storage\Exception
+     */
+    public function testFixBrokenFiles(): void
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+
+        $imageStorage = $this->getImageStorage($app);
+
+        $imageStorage->fixBrokenFiles();
+
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @throws Storage\Exception
+     */
+    public function testDeleteBrokenFiles(): void
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+
+        $imageStorage = $this->getImageStorage($app);
+
+        $imageStorage->deleteBrokenFiles('test');
+
+        $this->assertTrue(true);
+    }
 }
