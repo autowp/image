@@ -173,7 +173,7 @@ class Format
      */
     public function getStrip(): bool
     {
-        return $this->strip;
+        return $this->isStrip();
     }
 
     public function setReduceOnly(bool $reduceOnly): self
@@ -195,7 +195,7 @@ class Format
      */
     public function getReduceOnly(): bool
     {
-        return $this->reduceOnly;
+        return $this->isReduceOnly();
     }
 
     /**
@@ -284,7 +284,7 @@ class Format
      */
     public function getIgnoreCrop(): bool
     {
-        return $this->ignoreCrop;
+        return $this->isIgnoreCrop();
     }
 
     public function isIgnoreCrop(): bool
@@ -311,7 +311,7 @@ class Format
      */
     public function getProportionalCrop(): bool
     {
-        return $this->proportionalCrop;
+        return $this->isProportionalCrop();
     }
 
     /**

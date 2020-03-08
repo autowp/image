@@ -74,11 +74,13 @@ class StorageTest extends TestCase
         $this->assertNotEmpty($imageId);
 
         $formatedImage = $imageStorage->getFormatedImage($imageId, 'test');
-
         $this->assertEquals(160, $formatedImage->getWidth());
         $this->assertEquals(120, $formatedImage->getHeight());
         $this->assertTrue($formatedImage->getFileSize() > 0);
         $this->assertNotEmpty($formatedImage->getSrc());
+
+        $path = $imageStorage->getFormatedImagePath($imageId, 'test');
+        $this->assertStringContainsString('test', $path);
     }
 
     /**
