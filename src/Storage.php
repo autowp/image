@@ -149,10 +149,9 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @return $this
      * @throws Storage\Exception
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): self
     {
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
@@ -195,22 +194,14 @@ class Storage implements StorageInterface
         return $this->s3;
     }
 
-    /**
-     * @param bool $value
-     * @return $this
-     */
-    public function setForceHttps($value): self
+    public function setForceHttps(bool $value): self
     {
         $this->forceHttps = (bool) $value;
 
         return $this;
     }
 
-    /**
-     * @param string $tableName
-     * @return $this
-     */
-    public function setImageTableName($tableName): self
+    public function setImageTableName(string $tableName): self
     {
         $this->imageTableName = $tableName;
 
@@ -239,10 +230,9 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @return Sampler
      * @throws Storage\Exception
      */
-    public function getImageSampler()
+    public function getImageSampler(): Sampler
     {
         if (null === $this->imageSampler) {
             $this->setImageSampler([]);
@@ -250,11 +240,7 @@ class Storage implements StorageInterface
         return $this->imageSampler;
     }
 
-    /**
-     * @param string $tableName
-     * @return $this
-     */
-    public function setFormatedImageTableName($tableName)
+    public function setFormatedImageTableName(string $tableName): self
     {
         $this->formatedImageTableName = $tableName;
 
@@ -361,20 +347,12 @@ class Storage implements StorageInterface
         return $this;
     }
 
-    /**
-     * @param string $formatName
-     * @return Sampler\Format
-     */
-    public function getFormat($formatName)
+    public function getFormat(string $formatName): ?Sampler\Format
     {
         return $this->formats[$formatName] ?? null;
     }
 
-    /**
-     * @param string $dirName
-     * @return $this
-     */
-    public function setFormatedImageDirName($dirName)
+    public function setFormatedImageDirName(string $dirName): self
     {
         $this->formatedImageDirName = $dirName;
 
@@ -454,7 +432,6 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param int $imageId
      * @return array|ArrayObject|null
      * @throws Storage\Exception
      */
