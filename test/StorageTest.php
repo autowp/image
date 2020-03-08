@@ -30,7 +30,7 @@ class StorageTest extends TestCase
     /**
      * @throws Storage\Exception
      */
-    public function testAddImageFromFileChangeNameAndDelete()
+    public function testAddImageFromFileChangeNameAndDelete(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -61,7 +61,7 @@ class StorageTest extends TestCase
      * @throws Storage\Exception
      * @throws ImagickException
      */
-    public function testAddImageFromBlobAndFormat()
+    public function testAddImageFromBlobAndFormat(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -86,7 +86,7 @@ class StorageTest extends TestCase
     /**
      * @throws Storage\Exception
      */
-    public function testAddImageWithPrefferedName()
+    public function testAddImageWithPrefferedName(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -107,7 +107,7 @@ class StorageTest extends TestCase
      * @throws ImagickException
      * @throws Storage\Exception
      */
-    public function testIptcAndExif()
+    public function testIptcAndExif(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -134,7 +134,7 @@ class StorageTest extends TestCase
      * @throws ImagickException
      * @throws Storage\Exception
      */
-    public function testAddImageAndCrop()
+    public function testAddImageAndCrop(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -172,7 +172,7 @@ class StorageTest extends TestCase
      * @throws ImagickException
      * @throws Storage\Exception
      */
-    public function testFlopNormalizeAndMultipleRequest()
+    public function testFlopNormalizeAndMultipleRequest(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -206,7 +206,7 @@ class StorageTest extends TestCase
     /**
      * @throws Storage\Exception
      */
-    public function testGetImageReturnsNull()
+    public function testGetImageReturnsNull(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -221,7 +221,7 @@ class StorageTest extends TestCase
      * @throws ImagickException
      * @throws Storage\Exception
      */
-    public function testRequestFormatedImageAgain()
+    public function testRequestFormatedImageAgain(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -252,7 +252,7 @@ class StorageTest extends TestCase
      * @throws ImagickException
      * @throws Storage\Exception
      */
-    public function testTimeout()
+    public function testTimeout(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -286,7 +286,7 @@ class StorageTest extends TestCase
      * @throws ImagickException
      * @throws Storage\Exception
      */
-    public function testNormalizeProcessor()
+    public function testNormalizeProcessor(): void
     {
         $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
 
@@ -304,5 +304,19 @@ class StorageTest extends TestCase
         $this->assertEquals(120, $formatedImage->getHeight());
         $this->assertTrue($formatedImage->getFileSize() > 0);
         $this->assertNotEmpty($formatedImage->getSrc());
+    }
+
+    /**
+     * @throws Storage\Exception
+     */
+    public function testExtractAllEXIF(): void
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+
+        $imageStorage = $this->getImageStorage($app);
+
+        $imageStorage->extractAllEXIF('test');
+
+        $this->assertTrue(true);
     }
 }
