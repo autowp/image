@@ -17,9 +17,6 @@ use function floor;
 use function is_array;
 use function round;
 use function sqrt;
-use function trigger_error;
-
-use const E_USER_WARNING;
 
 class Sampler
 {
@@ -601,7 +598,7 @@ class Sampler
         return $this->extendEdgeColor($iterator);
     }
 
-    private function extendVertical(Imagick $imagick, Sampler\Format $format)
+    private function extendVertical(Imagick $imagick, Sampler\Format $format): void
     {
         $fRatio = $format->getWidth() / $format->getHeight();
 
@@ -662,7 +659,7 @@ class Sampler
         }
     }
 
-    private function extendHorizontal(Imagick $imagick, Sampler\Format $format)
+    private function extendHorizontal(Imagick $imagick, Sampler\Format $format): void
     {
         $fRatio = $format->getWidth() / $format->getHeight();
 

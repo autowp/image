@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Autowp\Image\Storage;
 
-use function array_merge;
+use function array_replace;
 
 class Image
 {
@@ -33,7 +33,7 @@ class Image
             'src'      => null,
         ];
 
-        $options = array_merge($defaults, $options);
+        $options = array_replace($defaults, $options);
 
         $this->id       = (int) $options['id'];
         $this->width    = (int) $options['width'];
