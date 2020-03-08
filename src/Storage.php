@@ -1417,7 +1417,7 @@ class Storage implements StorageInterface
             throw new Storage\Exception("Resource expected");
         }
 
-        $exif = @exif_read_data($stream, null, true);
+        $exif = @exif_read_data($stream, '', true);
 
         return $exif ? $exif : null;
     }
