@@ -65,6 +65,7 @@ use const IMAGETYPE_GIF;
 use const IMAGETYPE_JPEG;
 use const IMAGETYPE_PNG;
 use const JSON_INVALID_UTF8_SUBSTITUTE;
+use const JSON_THROW_ON_ERROR;
 use const PATHINFO_EXTENSION;
 
 /**
