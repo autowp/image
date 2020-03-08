@@ -43,6 +43,9 @@ class StorageTest extends TestCase
         $imageInfo = $imageStorage->getImage($imageId);
         $this->assertEquals(filesize(self::TEST_IMAGE_FILE), $imageInfo->toArray()['filesize']);
 
+        $blob = $imageStorage->getImageBlob($imageId);
+        $this->assertStringEqualsFile(self::TEST_IMAGE_FILE, $blob);
+
         $imageStorage->changeImageName($imageId, [
             'pattern' => 'new-name/by-pattern',
         ]);

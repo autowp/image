@@ -56,6 +56,14 @@ class Format
     /** @var array */
     private array $processors = [];
 
+    private const FORMAT_EXT = [
+        'jpg'  => 'jpeg',
+        'jpeg' => 'jpeg',
+        'png'  => 'png',
+        'gif'  => 'gif',
+        'bmp'  => 'bmp',
+    ];
+
     /**
      * @throws Exception
      */
@@ -116,27 +124,15 @@ class Format
      */
     public function getFormatExtension(): ?string
     {
-        if ($this->format) {
-            switch ($this->format) {
-                case 'jpg':
-                case 'jpeg':
-                    return 'jpeg';
-
-                case 'png':
-                    return 'png';
-
-                case 'gif':
-                    return 'gif';
-
-                case 'bmp':
-                    return 'bmp';
-
-                default:
-                    throw new Exception("Unsupported format `{$this->format}`");
-            }
+        if (! $this->format) {
+            return null;
         }
 
-        return null;
+        if (! isset(self::FORMAT_EXT[$this->format])) {
+            throw new Exception("Unsupported format `{$this->format}`");
+        }
+
+        return self::FORMAT_EXT[$this->format];
     }
 
     /**

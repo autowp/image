@@ -34,11 +34,14 @@ class ImageStorageFactory implements FactoryInterface
             $container->get(Processor\ProcessorPluginManager::class)
         );
 
-        $request = $container->get('Request');
-        if ($request instanceof Request) {
-            if ($request->getServer('HTTPS') || $request->getServer('HTTP_X_FORWARDED_PROTO') === 'https') {
-                $storage->setForceHttps(true);
-            }
+        $request    = $container->get('Request');
+        $forceHttps = $request instanceof Request &&
+                      (
+                          $request->getServer('HTTPS') ||
+                          $request->getServer('HTTP_X_FORWARDED_PROTO') === 'https'
+                      );
+        if ($forceHttps) {
+            $storage->setForceHttps(true);
         }
 
         return $storage;
