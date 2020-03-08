@@ -1757,7 +1757,7 @@ class Storage implements StorageInterface
     public function printBrokenFiles(): void
     {
         $select = $this->imageTable->getSql()->select()
-            ->columns(['id', 'filepath', 'dir']);
+            ->columns(['id', 'filepath', 'dir', 'date_add']);
 
         $rows = $this->imageTable->selectWith($select);
 
