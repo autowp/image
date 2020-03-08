@@ -1073,7 +1073,7 @@ class Storage implements StorageInterface
                     's3'          => isset($options['s3']) && $options['s3'] ? 1 : 0,
                 ]);
 
-                $id = $this->imageTable->getLastInsertValue();
+                $id = (int) $this->imageTable->getLastInsertValue();
 
                 $callback($destFilePath, $destFileName);
 
