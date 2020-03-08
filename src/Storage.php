@@ -113,7 +113,7 @@ class Storage implements StorageInterface
     private string $formatedImageDirName;
 
     /** @var Sampler */
-    private Sampler $imageSampler;
+    private ?Sampler $imageSampler;
 
     /** @var bool */
     private bool $forceHttps = false;
@@ -140,6 +140,8 @@ class Storage implements StorageInterface
         TableGateway $dirTable,
         Processor\ProcessorPluginManager $processors
     ) {
+        $this->imageSampler = null;
+
         $this->setOptions($options);
 
         $this->imageTable         = $imageTable;
@@ -173,9 +175,6 @@ class Storage implements StorageInterface
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function setS3(array $options): self
     {
         $this->s3 = null;
@@ -210,7 +209,6 @@ class Storage implements StorageInterface
 
     /**
      * @param array|Sampler $options
-     * @return $this
      * @throws Storage\Exception
      */
     public function setImageSampler($options): self
@@ -249,7 +247,6 @@ class Storage implements StorageInterface
 
     /**
      * @param string|int $mode
-     * @return $this
      */
     public function setFileMode($mode): self
     {
@@ -260,7 +257,6 @@ class Storage implements StorageInterface
 
     /**
      * @param string|int $mode
-     * @return $this
      */
     public function setDirMode($mode): self
     {
@@ -285,7 +281,6 @@ class Storage implements StorageInterface
 
     /**
      * @param Storage\Dir|array $dir
-     * @return $this
      * @throws Storage\Exception
      */
     public function addDir(string $dirName, $dir): StorageInterface
@@ -361,10 +356,9 @@ class Storage implements StorageInterface
 
     /**
      * @param array|ArrayObject $imageRow
-     * @return Storage\Image
      * @throws Storage\Exception
      */
-    private function buildImageResult($imageRow)
+    private function buildImageResult($imageRow): Storage\Image
     {
         $dir = $this->getDir($imageRow['dir']);
         if (! $dir) {
@@ -742,11 +736,10 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @return array
      * @throws ImagickException
      * @throws Storage\Exception
      */
-    private function getFormatedImageRows(array $imagesId, string $formatName)
+    private function getFormatedImageRows(array $imagesId, string $formatName): array
     {
         $destImageRows = [];
         if (count($imagesId)) {
@@ -1280,11 +1273,7 @@ class Storage implements StorageInterface
         return $this;
     }
 
-    /**
-     * @param string $dirName
-     * @return int
-     */
-    public function getDirCounter($dirName)
+    public function getDirCounter(string $dirName): int
     {
         $select = $this->dirTable->getSql()->select()
             ->columns(['count'])
@@ -1299,11 +1288,7 @@ class Storage implements StorageInterface
         return (int) $row['count'];
     }
 
-    /**
-     * @param string $dirName
-     * @return $this
-     */
-    private function incDirCounter($dirName)
+    private function incDirCounter(string $dirName): self
     {
         $row = $this->dirTable->select([
             'dir = ?' => $dirName,
@@ -1396,10 +1381,9 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @return array|null
      * @throws Storage\Exception
      */
-    public function extractEXIF(int $imageId)
+    public function extractEXIF(int $imageId): ?array
     {
         $imageRow = $this->getImageRow($imageId);
 

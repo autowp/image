@@ -17,10 +17,7 @@ class ImageStorage extends AbstractHelper
         $this->imageStorage = $imageStorage;
     }
 
-    /**
-     * @return Image\Storage
-     */
-    public function __invoke()
+    public function __invoke(): Image\Storage
     {
         return $this->imageStorage;
     }

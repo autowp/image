@@ -512,20 +512,14 @@ class Sampler
         $imagick->clear();
     }
 
-    /**
-     * @param bool $sample
-     * @return bool|float
-     */
-    private function standardDeviation(array $values, $sample = false)
+    private function standardDeviation(array $values, bool $sample = false): float
     {
         $count = count($values);
         if ($count === 0) {
-            trigger_error("The array has zero elements", E_USER_WARNING);
-            return false;
+            return 0.0;
         }
         if ($sample && $count === 1) {
-            trigger_error("The array has only 1 element", E_USER_WARNING);
-            return false;
+            return 0.0;
         }
         $mean  = array_sum($values) / $count;
         $carry = 0.0;
@@ -579,40 +573,28 @@ class Sampler
         return $color;
     }
 
-    /**
-     * @return ImagickPixel
-     */
-    private function extendTopColor(Imagick $imagick)
+    private function extendTopColor(Imagick $imagick): ?ImagickPixel
     {
         $iterator = $imagick->getPixelRegionIterator(0, 0, $imagick->getImageWidth(), 1);
 
         return $this->extendEdgeColor($iterator);
     }
 
-    /**
-     * @return ImagickPixel
-     */
-    private function extendBottomColor(Imagick $imagick)
+    private function extendBottomColor(Imagick $imagick): ?ImagickPixel
     {
         $iterator = $imagick->getPixelRegionIterator(0, $imagick->getImageHeight() - 1, $imagick->getImageWidth(), 1);
 
         return $this->extendEdgeColor($iterator);
     }
 
-    /**
-     * @return ImagickPixel
-     */
-    private function extendLeftColor(Imagick $imagick)
+    private function extendLeftColor(Imagick $imagick): ?ImagickPixel
     {
         $iterator = $imagick->getPixelRegionIterator(0, 0, 1, $imagick->getImageHeight());
 
         return $this->extendEdgeColor($iterator);
     }
 
-    /**
-     * @return ImagickPixel
-     */
-    private function extendRightColor(Imagick $imagick)
+    private function extendRightColor(Imagick $imagick): ?ImagickPixel
     {
         $iterator = $imagick->getPixelRegionIterator($imagick->getImageWidth() - 1, 0, 1, $imagick->getImageHeight());
 

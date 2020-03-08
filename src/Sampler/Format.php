@@ -70,10 +70,9 @@ class Format
     }
 
     /**
-     * @return $this
      * @throws Exception
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): self
     {
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
@@ -100,30 +99,22 @@ class Format
         return $this->processors;
     }
 
-    /**
-     * @param string $value
-     * @return $this
-     */
-    public function setFormat($value)
+    public function setFormat(string $value): self
     {
-        $this->format = $value ? (string) $value : null;
+        $this->format = $value;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getFormat()
+    public function getFormat(): string
     {
         return $this->format;
     }
 
     /**
-     * @return string|null
      * @throws Exception
      */
-    public function getFormatExtension()
+    public function getFormatExtension(): ?string
     {
         if ($this->format) {
             switch ($this->format) {
@@ -149,7 +140,6 @@ class Format
     }
 
     /**
-     * @return $this
      * @throws Exception
      */
     public function setQuality(int $value): self
@@ -169,9 +159,6 @@ class Format
         return $this->quality;
     }
 
-    /**
-     * @return $this
-     */
     public function setStrip(bool $value): self
     {
         $this->strip = (bool) $value;
@@ -194,9 +181,6 @@ class Format
         return $this->strip;
     }
 
-    /**
-     * @return $this
-     */
     public function setReduceOnly(bool $reduceOnly): self
     {
         $this->reduceOnly = (bool) $reduceOnly;
@@ -220,13 +204,10 @@ class Format
     }
 
     /**
-     * @param int $fitType
      * @throws Exception
-     * @return $this
      */
-    public function setFitType($fitType): self
+    public function setFitType(int $fitType): self
     {
-        $fitType = (int) $fitType;
         switch ($fitType) {
             case self::FIT_TYPE_INNER:
             case self::FIT_TYPE_OUTER:
@@ -247,13 +228,10 @@ class Format
     }
 
     /**
-     * @param int $width
      * @throws Exception
-     * @return $this
      */
-    public function setWidth($width): self
+    public function setWidth(int $width): self
     {
-        $width = (int) $width;
         if ($width < 0) {
             throw new Exception("Unexpected width `$width`");
         }
@@ -268,13 +246,10 @@ class Format
     }
 
     /**
-     * @param int $height
      * @throws Exception
-     * @return $this
      */
-    public function setHeight($height): self
+    public function setHeight(int $height): self
     {
-        $height = (int) $height;
         if ($height < 0) {
             throw new Exception("Unexpected height `$height`");
         }
@@ -288,11 +263,7 @@ class Format
         return $this->height;
     }
 
-    /**
-     * @param string $color
-     * @return $this
-     */
-    public function setBackground($color): self
+    public function setBackground(?string $color): self
     {
         $this->background = $color;
 
@@ -304,9 +275,6 @@ class Format
         return $this->background;
     }
 
-    /**
-     * @return $this
-     */
     public function setIgnoreCrop(bool $value): self
     {
         $this->ignoreCrop = (bool) $value;
@@ -329,9 +297,6 @@ class Format
         return $this->ignoreCrop;
     }
 
-    /**
-     * @return $this
-     */
     public function setProportionalCrop(bool $value): self
     {
         $this->proportionalCrop = (bool) $value;
@@ -355,11 +320,9 @@ class Format
     }
 
     /**
-     * @param float|null $value
      * @throws Exception
-     * @return $this
      */
-    public function setWidest($value): self
+    public function setWidest(?float $value): self
     {
         if ($value === null) {
             $this->widest = null;
@@ -377,11 +340,9 @@ class Format
     }
 
     /**
-     * @param float|null $value
      * @throws Exception
-     * @return $this
      */
-    public function setHighest($value): self
+    public function setHighest(?float $value): self
     {
         if ($value === null) {
             $this->highest = null;

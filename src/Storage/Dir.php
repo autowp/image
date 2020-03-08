@@ -37,7 +37,6 @@ class Dir
     }
 
     /**
-     * @return $this
      * @throws Exception
      */
     public function setOptions(array $options): self
@@ -55,9 +54,6 @@ class Dir
         return $this;
     }
 
-    /**
-     * @return $this
-     */
     public function setBucket(string $bucket): self
     {
         $this->bucket = trim($bucket);
@@ -71,7 +67,6 @@ class Dir
     }
 
     /**
-     * @return $this
      * @throws Exception
      */
     public function setPath(string $path): self
@@ -92,9 +87,6 @@ class Dir
         return $this->path;
     }
 
-    /**
-     * @return $this
-     */
     public function setUrl(string $url): self
     {
         $this->url = isset($url) ? (string) $url : null;
@@ -110,7 +102,6 @@ class Dir
     /**
      * @param string|array|AbstractStrategy $strategy
      * @throws Exception
-     * @return $this
      */
     public function setNamingStrategy($strategy): self
     {

@@ -42,10 +42,7 @@ class Image
         $this->src      = (string) $options['src'];
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'id'       => $this->id,

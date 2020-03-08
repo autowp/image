@@ -22,13 +22,10 @@ class Serial extends AbstractStrategy
     private int $deep = 0;
 
     /**
-     * @param int $deep
      * @throws Exception
-     * @return $this
      */
-    public function setDeep($deep): self
+    public function setDeep(int $deep): self
     {
-        $deep = (int) $deep;
         if ($deep < 0) {
             throw new Exception("Deep cannot be < 0");
         }
