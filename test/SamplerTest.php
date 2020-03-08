@@ -462,7 +462,7 @@ class SamplerTest extends TestCase
         $sampler = new Sampler();
 
         $imagick = $sampler->convertImagick($imagick, null, [
-            'fitType' => '0',
+            'fitType' => 0,
             'width'   => 200,
             'height'  => 200,
         ]);
@@ -489,7 +489,7 @@ class SamplerTest extends TestCase
         $sampler = new Sampler();
 
         $imagick = $sampler->convertImagick($imagick, null, [
-            'fitType'    => '0',
+            'fitType'    => 0,
             'width'      => 80,
             'height'     => 80,
             'background' => 'transparent',
@@ -517,7 +517,7 @@ class SamplerTest extends TestCase
         $sampler = new Sampler();
 
         $imagick = $sampler->convertImagick($imagick, null, [
-            'fitType'    => '0',
+            'fitType'    => 0,
             'width'      => 456,
             'background' => '',
             'widest'     => 16 / 9,

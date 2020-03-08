@@ -961,10 +961,9 @@ class Storage implements StorageInterface
     }
 
     /**
-     * @param string $path
      * @throws Storage\Exception
      */
-    private function chmodFile($path)
+    private function chmodFile(string $path): void
     {
         if (! chmod($path, $this->fileMode)) {
             throw new Storage\Exception("Cannot chmod file '$path'");
