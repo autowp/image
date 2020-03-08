@@ -38,5 +38,5 @@ script:
   - sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || true;
 
 after_script:
-  - ./vendor/bin/php-coveralls -v
+  - ./vendor/bin/php-coveralls -v -x ./test/logs/clover.xml
   - ./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./test/logs/clover.xml
