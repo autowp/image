@@ -13,9 +13,9 @@ use function ucfirst;
 class Format
 {
     public const
-        FIT_TYPE_INNER   = '0', // вписать
-        FIT_TYPE_OUTER   = '1', // описать
-        FIT_TYPE_MAXIMUM = '2';
+        FIT_TYPE_INNER   = 0, // вписать
+        FIT_TYPE_OUTER   = 1, // описать
+        FIT_TYPE_MAXIMUM = 2;
 
     /** @var int */
     private int $fitType;
@@ -89,7 +89,7 @@ class Format
 
     public function setProcessors(array $value): self
     {
-        $this->processors = (array) $value;
+        $this->processors = $value;
 
         return $this;
     }
@@ -144,7 +144,6 @@ class Format
      */
     public function setQuality(int $value): self
     {
-        $value = (int) $value;
         if ($value < 0 || $value > 100) {
             throw new Exception("Compression quality must be >= 0 and <= 100");
         }
@@ -161,7 +160,7 @@ class Format
 
     public function setStrip(bool $value): self
     {
-        $this->strip = (bool) $value;
+        $this->strip = $value;
 
         return $this;
     }
@@ -183,7 +182,7 @@ class Format
 
     public function setReduceOnly(bool $reduceOnly): self
     {
-        $this->reduceOnly = (bool) $reduceOnly;
+        $this->reduceOnly = $reduceOnly;
 
         return $this;
     }
@@ -329,12 +328,11 @@ class Format
             return $this;
         }
 
-        $widest = (float) $value;
-        if ($widest <= 0) {
+        if ($value <= 0) {
             throw new Exception("widest value must be > 0");
         }
 
-        $this->widest = $widest;
+        $this->widest = $value;
 
         return $this;
     }
@@ -349,11 +347,10 @@ class Format
             return $this;
         }
 
-        $highest = (float) $value;
-        if ($highest <= 0) {
+        if ($value <= 0) {
             throw new Exception("highest value must be > 0");
         }
-        $this->highest = $highest;
+        $this->highest = $value;
 
         return $this;
     }
