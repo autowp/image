@@ -648,7 +648,7 @@ class Storage implements StorageInterface
                     'image_id' => $imageId,
                 ])->current();
 
-                $done = $formatedImageRow['status'] !== self::STATUS_PROCESSING;
+                $done = (int) $formatedImageRow['status'] !== self::STATUS_PROCESSING;
 
                 if (! $done) {
                     sleep(1);
