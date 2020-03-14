@@ -752,7 +752,7 @@ class Storage implements StorageInterface
                 )
                 ->where([
                     new Sql\Predicate\In('f.image_id', $imagesId),
-                    'f.format' => (string) $formatName,
+                    'f.format' => $formatName,
                 ]);
             foreach ($this->imageTable->selectWith($select) as $row) {
                 $destImageRows[] = $row;
@@ -764,7 +764,7 @@ class Storage implements StorageInterface
         foreach ($imagesId as $key => $imageId) {
             $destImageRow = null;
             foreach ($destImageRows as $row) {
-                if ($row['image_id'] === $imageId) {
+                if ((int) $row['image_id'] === (int) $imageId) {
                     $destImageRow = $row;
                     break;
                 }
@@ -1131,7 +1131,7 @@ class Storage implements StorageInterface
 
         $exif = $this->extractEXIF($id);
         if ($exif) {
-            $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE);
+            $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
             if ($exif === false) {
                 throw new Storage\Exception("Failed to encode exif");
             }
@@ -1215,7 +1215,7 @@ class Storage implements StorageInterface
 
         $exif = $this->extractEXIF($id);
         if ($exif) {
-            $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE);
+            $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
             if ($exif === false) {
                 throw new Storage\Exception("Failed to encode exif");
             }
@@ -1950,7 +1950,7 @@ class Storage implements StorageInterface
         foreach ($rows as $row) {
             $exif = $this->extractEXIF($row['id']);
             if ($exif) {
-                $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE);
+                $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
                 if ($exif === false) {
                     throw new Storage\Exception("Failed to encode exif");
                 }
