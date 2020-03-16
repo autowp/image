@@ -762,7 +762,7 @@ class Storage implements StorageInterface
         $result = [];
 
         foreach ($imagesId as $key => $imageId) {
-            $imageId = (int) $imageId;
+            $imageId      = (int) $imageId;
             $destImageRow = null;
             foreach ($destImageRows as $row) {
                 if ((int) $row['image_id'] === $imageId) {
