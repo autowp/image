@@ -1877,7 +1877,7 @@ class Storage implements StorageInterface
     /**
      * @throws Storage\Exception
      */
-    public function setImageCrop(int $imageId, array $crop): void
+    public function setImageCrop(int $imageId, ?array $crop): void
     {
         if (! $imageId) {
             throw new Storage\Exception("Invalid image id provided `$imageId`");
