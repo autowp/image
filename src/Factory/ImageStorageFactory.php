@@ -11,6 +11,9 @@ use Interop\Container\ContainerInterface;
 use Laminas\Http\Request;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
+use function array_rand;
+use function is_array;
+
 class ImageStorageFactory implements FactoryInterface
 {
     /**
@@ -28,7 +31,7 @@ class ImageStorageFactory implements FactoryInterface
 
         // pick random endpoint
         if (isset($config['s3']['endpoint']) && is_array($config['s3']['endpoint'])) {
-            $s3endpoints = $config['s3']['endpoint'];
+            $s3endpoints              = $config['s3']['endpoint'];
             $config['s3']['endpoint'] = $s3endpoints[array_rand($s3endpoints)];
         }
 
