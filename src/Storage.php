@@ -83,52 +83,36 @@ class Storage implements StorageInterface
 
     private const TIMEOUT = 15;
 
-    /** @var TableGateway */
     private TableGateway $imageTable;
 
-    /** @var string */
     private string $imageTableName = 'image';
 
-    /** @var TableGateway */
     private TableGateway $formatedImageTable;
 
-    /** @var string */
     private string $formatedImageTableName = 'formated_image';
 
-    /** @var TableGateway */
     private TableGateway $dirTable;
 
-    /** @var array */
     private array $dirs = [];
 
-    /** @var array */
     private array $formats = [];
 
-    /** @var int */
     private int $fileMode = 0600;
 
-    /** @var int */
     private int $dirMode = 0700;
 
-    /** @var string */
     private string $formatedImageDirName;
 
-    /** @var Sampler */
-    private ?Sampler $imageSampler;
+    private Sampler $imageSampler;
 
-    /** @var bool */
     private bool $forceHttps = false;
 
-    /** @var Processor\ProcessorPluginManager */
     private Processor\ProcessorPluginManager $processors;
 
-    /** @var S3Client */
-    private ?S3Client $s3;
+    private S3Client $s3;
 
-    /** @var array */
     private array $s3Options = [];
 
-    /** @var bool */
     private bool $formatToS3 = false;
 
     /**
@@ -141,8 +125,6 @@ class Storage implements StorageInterface
         TableGateway $dirTable,
         Processor\ProcessorPluginManager $processors
     ) {
-        $this->imageSampler = null;
-
         $this->setOptions($options);
 
         $this->imageTable         = $imageTable;
@@ -178,8 +160,6 @@ class Storage implements StorageInterface
 
     public function setS3(array $options): self
     {
-        $this->s3 = null;
-
         $this->s3Options = $options;
 
         return $this;
@@ -187,7 +167,7 @@ class Storage implements StorageInterface
 
     private function getS3Client(): S3Client
     {
-        if (! $this->s3) {
+        if (! isset($this->s3)) {
             $this->s3 = new S3Client($this->s3Options);
         }
 
@@ -233,7 +213,7 @@ class Storage implements StorageInterface
      */
     public function getImageSampler(): Sampler
     {
-        if (null === $this->imageSampler) {
+        if (! isset($this->imageSampler)) {
             $this->setImageSampler([]);
         }
         return $this->imageSampler;
