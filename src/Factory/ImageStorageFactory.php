@@ -30,9 +30,9 @@ class ImageStorageFactory implements FactoryInterface
         $tables = $container->get(TableManager::class);
 
         // pick random endpoint
-        if (isset($config['s3']['endpoint']) && is_array($config['s3']['endpoint'])) {
-            $s3endpoints              = $config['s3']['endpoint'];
-            $config['s3']['endpoint'] = $s3endpoints[array_rand($s3endpoints)];
+        if (isset($storageConfig['s3']['endpoint']) && is_array($storageConfig['s3']['endpoint'])) {
+            $s3endpoints                     = $storageConfig['s3']['endpoint'];
+            $storageConfig['s3']['endpoint'] = $s3endpoints[array_rand($s3endpoints)];
         }
 
         $storage = new Storage(
