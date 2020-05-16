@@ -40,8 +40,7 @@ return [
     'imageStorage' => [
         'imageTableName'         => 'image',
         'formatedImageTableName' => 'formated_image',
-
-        'dirs' => [
+        'dirs'                   => [
             'format' => [
                 'namingStrategy' => [
                     'strategy' => 'pattern',
@@ -64,10 +63,8 @@ return [
                 'bucket'         => 'test-naming',
             ],
         ],
-
-        'formatedImageDirName' => 'format',
-
-        'formats' => [
+        'formatedImageDirName'   => 'format',
+        'formats'                => [
             'test'            => [
                 'fitType'    => 0,
                 'width'      => 160,
@@ -95,7 +92,7 @@ return [
                 ],
             ],
         ],
-        's3'      => [
+        's3'                     => [
             'region'                  => '',
             'version'                 => 'latest',
             'endpoint'                => getenv('S3_ENDPOINT'),

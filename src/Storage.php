@@ -81,8 +81,6 @@ class Storage implements StorageInterface
 
     private Sampler $imageSampler;
 
-    private bool $forceHttps = false;
-
     private Processor\ProcessorPluginManager $processors;
 
     private S3Client $s3;
@@ -139,13 +137,6 @@ class Storage implements StorageInterface
         }
 
         return $this->s3;
-    }
-
-    public function setForceHttps(bool $value): self
-    {
-        $this->forceHttps = (bool) $value;
-
-        return $this;
     }
 
     public function setImageTableName(string $tableName): self
