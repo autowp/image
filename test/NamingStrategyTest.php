@@ -8,8 +8,6 @@ use Autowp\Image\Storage\Exception;
 use Autowp\Image\Storage\NamingStrategy\Pattern;
 use PHPUnit\Framework\TestCase;
 
-use function sys_get_temp_dir;
-
 /**
  * @group Autowp_Image
  */
@@ -32,9 +30,7 @@ class NamingStrategyTest extends TestCase
      */
     public function testPatternStrategy(string $pattern, string $result, string $extension)
     {
-        $strategy  = new Pattern([
-            'dir' => sys_get_temp_dir(),
-        ]);
+        $strategy  = new Pattern([]);
         $generated = $strategy->generate([
             'pattern'   => $pattern,
             'extension' => $extension,
