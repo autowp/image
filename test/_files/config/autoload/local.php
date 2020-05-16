@@ -8,8 +8,6 @@ use PDO;
 
 use function getenv;
 
-$imageDir = __DIR__ . '/../../images/';
-
 if (getenv('PDODRIVER') === 'pgsql') {
     $db = [
         'driver'         => 'Pdo',
@@ -42,21 +40,15 @@ return [
     'imageStorage' => [
         'imageTableName'         => 'image',
         'formatedImageTableName' => 'formated_image',
-        'fileMode'               => 0644,
-        'dirMode'                => 0755,
 
         'dirs' => [
             'format' => [
-                'path'           => $imageDir . "format",
-                'url'            => 'http://localhost/image/format/',
                 'namingStrategy' => [
                     'strategy' => 'pattern',
                 ],
                 'bucket'         => 'test-format',
             ],
             'test'   => [
-                'path'           => $imageDir . "test",
-                'url'            => 'http://localhost/image/museum/',
                 'namingStrategy' => [
                     'strategy' => 'serial',
                     'options'  => [
@@ -66,8 +58,6 @@ return [
                 'bucket'         => 'test-test',
             ],
             'naming' => [
-                'path'           => $imageDir . "naming",
-                'url'            => 'http://localhost/image/naming/',
                 'namingStrategy' => [
                     'strategy' => 'pattern',
                 ],
@@ -77,7 +67,7 @@ return [
 
         'formatedImageDirName' => 'format',
 
-        'formats'    => [
+        'formats' => [
             'test'            => [
                 'fitType'    => 0,
                 'width'      => 160,
@@ -105,8 +95,7 @@ return [
                 ],
             ],
         ],
-        'formatToS3' => false,
-        's3'         => [
+        's3'      => [
             'region'                  => '',
             'version'                 => 'latest',
             'endpoint'                => getenv('S3_ENDPOINT'),

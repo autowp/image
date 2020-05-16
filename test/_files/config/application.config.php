@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 return [
     'modules'                 => [
-        'Zend\\Db',
-        'Zend\\Router',
+        'Laminas\\Db',
+        'Laminas\\Router',
         'Autowp\\Image',
         'Autowp\\ZFComponents',
     ],

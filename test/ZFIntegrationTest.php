@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace AutowpTest\Image;
+namespace AutowpTest;
 
 use Autowp\Image\Controller\ConsoleController;
 use Autowp\Image\Storage;
+use Laminas\Mvc\Application;
 use PHPUnit\Framework\TestCase;
-use Zend\Mvc\Application;
 
 /**
  * @group Autowp_Image

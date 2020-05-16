@@ -7,15 +7,10 @@ namespace Autowp\Image\Storage\NamingStrategy;
 use Autowp\Image\Storage\Exception;
 
 use function method_exists;
-use function rtrim;
 use function ucfirst;
-
-use const DIRECTORY_SEPARATOR;
 
 abstract class AbstractStrategy
 {
-    private string $dir;
-
     /**
      * @throws Exception
      */
@@ -40,18 +35,6 @@ abstract class AbstractStrategy
         }
 
         return $this;
-    }
-
-    public function setDir(string $dir): self
-    {
-        $this->dir = rtrim($dir, DIRECTORY_SEPARATOR);
-
-        return $this;
-    }
-
-    public function getDir(): string
-    {
-        return $this->dir;
     }
 
     abstract public function generate(array $options = []): string;

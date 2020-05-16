@@ -48,13 +48,9 @@ class Module implements
     {
         //description command
         return [
-            'image-storage list-dirs'                     => 'List registered dirs',
-            'image-storage list-broken-files'             => 'List broken files',
-            'image-storage fix-broken-files'              => 'Try to fix broken files',
-            'image-storage flush-format <format>'         => 'Flush formated images by format',
-            'image-storage flush-image <image>'           => 'Flush formated images by image id',
-            'image-storage delete-broken-files <dirname>' => 'Delete broken files',
-            'image-storage clear-empty-dirs <dirname>'    => 'Clear empty directories',
+            'image-storage list-dirs'             => 'List registered dirs',
+            'image-storage flush-format <format>' => 'Flush formated images by format',
+            'image-storage flush-image <image>'   => 'Flush formated images by image id',
         ];
     }
 }

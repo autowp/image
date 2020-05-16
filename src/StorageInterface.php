@@ -42,8 +42,6 @@ interface StorageInterface
 
     public function flush(array $options): self;
 
-    public function getImageIPTC(int $imageId): ?string;
-
     public function getImageEXIF(int $imageId): ?array;
 
     public function getImageResolution(int $imageId): ?array;

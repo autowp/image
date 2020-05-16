@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace AutowpTest\Image;
+namespace AutowpTest;
 
 use Autowp\Image\Storage;
 use ImagickException;
+use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Mvc\Application;
 use PHPUnit\Framework\TestCase;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Mvc\Application;
 
 use function count;
-use function file_exists;
 use function file_get_contents;
 use function filesize;
+use function strlen;
 
 class StorageTest extends TestCase
 {
@@ -78,9 +78,6 @@ class StorageTest extends TestCase
         $this->assertEquals(120, $formatedImage->getHeight());
         $this->assertTrue($formatedImage->getFileSize() > 0);
         $this->assertNotEmpty($formatedImage->getSrc());
-
-        $path = $imageStorage->getFormatedImagePath($imageId, 'test');
-        $this->assertStringContainsString('test', $path);
     }
 
     /**
@@ -119,9 +116,6 @@ class StorageTest extends TestCase
 
         $this->assertNotEmpty($imageId);
 
-        $iptc = $imageStorage->getImageIPTC($imageId);
-        $this->assertNotEmpty($iptc);
-
         $exif = $imageStorage->getImageEXIF($imageId);
         $this->assertNotEmpty($exif);
         $this->assertEquals('Adobe Photoshop CS3 Macintosh', $exif['IFD0']['Software']);
@@ -154,9 +148,8 @@ class StorageTest extends TestCase
 
         $this->assertEquals($crop, $imageStorage->getImageCrop($imageId));
 
-        $filePath = $imageStorage->getImageFilepath($imageId);
-        $this->assertTrue(file_exists($filePath));
-        $this->assertEquals(filesize(self::TEST_IMAGE_FILE2), filesize($filePath));
+        $fileContents = $imageStorage->getImageBlob($imageId);
+        $this->assertEquals(filesize(self::TEST_IMAGE_FILE2), strlen($fileContents));
 
         $formatedImage = $imageStorage->getFormatedImage($imageId, 'picture-gallery');
 
@@ -316,45 +309,6 @@ class StorageTest extends TestCase
         $imageStorage = $this->getImageStorage($app);
 
         $imageStorage->extractAllEXIF('test');
-
-        $this->assertTrue(true);
-    }
-
-    public function testPrintBrokenFiles(): void
-    {
-        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
-
-        $imageStorage = $this->getImageStorage($app);
-
-        $imageStorage->printBrokenFiles();
-
-        $this->assertTrue(true);
-    }
-
-    /**
-     * @throws Storage\Exception
-     */
-    public function testFixBrokenFiles(): void
-    {
-        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
-
-        $imageStorage = $this->getImageStorage($app);
-
-        $imageStorage->fixBrokenFiles();
-
-        $this->assertTrue(true);
-    }
-
-    /**
-     * @throws Storage\Exception
-     */
-    public function testDeleteBrokenFiles(): void
-    {
-        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
-
-        $imageStorage = $this->getImageStorage($app);
-
-        $imageStorage->deleteBrokenFiles('test');
 
         $this->assertTrue(true);
     }

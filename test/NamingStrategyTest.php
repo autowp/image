@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AutowpTest\Image;
+namespace AutowpTest;
 
 use Autowp\Image\Storage\Exception;
 use Autowp\Image\Storage\NamingStrategy\Pattern;

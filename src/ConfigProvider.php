@@ -42,7 +42,7 @@ class ConfigProvider
                 'routes' => [
                     'image-storage'              => [
                         'options' => [
-                            'route'    => 'image-storage (list-broken-files|fix-broken-files|list-dirs):action',
+                            'route'    => 'image-storage (list-dirs):action',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
                             ],
@@ -58,16 +58,7 @@ class ConfigProvider
                     ],
                     'image-storage-image'        => [
                         'options' => [
-                            'route'    => 'image-storage (flush-image|move-to-s3):action <image>',
-                            'defaults' => [
-                                'controller' => Controller\ConsoleController::class,
-                            ],
-                        ],
-                    ],
-                    'image-storage-dir'          => [
-                        'options' => [
-                            'route'    => 'image-storage (delete-broken-files|clear-empty-dirs|move-dir-to-s3):action '
-                                . '<dirname>',
+                            'route'    => 'image-storage (flush-image):action <image>',
                             'defaults' => [
                                 'controller' => Controller\ConsoleController::class,
                             ],
