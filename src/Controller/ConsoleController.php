@@ -10,6 +10,8 @@ use Laminas\Console\ColorInterface;
 use Laminas\Console\Console;
 use Laminas\Mvc\Controller\AbstractActionController;
 
+use function array_keys;
+
 /**
  * @method Storage imageStorage()
  */
@@ -19,7 +21,7 @@ class ConsoleController extends AbstractActionController
     {
         $console = Console::getInstance();
 
-        foreach ($this->imageStorage()->getDirs() as $name => $dir) {
+        foreach (array_keys($this->imageStorage()->getDirs()) as $name) {
             $console->writeLine($name);
         }
     }
