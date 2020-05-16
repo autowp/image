@@ -1254,6 +1254,7 @@ class Storage implements StorageInterface
             'Key'         => $imageRow['filepath'],
             'Body'        => $imagick->getImagesBlob(),
             'Bucket'      => $dir->getBucket(),
+            'ACL'         => 'public-read',
             'ContentType' => $imagick->getImageMimeType(),
         ]);
 
@@ -1297,6 +1298,7 @@ class Storage implements StorageInterface
             'Key'         => $imageRow['filepath'],
             'Body'        => $imagick->getImagesBlob(),
             'Bucket'      => $dir->getBucket(),
+            'ACL'         => 'public-read',
             'ContentType' => $imagick->getImageMimeType(),
         ]);
 
