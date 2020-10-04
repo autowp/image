@@ -332,9 +332,12 @@ class Storage implements StorageInterface
     {
         $result = [];
         if (count($imageIds)) {
-            $result = $this->imageTable->select([
+            $rows = $this->imageTable->select([
                 new Sql\Predicate\In('id', $imageIds),
             ]);
+            foreach ($rows as $row) {
+                $result[] = $row;
+            }
         }
 
         return $result;
