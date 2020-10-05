@@ -8,7 +8,7 @@ use Imagick;
 
 class Negate extends AbstractProcessor
 {
-    public function process(Imagick $imagick)
+    public function process(Imagick $imagick): void
     {
         $imagick->negateImage(true);
     }

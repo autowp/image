@@ -8,5 +8,5 @@ use Imagick;
 
 abstract class AbstractProcessor
 {
-    abstract public function process(Imagick $imagick);
+    abstract public function process(Imagick $imagick): void;
 }

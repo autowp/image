@@ -45,22 +45,25 @@ class Sampler
         $srcHeight = $imagick->getImageHeight();
         $srcRatio  = $srcWidth / $srcHeight;
 
-        $widthLess  = $format->getWidth() && ($srcWidth < $format->getWidth() );
-        $heightLess = $format->getHeight() && ($srcHeight < $format->getHeight());
+        $formatWidth  = (int) $format->getWidth();
+        $formatHeight = (int) $format->getHeight();
+
+        $widthLess  = $formatWidth && ($srcWidth < $formatWidth );
+        $heightLess = $formatHeight && ($srcHeight < $formatHeight);
         $sizeLess   = $widthLess || $heightLess;
 
-        $ratio = $format->getWidth() / $format->getHeight();
+        $ratio = $formatWidth / $formatHeight;
 
         if ($format->isReduceOnly() && $sizeLess) {
             // dont crop
             if (! $heightLess) {
                 // resize by height
-                $scaleHeight = $format->getHeight();
+                $scaleHeight = $formatHeight;
                 $scaleWidth  = (int) round($scaleHeight * $srcRatio);
                 $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             } elseif (! $widthLess) {
                 // resize by width
-                $scaleWidth  = $format->getWidth();
+                $scaleWidth  = $formatWidth;
                 $scaleHeight = (int) round($scaleWidth / $srcRatio);
                 $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             }
@@ -81,7 +84,7 @@ class Sampler
             }
 
             $imagick = $this->crop($imagick, $cropWidth, $cropHeight, $cropLeft, $cropTop);
-            $imagick = $this->scaleImage($imagick, $format->getWidth(), $format->getHeight());
+            $imagick = $this->scaleImage($imagick, $formatWidth, $formatHeight);
         }
 
         return $imagick;
@@ -96,46 +99,49 @@ class Sampler
         $srcHeight = $imagick->getImageHeight();
         $srcRatio  = $srcWidth / $srcHeight;
 
-        $widthLess  = $format->getWidth() && ($srcWidth < $format->getWidth() );
-        $heightLess = $format->getHeight() && ($srcHeight < $format->getHeight());
+        $formatWidth  = (int) $format->getWidth();
+        $formatHeight = (int) $format->getHeight();
+
+        $widthLess  = $formatWidth && ($srcWidth < $formatWidth);
+        $heightLess = $formatHeight && ($srcHeight < $formatHeight);
         $sizeLess   = $widthLess || $heightLess;
 
-        $ratio = $format->getWidth() / $format->getHeight();
+        $ratio = $formatWidth / $formatHeight;
 
         if ($format->isReduceOnly() && $sizeLess) {
             // dont crop
             if (! $heightLess) {
                 // resize by height
-                $scaleHeight = $format->getHeight();
+                $scaleHeight = $formatHeight;
                 $scaleWidth  = (int) round($scaleHeight * $srcRatio);
                 $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             } elseif (! $widthLess) {
                 // resize by width
-                $scaleWidth  = $format->getWidth();
+                $scaleWidth  = $formatWidth;
                 $scaleHeight = (int) round($scaleWidth / $srcRatio);
                 $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             }
         } else {
             if ($ratio < $srcRatio) {
-                $scaleWidth = $format->getWidth();
+                $scaleWidth = $formatWidth;
                 // add top and bottom margins
-                $scaleHeight = (int) round($format->getWidth() / $srcRatio);
+                $scaleHeight = (int) round($formatWidth / $srcRatio);
             } else {
                 // add left and right margins
-                $scaleWidth  = (int) round($format->getHeight() * $srcRatio);
-                $scaleHeight = $format->getHeight();
+                $scaleWidth  = (int) round($formatHeight * $srcRatio);
+                $scaleHeight = $formatHeight;
             }
 
             $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
         }
 
         // extend by bg-space
-        $borderLeft = (int) floor(($format->getWidth() - $imagick->getImageWidth()) / 2);
-        $borderTop  = (int) floor(($format->getHeight() - $imagick->getImageHeight()) / 2);
+        $borderLeft = (int) floor(($formatWidth - $imagick->getImageWidth()) / 2);
+        $borderTop  = (int) floor(($formatHeight - $imagick->getImageHeight()) / 2);
 
         $imagick->extentImage(
-            $format->getWidth(),
-            $format->getHeight(),
+            $formatWidth,
+            $formatHeight,
             -$borderLeft,
             -$borderTop
         );
@@ -152,33 +158,36 @@ class Sampler
         $srcHeight = $imagick->getImageHeight();
         $srcRatio  = $srcWidth / $srcHeight;
 
-        $widthLess  = $format->getWidth() && ($srcWidth < $format->getWidth() );
-        $heightLess = $format->getHeight() && ($srcHeight < $format->getHeight());
+        $formatWidth  = (int) $format->getWidth();
+        $formatHeight = (int) $format->getHeight();
+
+        $widthLess  = $formatWidth && ($srcWidth < $formatWidth);
+        $heightLess = $formatHeight && ($srcHeight < $formatHeight);
         $sizeLess   = $widthLess || $heightLess;
 
-        $ratio = $format->getWidth() / $format->getHeight();
+        $ratio = $formatWidth / $formatHeight;
 
         if ($format->isReduceOnly() && $sizeLess) {
             if (! $heightLess) {
                 // resize by height
-                $scaleHeight = $format->getHeight();
+                $scaleHeight = $formatHeight;
                 $scaleWidth  = (int) round($scaleHeight * $srcRatio);
                 $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             } elseif (! $widthLess) {
                 // resize by width
-                $scaleWidth  = $format->getWidth();
+                $scaleWidth  = $formatWidth;
                 $scaleHeight = (int) round($scaleWidth / $srcRatio);
                 $imagick     = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
             }
         } else {
             // высчитываем размеры обрезания
             if ($ratio < $srcRatio) {
-                $scaleWidth  = $format->getWidth();
-                $scaleHeight = (int) round($format->getWidth() / $srcRatio);
+                $scaleWidth  = $formatWidth;
+                $scaleHeight = (int) round($formatWidth / $srcRatio);
             } else {
                 // добавляем поля по бокам
-                $scaleWidth  = (int) round($format->getHeight() * $srcRatio);
-                $scaleHeight = $format->getHeight();
+                $scaleWidth  = (int) round($formatHeight * $srcRatio);
+                $scaleHeight = $formatHeight;
             }
 
             $imagick = $this->scaleImage($imagick, $scaleWidth, $scaleHeight);
@@ -200,7 +209,7 @@ class Sampler
         if ($format->isReduceOnly() && $widthLess) {
             $scaleWidth = $srcWidth;
         } else {
-            $scaleWidth = $format->getWidth();
+            $scaleWidth = (int) $format->getWidth();
         }
 
         $scaleHeight = (int) round($scaleWidth / $srcRatio);
@@ -221,7 +230,7 @@ class Sampler
         if ($format->isReduceOnly() && $heightLess) {
             $scaleHeight = $srcHeight;
         } else {
-            $scaleHeight = $format->getHeight();
+            $scaleHeight = (int) $format->getHeight();
         }
 
         $scaleWidth = (int) round($scaleHeight * $srcRatio);
@@ -360,7 +369,7 @@ class Sampler
 
         if ($ratioDiff < 0) {
             $dstHeight = (int) round($srcWidth / $highestRatio);
-            $imagick   = $this->crop($imagick, $srcWidth, $dstHeight, 0, ($srcHeight - $dstHeight) / 2);
+            $imagick   = $this->crop($imagick, $srcWidth, $dstHeight, 0, (int) (($srcHeight - $dstHeight) / 2));
         }
 
         return $imagick;
@@ -410,10 +419,10 @@ class Sampler
         }
 
         // check for monotone background extend posibility
-        $fWidth  = $format->getWidth();
-        $fHeight = $format->getHeight();
+        $fWidth  = (int) $format->getWidth();
+        $fHeight = (int) $format->getHeight();
         if ($format->isProportionalCrop() && $fWidth && $fHeight) {
-            $fRatio = $format->getWidth() / $format->getHeight();
+            $fRatio = $fWidth / $fHeight;
             $cRatio = $decomposited->getImageWidth() / $decomposited->getImageHeight();
 
             $ratioDiff = abs($fRatio - $cRatio);
@@ -433,7 +442,7 @@ class Sampler
             $decomposited->setImageBackgroundColor($background);
         }
 
-        if ($format->getWidth() && $format->getHeight()) {
+        if ($fWidth && $fHeight) {
             switch ($format->getFitType()) {
                 case Sampler\Format::FIT_TYPE_INNER:
                     $decomposited = $this->convertByInnerFit($decomposited, $format);
@@ -451,9 +460,9 @@ class Sampler
                     throw new Sampler\Exception("Unexpected FIT_TYPE `{$format->getFitType()}`");
             }
         } else {
-            if ($format->getWidth()) {
+            if ($fWidth) {
                 $decomposited = $this->convertByWidth($decomposited, $format);
-            } elseif ($format->getHeight()) {
+            } elseif ($fHeight) {
                 $decomposited = $this->convertByHeight($decomposited, $format);
             }
         }

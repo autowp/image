@@ -61,7 +61,7 @@ class ConsoleController extends AbstractActionController
     /**
      * @throws Storage\Exception
      */
-    public function extractExifAction()
+    public function extractExifAction(): void
     {
         $dir = (string) $this->params('dirname');
 

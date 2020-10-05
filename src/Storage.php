@@ -463,9 +463,6 @@ class Storage implements StorageInterface
         $cFormat = clone $format;
 
         $sampler = $this->getImageSampler();
-        if (! $sampler) {
-            throw new Storage\Exception("Image sampler not initialized");
-        }
 
         try {
             $this->formatedImageTable->insert([
@@ -727,9 +724,6 @@ class Storage implements StorageInterface
         }
 
         $namingStrategy = $dir->getNamingStrategy();
-        if (! $namingStrategy) {
-            throw new Storage\Exception("Naming strategy not initialized for `$dirName`");
-        }
 
         $options = array_replace([
             'count' => $this->getDirCounter($dirName),
@@ -861,7 +855,7 @@ class Storage implements StorageInterface
             $options,
             $width,
             $height,
-            function ($fileName) use ($dir, $blob, $imagick) {
+            function (string $fileName) use ($dir, $blob, $imagick) {
                 $this->getS3Client()->putObject([
                     'Key'         => $fileName,
                     'Body'        => $blob,
@@ -934,7 +928,7 @@ class Storage implements StorageInterface
             $options,
             $width,
             $height,
-            function ($fileName) use ($dir, $file) {
+            function (string $fileName) use ($dir, $file) {
                 $handle = fopen($file, 'r');
                 $this->getS3Client()->putObject([
                     'Key'         => $fileName,
