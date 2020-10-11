@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="./test/bootstrap.php"
-         colors="true">
-    <testsuites>
-        <testsuite name="autowp/image Test Suite">
-            <directory>./test/</directory>
-        </testsuite>
-    </testsuites>
-
-    <filter>
-        <whitelist addUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src</directory>
-        </whitelist>
-    </filter>
-
-    <php>
-        <ini name="date.timezone" value="UTC"/>
-        <env name="TESTS_AUTOWP_OB_ENABLED" value="false" />
-    </php>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" bootstrap="./test/bootstrap.php" colors="true">
+  <coverage includeUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">./src</directory>
+    </include>
+  </coverage>
+  <testsuites>
+    <testsuite name="autowp/image Test Suite">
+      <directory>./test/</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <ini name="date.timezone" value="UTC"/>
+    <env name="TESTS_AUTOWP_OB_ENABLED" value="false"/>
+  </php>
 </phpunit>

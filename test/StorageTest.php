@@ -321,7 +321,7 @@ class StorageTest extends TestCase
         $imageStorage->setSrcOverride([
             'host'   => 'example.com',
             'port'   => '8888',
-            'scheme' => 'ftp',
+            'scheme' => 'https',
         ]);
 
         $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
@@ -330,6 +330,6 @@ class StorageTest extends TestCase
 
         $image = $imageStorage->getImage($imageId);
 
-        $this->assertStringContainsString('ftp://example.com:8888', $image->getSrc());
+        $this->assertStringContainsString('https://example.com:8888', $image->getSrc());
     }
 }
