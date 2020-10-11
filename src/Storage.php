@@ -308,13 +308,12 @@ class Storage implements StorageInterface
                     break;
             }
         }
-        $uri->setHost('127.0.0.1');
 
         return new Storage\Image([
             'id'       => $imageRow['id'],
             'width'    => $imageRow['width'],
             'height'   => $imageRow['height'],
-            'src'      => $url,
+            'src'      => $uri->toString(),
             'filesize' => $imageRow['filesize'],
         ]);
     }
