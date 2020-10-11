@@ -10,10 +10,10 @@ use Closure;
 use Exception;
 use Imagick;
 use ImagickException;
-use Laminas\Db\Exception\ExceptionInterface;
 use Laminas\Db\ResultSet\ResultSetInterface;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
+use Laminas\Uri\UriFactory;
 
 use function array_replace;
 use function count;
@@ -87,6 +87,8 @@ class Storage implements StorageInterface
 
     private array $s3Options = [];
 
+    private iterable $srcOverride = [];
+
     /**
      * @throws Storage\Exception
      */
@@ -119,6 +121,13 @@ class Storage implements StorageInterface
 
             $this->$method($value);
         }
+
+        return $this;
+    }
+
+    public function setSrcOverride(iterable $value): self
+    {
+        $this->srcOverride = $value;
 
         return $this;
     }
@@ -284,11 +293,28 @@ class Storage implements StorageInterface
             throw new Storage\Exception("Dir '{$imageRow['dir']}' not defined");
         }
 
+        $url = $this->getS3Client()->getObjectUrl($dir->getBucket(), $imageRow['filepath']);
+        $uri = UriFactory::factory($url);
+        foreach ($this->srcOverride as $key => $value) {
+            switch ($key) {
+                case 'host':
+                    $uri->setHost($value);
+                    break;
+                case 'port':
+                    $uri->setPort($value);
+                    break;
+                case 'scheme':
+                    $uri->setScheme($value);
+                    break;
+            }
+        }
+        $uri->setHost('127.0.0.1');
+
         return new Storage\Image([
             'id'       => $imageRow['id'],
             'width'    => $imageRow['width'],
             'height'   => $imageRow['height'],
-            'src'      => $this->getS3Client()->getObjectUrl($dir->getBucket(), $imageRow['filepath']),
+            'src'      => $url,
             'filesize' => $imageRow['filesize'],
         ]);
     }
@@ -471,7 +497,7 @@ class Storage implements StorageInterface
                 'status'            => self::STATUS_PROCESSING,
                 'formated_image_id' => null,
             ]);
-        } catch (ExceptionInterface $e) {
+        } catch (Exception $e) {
             if (! $this->isDuplicateKeyException($e)) {
                 throw $e;
             }

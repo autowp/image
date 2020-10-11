@@ -312,4 +312,24 @@ class StorageTest extends TestCase
 
         $this->assertTrue(true);
     }
+
+    public function testSrcOverride(): void
+    {
+        $app = Application::init(require __DIR__ . '/_files/config/application.config.php');
+
+        $imageStorage = $this->getImageStorage($app);
+        $imageStorage->setSrcOverride([
+            'host'   => 'example.com',
+            'port'   => '8888',
+            'scheme' => 'ftp',
+        ]);
+
+        $imageId = $imageStorage->addImageFromFile(self::TEST_IMAGE_FILE2, 'naming');
+
+        $this->assertNotEmpty($imageId);
+
+        $image = $imageStorage->getImage($imageId);
+
+        $this->assertStringContainsString('ftp://example.com:8888', $image->getSrc());
+    }
 }

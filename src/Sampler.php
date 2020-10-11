@@ -609,7 +609,7 @@ class Sampler
 
     private function extendVertical(Imagick $imagick, Sampler\Format $format): void
     {
-        $fRatio = $format->getWidth() / $format->getHeight();
+        $fRatio = (int) $format->getWidth() / (int) $format->getHeight();
 
         $srcWidth  = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();
@@ -670,7 +670,7 @@ class Sampler
 
     private function extendHorizontal(Imagick $imagick, Sampler\Format $format): void
     {
-        $fRatio = $format->getWidth() / $format->getHeight();
+        $fRatio = (int) $format->getWidth() / (int) $format->getHeight();
 
         $srcWidth  = $imagick->getImageWidth();
         $srcHeight = $imagick->getImageHeight();

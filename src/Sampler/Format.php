@@ -17,43 +17,30 @@ class Format
         FIT_TYPE_OUTER   = 1, // описать
         FIT_TYPE_MAXIMUM = 2;
 
-    /** @var int */
     private int $fitType;
 
-    /** @var int */
     private ?int $width;
 
-    /** @var int */
     private ?int $height;
 
-    /** @var string */
     private ?string $background;
 
-    /** @var bool */
     private bool $ignoreCrop = false;
 
-    /** @var bool */
     private bool $proportionalCrop = false;
 
-    /** @bool */
     private bool $reduceOnly = false;
 
-    /** @var bool */
     private bool $strip = false;
 
-    /** @var int */
     private int $quality = 0;
 
-    /** @var string */
     private string $format = '';
 
-    /** @var float|null */
     private ?float $widest;
 
-    /** @var float|null */
     private ?float $highest;
 
-    /** @var array */
     private array $processors = [];
 
     private const FORMAT_EXT = [
@@ -69,6 +56,7 @@ class Format
      */
     public function __construct(array $options = [])
     {
+        $this->fitType    = self::FIT_TYPE_INNER;
         $this->width      = null;
         $this->height     = null;
         $this->background = null;
