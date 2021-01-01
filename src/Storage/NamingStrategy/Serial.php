@@ -18,7 +18,6 @@ class Serial extends AbstractStrategy
 {
     private const ITEM_PER_DIR = 1000;
 
-    /** @var int */
     private int $deep = 0;
 
     /**

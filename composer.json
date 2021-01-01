@@ -33,7 +33,8 @@
         "phpmd/phpmd" : "^2.8",
         "laminas/laminas-coding-standard": "^2.0.0rc1",
         "laminas/laminas-test": "^3.4",
-        "vimeo/psalm": "^3.16"
+        "vimeo/psalm": "^4.3.2",
+        "phpstan/phpstan": "^0.12.64"
     },
     "autoload-dev": {
         "psr-4": {

@@ -10,6 +10,8 @@ use Closure;
 use Exception;
 use Imagick;
 use ImagickException;
+use JsonException;
+use Laminas\Db\ResultSet\ResultSet;
 use Laminas\Db\ResultSet\ResultSetInterface;
 use Laminas\Db\Sql;
 use Laminas\Db\TableGateway\TableGateway;
@@ -343,17 +345,16 @@ class Storage implements StorageInterface
      */
     private function getImageRow(int $imageId)
     {
-        $imageRow = $this->imageTable->select([
+        /** @var ResultSet $resultSet */
+        $resultSet = $this->imageTable->select([
             'id' => $imageId,
-        ])->current();
+        ]);
+        $imageRow  = $resultSet->current();
 
         return $imageRow ? $imageRow : null;
     }
 
-    /**
-     * @return array|ArrayObject
-     */
-    private function getImageRows(array $imageIds)
+    private function getImageRows(array $imageIds): array
     {
         $result = [];
         if (count($imageIds)) {
@@ -456,9 +457,11 @@ class Storage implements StorageInterface
     private function doFormatImage(int $imageId, string $formatName): int
     {
         // find source image
-        $imageRow = $this->imageTable->select([
+        /** @var ResultSet $resultSet */
+        $resultSet = $this->imageTable->select([
             'id' => $imageId,
-        ])->current();
+        ]);
+        $imageRow  = $resultSet->current();
         if (! $imageRow) {
             throw new Storage\Exception("Image '$imageId' not defined");
         }
@@ -505,10 +508,12 @@ class Storage implements StorageInterface
             $done             = false;
             $formatedImageRow = null;
             for ($i = 0; $i < self::TIMEOUT && ! $done; $i++) {
-                $formatedImageRow = $this->formatedImageTable->select([
+                /** @var ResultSet $resultSet */
+                $resultSet        = $this->formatedImageTable->select([
                     'format'   => $formatName,
                     'image_id' => $imageId,
-                ])->current();
+                ]);
+                $formatedImageRow = $resultSet->current();
 
                 $done = (int) $formatedImageRow['status'] !== self::STATUS_PROCESSING;
 
@@ -634,10 +639,11 @@ class Storage implements StorageInterface
 
             if (! $destImageRow) {
                 $formatedImageId = $this->doFormatImage($imageId, $formatName);
-                // result
-                $destImageRow = $this->imageTable->select([
+                /** @var ResultSet $resultSet */
+                $resultSet    = $this->imageTable->select([
                     'id' => $formatedImageId,
-                ])->current();
+                ]);
+                $destImageRow = $resultSet->current();
             }
 
             $result[$key] = $destImageRow;
@@ -703,9 +709,12 @@ class Storage implements StorageInterface
      */
     public function removeImage(int $imageId): StorageInterface
     {
-        $imageRow = $this->imageTable->select([
+        /** @var ResultSet $resultSet */
+        $resultSet = $this->imageTable->select([
             'id' => $imageId,
-        ])->current();
+        ]);
+
+        $imageRow = $resultSet->current();
 
         if (! $imageRow) {
             throw new Storage\Exception("Image '$imageId' not found");
@@ -895,9 +904,6 @@ class Storage implements StorageInterface
         $exif     = $this->extractEXIF($id);
         if ($exif) {
             $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
-            if ($exif === false) {
-                throw new Storage\Exception("Failed to encode exif");
-            }
         }
 
         $this->imageTable->update([
@@ -969,9 +975,6 @@ class Storage implements StorageInterface
         $exif = $this->extractEXIF($id);
         if ($exif) {
             $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
-            if ($exif === false) {
-                throw new Storage\Exception("Failed to encode exif");
-            }
         }
 
         $this->imageTable->update([
@@ -1032,7 +1035,10 @@ class Storage implements StorageInterface
             ->columns(['count'])
             ->where(['dir' => $dirName]);
 
-        $row = $this->dirTable->selectWith($select)->current();
+        /** @var ResultSet $resultSet */
+        $resultSet = $this->dirTable->selectWith($select);
+
+        $row = $resultSet->current();
 
         if (! $row) {
             return 0;
@@ -1043,9 +1049,11 @@ class Storage implements StorageInterface
 
     private function incDirCounter(string $dirName): self
     {
-        $row = $this->dirTable->select([
+        /** @var ResultSet $resultSet */
+        $resultSet = $this->dirTable->select([
             'dir' => $dirName,
-        ])->current();
+        ]);
+        $row       = $resultSet->current();
 
         if ($row) {
             $this->dirTable->update([
@@ -1076,7 +1084,7 @@ class Storage implements StorageInterface
 
         $exif = json_decode($imageRow['exif'], true, 512, JSON_THROW_ON_ERROR);
 
-        if ($exif === false) {
+        if (! $exif) {
             return null;
         }
 
@@ -1412,6 +1420,7 @@ class Storage implements StorageInterface
 
     /**
      * @throws Storage\Exception
+     * @throws JsonException
      */
     public function extractAllEXIF(string $dir): void
     {
@@ -1428,9 +1437,6 @@ class Storage implements StorageInterface
             $exif = $this->extractEXIF($row['id']);
             if ($exif) {
                 $exif = json_encode($exif, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
-                if ($exif === false) {
-                    throw new Storage\Exception("Failed to encode exif");
-                }
             }
 
             $this->imageTable->update([

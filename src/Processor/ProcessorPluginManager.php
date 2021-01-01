@@ -28,9 +28,7 @@ class ProcessorPluginManager extends AbstractPluginManager
      */
     protected $sharedByDefault = false;
 
-    /**
-     * {inheritDoc}
-     */
+    /** @var null|string */
     protected $instanceOf = AbstractProcessor::class;
 
     /**
@@ -44,8 +42,7 @@ class ProcessorPluginManager extends AbstractPluginManager
      */
     public function validate($instance)
     {
-        if ($instance instanceof $this->instanceOf) {
-            // we're okay
+        if (empty($this->instanceOf) || $instance instanceof $this->instanceOf) {
             return;
         }
 

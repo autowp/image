@@ -1,0 +1,7 @@
+parameters:
+    level: 5
+    parallel:
+        processTimeout: 300.0
+        maximumNumberOfProcesses: 2
+    paths:
+        - src

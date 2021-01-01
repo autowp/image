@@ -9,7 +9,6 @@ use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class ImageStorage extends AbstractPlugin
 {
-    /** @var Image\StorageInterface */
     private Image\StorageInterface $imageStorage;
 
     public function __construct(Image\StorageInterface $imageStorage)

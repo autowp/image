@@ -260,7 +260,7 @@ class Format
 
     public function setIgnoreCrop(bool $value): self
     {
-        $this->ignoreCrop = (bool) $value;
+        $this->ignoreCrop = $value;
 
         return $this;
     }
@@ -282,7 +282,7 @@ class Format
 
     public function setProportionalCrop(bool $value): self
     {
-        $this->proportionalCrop = (bool) $value;
+        $this->proportionalCrop = $value;
 
         return $this;
     }

@@ -9,7 +9,6 @@ use Laminas\View\Helper\AbstractHelper;
 
 class ImageStorage extends AbstractHelper
 {
-    /** @var Image\Storage */
     private Image\Storage $imageStorage;
 
     public function __construct(Image\Storage $imageStorage)

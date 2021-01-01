@@ -8,19 +8,14 @@ use function array_replace;
 
 class Image
 {
-    /** @var int */
     private int $id;
 
-    /** @var int */
     private int $width;
 
-    /** @var int */
     private int $height;
 
-    /** @var int */
     private int $filesize;
 
-    /** @var string */
     private string $src;
 
     public function __construct(array $options)
