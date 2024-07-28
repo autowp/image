@@ -19,7 +19,7 @@ install:
   - pear config-set preferred_state beta || travis_terminate 1;
   - pecl channel-update pecl.php.net || travis_terminate 1;
   - yes | pecl install imagick || travis_terminate 1;
-  
+
 before_script: 
   - composer install --no-progress --no-interaction --no-suggest --ignore-platform-reqs || travis_terminate 1;
   - mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql || travis_terminate 1;
